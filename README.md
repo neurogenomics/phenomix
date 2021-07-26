@@ -1,11 +1,11 @@
-<img src='./inst/figures/phenomix.png' height='400'><br>
+<img src='./inst/hex/phenomix.png' height='400'><br>
 ================
-<h5>
+<h4>
 Author: <i>Brian M. Schilder</i>
-</h5>
-<h5>
+</h4>
+<h4>
 Most recent update: <i>Jul-26-2021</i>
-</h5>
+</h4>
 
 ## R package for the exploration and analysis of many genotype-phenotype datasets at once.
 

@@ -13,6 +13,16 @@
 #' @importFrom data.table rbindlist
 #' @importFrom dplyr mutate %>% 
 #' @importFrom stats p.adjust 
+#' @examples 
+#' ### DeGAs loadings
+#' data("DEGAS_contributionGene")
+#' xmat <- DEGAS_contributionGene@feature.loadings
+#' xmat <- xmat[,1:10] # Let's use just 10 components as an example
+#' 
+#' ### Celltype Dataset
+#' data("ctd_BlueLake2018_FrontalCortexOnly")
+#' ymat <- ctd_BlueLake2018_FrontalCortexOnly[[1]]$specificity
+#' res_lm <- iterate_lm(xmat = xmat, ymat = ymat)
 iterate_lm <- function(xmat, 
                        ymat,
                        correction_method="BH",
