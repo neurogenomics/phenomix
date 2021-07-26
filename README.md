@@ -9,7 +9,7 @@ Most recent update: <i>Jul-26-2021</i>
 
 ## R package for the exploration and analysis of many genotype-phenotype datasets at once.
 
-### [Vignette: Celltype enrichment](https://neurogenomics.github.io/phenomix/vignettes/celltype_enrichment.html)
+### [Vignette: Celltype enrichment](https://neurogenomics.github.io/phenomix/articles/celltype_enrichment.html)
 
 # Session Info
 
