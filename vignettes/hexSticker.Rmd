@@ -29,8 +29,8 @@ You can make awesome hex stickers for your R packages using [hexSticker](https:/
 
 Subplot image from [Geneshot_ontologies](https://github.com/bschilder/Geneshot_ontologies) project.
 
-```{r}   
-img1 <- "../images/geneshot.UMAP.layer2.pdf"
+```{r, eval=F}   
+img1 <- "inst/images/geneshot.UMAP.layer2.pdf"
 # img2 <- "../images/phoenix_pixel.png"
 
 sticker(subplot = img1, package="phenomix", p_size=20, s_x=1, s_y=.7,  s_width = .8,
