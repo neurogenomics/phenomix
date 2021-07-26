@@ -1,4 +1,4 @@
-phenomix
+<img src='./inst/figures/phenomix.png' height='400'><br>
 ================
 <h5>
 Author: <i>Brian M. Schilder</i>
