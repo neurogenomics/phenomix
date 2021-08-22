@@ -9,17 +9,18 @@ An object of class \code{list} of length 2.
 }
 \source{
 \href{ https://pubmed.ncbi.nlm.nih.gov/29227469/}{Publication}
+
+\href{https://www.nature.com/articles/s41467-019-11953-9}{Publication}
+
+\code{
+ctd_BlueLake2018_FrontalCortexOnly <- readRDS("/Desktop/model_celltype_conservation/processed_data/EWCE/standardized_CTD/BlueLake2018_FrontalCortexOnly.rds")
+usethis::use_data(ctd_BlueLake2018_FrontalCortexOnly, overwrite = TRUE)
+}
 }
 \usage{
 ctd_BlueLake2018_FrontalCortexOnly
 }
 \description{
 CellTypeDataset: ctd_BlueLake2018_FrontalCortexOnly
-}
-\examples{
-\dontrun{
-ctd_BlueLake2018_FrontalCortexOnly <- readRDS("/Desktop/model_celltype_conservation/processed_data/EWCE/standardized_CTD/BlueLake2018_FrontalCortexOnly.rds")
-usethis::use_data(ctd_BlueLake2018_FrontalCortexOnly, overwrite = TRUE)
-} 
 }
 \keyword{datasets}

@@ -1,0 +1,349 @@
+---
+title: "OpenGWAS"
+author: "Brian M. Schilder"
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    self_contained: yes
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    code_folding: show
+    df_print: paged
+csl: nature.csl
+vignette: >
+    %\VignetteIndexEntry{OpenGWAS} 
+    %\usepackage[utf8]{inputenc}
+    %\VignetteEngine{knitr::rmarkdown}  
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r style, echo=FALSE, results='asis', message=FALSE}
+BiocStyle::markdown()
+knitr::opts_chunk$set(tidy = FALSE, message  = FALSE)
+```
+
+```{r setup, include=TRUE}
+#### To install the dev branch of MAGMA.Celltyping, use:
+# remotes::install_github("NathanSkene/MAGMA_Celltyping@bschilder_dev")
+
+# devtools::install_github("neurogenomics/MungeSumstats")
+library(phenomix)
+library(MAGMA.Celltyping)
+library(MungeSumstats)
+
+library(ggplot2)
+library(dplyr)
+
+save_dir <- "/Volumes/bms20/projects/neurogenomics-lab/live/GWAS_sumstats/OpenGWAS"
+storage_dir <- "/Desktop/model_celltype_conservation/raw_data/MAGMA" 
+```
+
+# Munge sum stats
+
+## Find sum stats
+
+```{r} 
+metagwas <- MungeSumstats::find_sumstats(traits = c("Alzheimer","Parkinson",
+                                                    "amyotrophic","dementia"))
+knitr::kable(metagwas)
+```
+
+## Import sum stats
+
+```{r}
+gwas <- MungeSumstats::import_sumstats(ids = metagwas$id, 
+                                       save_dir = save_dir, 
+                                       nThread = 10, 
+                                       parallel_across_ids = FALSE,
+                                       force_new = FALSE) 
+```
+
+## Create metadata file
+
+```{r}
+#### Collected munged G#WAS ####
+munged_files <- list.files(save_dir,".tsv.gz", full.names = TRUE)
+munged_ids <- gsub(".tsv.gz","",basename(munged_files))
+names(munged_files) <- munged_ids
+#### Search OpenGWAS for thei IDs ####
+metagwas_all <- MungeSumstats::find_sumstats(ids = munged_ids) 
+#### Add munged GWAS path into metadata ####
+metagwas_all$path <- munged_files[metagwas_all$id] 
+```
+
+### Check genome builds
+
+`MungeSumstats` automatically keeps log files in the `tempdir()`. But if you restart your R session mid-way, they'll be erased.
+
+Instead, infer the genome build here.
+
+```{r} 
+builds <- infer_genome_builds(munged_files = munged_files) 
+metagwas_all$build_inferred <- unlist(builds) 
+```
+
+### Filter metadata
+
+Must have sample size.
+
+```{r}
+metagwas_all <- metagwas_all %>% 
+  dplyr::mutate(N = ifelse(is.na(sample_size), sum(ncase, ncontrol, na.rm = TRUE), sample_size))
+metagwas_all <- subset(metagwas_all, !is.na(N))
+```
+
+
+## Save metadata
+
+```{r} 
+metagwas_all <- data.frame(metagwas_all) %>%
+  `rownames<-`(gsub("-|[:]|[.]","_",metagwas_all$id))
+
+utils::write.csv(metagwas_all, file.path(save_dir,"OpenGWAS_metadata.csv"))
+```
+
+
+
+
+
+
+
+
+
+# Map SNPs to genes
+
+## MAGMA
+
+### Read metadata
+
+```{r}
+metagwas_all <- read.csv(file.path(save_dir,"OpenGWAS_metadata.csv"), row.names = 1)
+
+metagwas_all$trait_group <- stringr::str_extract(tolower(metagwas_all$trait),
+                                                 "(alzheimer)|(parkinson)|(amyotrophic)|(frontotemporal dementia)|(dementia)")
+metagwas_all[is.na(metagwas_all$trait_group),"trait_group"] <- "other"
+
+```
+
+### Genome reference
+
+```{r Prepare genome reference, attr.output='style="max-height: 400px;"'}
+get_genome_ref <- function(storage_dir=tempdir(),
+                           nCores=1,
+                           verbose=TRUE,
+                           ...){ 
+  
+  #### Set up paths ###
+  genome_ref_dir = file.path(storage_dir,"g1000_eur")
+  genome_ref_path = sprintf("%s/g1000_eur",genome_ref_dir) 
+  ##### Link to 1000 genomes reference data. ####
+  input_url <- "https://ctg.cncr.nl/software/MAGMA/ref_data/g1000_eur.zip"
+  destfile <- sprintf("%s.zip",genome_ref_dir)
+  #### Check if the genome ref is already available ####
+  if(file.exists(sprintf("%s/g1000_eur.bed",genome_ref_dir))){
+    messager("Using existing genome_ref found in storage_dir.",
+             v=verbose)
+  }else {
+      #### Download anew ####
+      messager("genome_ref not found in storage_dir.\n",
+               "Downloading from remote server instead ==>",
+               genome_ref_dir, v=verbose)
+      #### Use downloader since it suppports multi-threaded downloads ####
+      MungeSumstats:::downloader(input_url = input_url, 
+                                 destfile = destfile, 
+                                 nThread = nCores,
+                                 ...) 
+      unzip(sprintf("%s.zip",genome_ref_dir),
+            exdir=genome_ref_dir)
+      file.remove(sprintf("%s.zip",genome_ref_dir))
+  } 
+  return(genome_ref_path)
+}
+
+genome_ref_path <- get_genome_ref(storage_dir = storage_dir)
+```
+ 
+### Map SNPs 
+
+```{r}
+magma_files <- parallel::mclapply(seq(1,nrow(metagwas_all)),
+                                  function(i){
+  MAGMA.Celltyping:::message_parallel("----- ", metagwas_all$id[i]," -----")
+  MAGMA.Celltyping::map.snps.to.genes(path_formatted = metagwas_all$path[i],
+                                      genome_build = metagwas_all$build_inferred[i],
+                                      upstream_kb = 35,  
+                                      downstream_kb = 10,
+                                      N = metagwas_all$N[i],
+                                      genome_ref_path = genome_ref_path,
+                                      force_new = FALSE)
+}, mc.cores = 10) %>% `names<-`(metagwas_all$id)
+```
+
+
+### Construct gene x trait matrix
+
+Can construct gene x trait matrix from gene-level MAGMA results across multiple GWAS traits.
+
+```{r}
+magma_matrix <- phenomix:: gene_trait_matrix(magma_files = magma_files,
+                                            metric = "ADJ_ZSTAT", 
+                                            save_path = file.path(save_dir,"OpenGWAS_neurodegenGWAS_ADJZSTAT.rds"),
+                                            mc.cores = 10)
+# magma_matrix <- readRDS(file.path(save_dir,"OpenGWAS_neurodegenGWAS_ADJZSTAT.rds"))
+```
+
+
+## ABC
+
+ABC method requires hg19 at the moment.
+
+```{r}
+metagwas <- subset(metagwas_all, build_inferred=="GRCH37")
+```
+
+
+```{r}
+# preload file to make faster 
+abc <- phenomix::import_abc(dataset = "Nasser2020")
+
+{ 
+  start <- Sys.time()
+  abc_hits <- parallel::mclapply(seq(1,nrow(metagwas)),
+                                 function(i){
+    phenomix:::message_parallel("Mapping: ",metagwas$id[i])
+    tryCatch(expr = {
+      map_snps2genes(sumstats_file = metagwas$path[i],
+                             method = "abc",
+                             abc = abc) 
+    }, error = function(x){x})
+  }, mc.cores = 1) %>% `names<-`(metagwas$id)
+  phenomix:::report_time(start)
+}
+
+saveRDS(abc_hits,"/Desktop/abc_hits.rds")
+abc_hits <- readRDS("/Desktop/abc_hits.rds")
+
+metric <- "ZSTAT"
+abc_matrix <- parallel::mclapply(names(abc_hits), 
+                                 function(x){  
+  # data.table::setnames(dat, "SYMBOL","GENE")
+  phenomix:::message_parallel(x)
+  dat <- abc_hits[[x]]
+  dat <- na.omit(dat,"ZSTAT")
+  data.table::setkey(dat, "GENE") 
+  data.table::setnames(dat, old = metric, new = x)
+  return(dat[,c("GENE",..x)])
+  # if(nrow(dat)>0){
+  #   return( dat[,c("GENE",..x)])
+  # } else {return(NULL)}
+  # return( dat[,c("GENE","ZSTAT")])
+},  mc.cores = 1) %>%
+  # plyr::compact() %>%
+  base::Reduce(f = function(x,y){merge(x,y,all.x=TRUE,all.y=TRUE)})
+
+
+abc_gene_counts <- unlist(lapply(abc_hits,nrow))
+magma_genes_counts <- Matrix::colSums(magma_matrix>0)
+```
+
+
+
+
+
+
+# Variance partition
+
+Use a linear mixed model to determine how much each metadata attribute affects each GWAS.
+
+```{r}
+#### Run ####
+varPart <- phenomix::run_variancePartition(obj = magma_matrix, 
+                                           metadata = metagwas_all, 
+                                           is_opengwas = TRUE)
+#### Plot ####
+varPlots <- phenomix::plot_variancePartition(varPart = varPart)
+
+
+```
+
+
+# Reduce dimensions
+
+
+## PCA
+
+```{r}
+#### Run ####
+pca <- phenomix::run_pca(mat = magma_matrix)
+#### Plot ####
+gg_pca <- plot_reduction(obj = pca, 
+                         metadata = metagwas_all, 
+                         color_var = "trait_group",
+                         label_var = "trait",
+                         size_var = "N")
+##### Find top loaded genes per PC ####
+top_genes <- get_top_features(pca)
+##### Find top factors for a given set of phenotypes ####
+top_factors <- get_top_factors(obj=pca,
+                               metadata = metagwas_all,
+                               term = "parkinson") 
+#### Run GSEA of PCs ####
+gres <- run_gprofiler(obj = pca)
+```
+
+
+### Sparse SVD
+
+```{r}
+#### Run ####
+ssvd <- phenomix::run_sparsesvd(mat = magma_matrix)
+#### Plot ####
+gg_ssvd <- plot_reduction(obj = ssvd,
+                          metadata = metagwas_all,
+                          color_var = "trait_group", 
+                          label_var = "trait",
+                          size_var = "N") 
+
+#### Get top loaded genes per PC ####
+top_genes <- get_top_features(obj = ssvd)
+##### Find top factors for a given set of phenotypes ####
+top_factors <- get_top_factors(obj=ssvd,
+                               metadata = metagwas_all,
+                               term = "parkinson") 
+#### Run GSEA of PCs ####
+gres <- run_gprofiler(obj = ssvd)
+```
+
+
+### UMAP
+
+```{r}
+#### Run ####
+umap <- phenomix::run_umap(mat = magma_matrix) 
+#### Plot ####
+gg_umap <- plot_reduction(obj = umap,
+                          metadata = metagwas_all,
+                          color_var = "trait_group", 
+                          label_var = "trait",
+                          size_var = "N")
+#### Get top loaded genes per PC #### 
+top_genes <- get_top_features(umap)
+#### Run GSEA of PCs ####
+gres <- run_gprofiler(obj = umap)
+```
+
+
+
+
+# Session Info
+
+<details>
+
+```{r}
+utils::sessionInfo()
+```
+
+</details>

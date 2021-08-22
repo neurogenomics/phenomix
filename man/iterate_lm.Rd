@@ -31,8 +31,8 @@ Iterate linear regression across all traits and celltypes
 }
 \examples{
 ### DeGAs loadings
-data("DEGAS_contributionGene")
-xmat <- DEGAS_contributionGene@feature.loadings
+data("DEGAS_seurat")
+xmat <- DEGAS_seurat@reductions$contributionGene@feature.loadings
 xmat <- xmat[,1:10] # Let's use just 10 components as an example
 
 ### Celltype Dataset
