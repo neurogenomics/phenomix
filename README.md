@@ -1,10 +1,10 @@
-<img src='./inst/hex/phenomix.png' height='400'><br>
+<img src='https://github.com/neurogenomics/phenomix/blob/main/inst/hex/phenomix.png?raw=true' height='400'><br>
 ================
 <h4>
 Author: <i>Brian M. Schilder</i>
 </h4>
 <h4>
-Most recent update: <i>Jul-26-2021</i>
+Most recent update: <i>Sep-08-2021</i>
 </h4>
 
 ## R package for the exploration and analysis of many genotype-phenotype datasets at once.
@@ -39,8 +39,8 @@ utils::sessionInfo()
     ## 
     ## loaded via a namespace (and not attached):
     ##  [1] compiler_4.1.0    magrittr_2.0.1    tools_4.1.0       htmltools_0.5.1.1
-    ##  [5] yaml_2.2.1        stringi_1.7.3     rmarkdown_2.9     knitr_1.33       
-    ##  [9] stringr_1.4.0     xfun_0.24         digest_0.6.27     rlang_0.4.11     
+    ##  [5] yaml_2.2.1        stringi_1.7.4     rmarkdown_2.10    knitr_1.33       
+    ##  [9] stringr_1.4.0     xfun_0.25         digest_0.6.27     rlang_0.4.11     
     ## [13] evaluate_0.14
 
 </details>

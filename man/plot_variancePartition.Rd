@@ -15,7 +15,7 @@ plot_variancePartition(
 )
 }
 \arguments{
-\item{varPart}{\link[variancePartition]{fitExtractVarPartModel} 
+\item{varPart}{\link[variancePartition]{fitExtractVarPartModel}
 output.}
 
 \item{plot_PercentBars}{Add  \link[variancePartition]{plotPercentBars}.}
@@ -30,6 +30,6 @@ output.}
 \link[patchwork]{wrap_plots}.}
 }
 \description{
-Plot \link[variancePartition]{fitExtractVarPartModel} 
+Plot \link[variancePartition]{fitExtractVarPartModel}
 output.
 }

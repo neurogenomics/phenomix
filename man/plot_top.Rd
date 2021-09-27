@@ -36,7 +36,7 @@ plot_top(
 ggplot object
 }
 \description{
-Plot the top factors for a given set of phenotypes, 
+Plot the top factors for a given set of phenotypes,
 OR plot the top features for a given set of factors.
 }
 \keyword{internal}

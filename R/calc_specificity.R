@@ -1,7 +1,6 @@
 ### From EWCE::generate_celltype_data()
-calc_specificity <- function(X){
-    normalised_meanExp <- t(t(X) * (1/colSums(X)))
-    spec <- normalised_meanExp/(apply(normalised_meanExp, 1, sum) + 1e-12)
+calc_specificity <- function(X) {
+    normalised_meanExp <- t(t(X) * (1 / colSums(X)))
+    spec <- normalised_meanExp / (apply(normalised_meanExp, 1, sum) + 1e-12)
     return(spec)
 }
-

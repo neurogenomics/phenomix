@@ -14,7 +14,7 @@ extract_embeddings(obj, reduction = NULL, verbose = TRUE)
 \item{\code{Seurat}}
 }}
 
-\item{reduction}{Which reduction to extract from. 
+\item{reduction}{Which reduction to extract from.
 Only used if \code{obj} is of class \code{Seurat}.}
 
 \item{verbose}{Print messages.}

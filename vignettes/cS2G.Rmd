@@ -1,0 +1,171 @@
+---
+title: "cS2G"
+author: "<h4>Author: <i>Brian M. Schilder</i></h4>" 
+date: "<h4>Most recent update: <i>`r format( Sys.Date(), '%b-%d-%Y')`</i></h4>"
+output:
+  BiocStyle::html_document:
+    self_contained: yes
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    code_folding: show
+    df_print: paged
+vignette: >
+    %\VignetteIndexEntry{cS2G} 
+    %\usepackage[utf8]{inputenc}
+    %\VignetteEngine{knitr::rmarkdown} 
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = T, fig.width = 7, fig.height = 5)
+```
+
+```{r setup, include=TRUE, message=FALSE} 
+library(phenomix)
+
+library(dplyr)
+library(ggplot2)
+set.seed(2020)
+```
+
+# cS2G-mapped UK Biobank
+
+## Import data
+
+47 UKB traits that have been fine-mapped and 
+
+```{r}
+ukb_cs2g <- phenomix::get_cs2g_ukb(value.var = "cS2G")
+ukb_pip <- phenomix::get_cs2g_ukb(value.var = "PIP")
+```
+
+## Decompose
+
+### UMAP
+
+```{r, fig.height=7, fig.width=8}
+umap <- phenomix::run_umap(mat = ukb_cs2g$data)
+
+gg_umap <- phenomix::plot_reduction(obj = umap, 
+                                    metadata = ukb_cs2g$metadata, 
+                                    size_var = "N_GENE", 
+                                    color_var = "GROUP",
+                                    label_var = "TRAIT") 
+```
+
+
+### MOFA2
+
+Integrate the cS2G and PIP scores with MOFA2.
+
+## Run MOFA2
+
+*Note*: We've set `maxiter=10` for fast demonstration purposes only. The recommended default is `1000`.
+
+```{r}
+model <- phenomix::run_mofa2(mat_list = list(cS2G=ukb_cs2g$data, 
+                                             PIP=ukb_pip$data), 
+                   metadata = ukb_cs2g$metadata,
+                   metadata_idcol = "DISEASE.TRAIT", 
+                   ### Set  low maxiter for demo 
+                   maxiter = 10)
+MOFA2::plot_data_overview(model)
+```
+
+### Evaluate model 
+
+```{r}
+head(model@cache$variance_explained$r2_total[[1]]) # group 1
+head(model@cache$variance_explained$r2_per_factor[[1]]) # group 1
+
+MOFA2::plot_variance_explained(model, x="view", y="factor")
+
+MOFA2::plot_factor(model, 
+  factor = 1:3,
+  color_by = "GROUP"
+)
+
+MOFA2::plot_factors(model, 
+  factors = 1:3,
+  color_by = "GROUP"
+)
+
+MOFA2::plot_weights(model,
+  view = "PIP",
+  factor = 1,
+  nfeatures = 10,     # Number of features to highlight
+  scale = T,          # Scale weights from -1 to 1
+  abs = F             # Take the absolute value?
+)
+
+MOFA2::plot_top_weights(model,
+  view = "PIP",
+  factor = 1,
+  nfeatures = 10
+)
+
+MOFA2::plot_data_heatmap(model,
+  view = "PIP",         # view of interest
+  factor = 1,             # factor of interest
+  features = 20,          # number of features to plot (they are selected by weight)
+  
+  # extra arguments that are passed to the `pheatmap` function
+  cluster_rows = TRUE, cluster_cols = FALSE,
+  show_rownames = TRUE, show_colnames = FALSE
+)
+```
+
+### Plot MOFA2 UMAP
+
+Run UMAP on the MOFA factors and visualize.
+
+```{r} 
+MOFA2::plot_dimred(object = model,
+                   method = "UMAP", 
+                   color_by = "GROUP")
+```
+
+
+# cS2G-mapped GWAS Catalog
+
+The larger GWAS Catalog dataset is also provided by `phenomix`. 
+
+```{r, eval=FALSE}
+gwascatalog <- get_cs2g_gwascatalog()
+```
+
+## Run MOFA2
+
+*Note*: We've set `maxiter=10` for fast demonstration purposes only. The recommended default is `1000`.
+
+```{r, eval=FALSE}
+model <- phenomix::run_mofa2(mat_list = list(GWAScatalog=gwascatalog$data), 
+                   metadata = gwascatalog$metadata,
+                   metadata_idcol = "ID", 
+                   ### Set  low maxiter for demo
+                   maxiter = 10) 
+```
+
+### Plot MOFA2 UMAP
+
+Run UMAP on the MOFA factors and visualize.
+
+```{r, eval=FALSE}
+MOFA2::plot_dimred(object = model,
+                   method = "UMAP", # TSNE 
+                   color_by = "N_GENE")
+```
+
+# Session Info 
+
+<details> 
+
+```{r Session Info}
+utils::sessionInfo()
+```
+
+</details>  
+

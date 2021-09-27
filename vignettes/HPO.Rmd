@@ -1,0 +1,95 @@
+---
+title: "HPO"
+author: "<h4>Author: <i>Brian M. Schilder</i></h4>" 
+date: "<h4>Most recent update: <i>`r format( Sys.Date(), '%b-%d-%Y')`</i></h4>"
+output:
+  BiocStyle::html_document:
+    self_contained: yes
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    code_folding: show
+    df_print: paged
+vignette: >
+    %\VignetteIndexEntry{HPO} 
+    %\usepackage[utf8]{inputenc}
+    %\VignetteEngine{knitr::rmarkdown} 
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r style, echo=FALSE, results='asis', message=FALSE}
+BiocStyle::markdown()
+knitr::opts_chunk$set(tidy = FALSE, message  = FALSE)
+```
+
+```{r setup, include=TRUE, message=FALSE} 
+library(phenomix)
+
+library(dplyr)
+library(ggplot2)
+```
+
+Analyze gene associations for 9k+ traits in the Human Phenotype Ontology (HPO). 
+
+# Import data
+
+```{r}
+obj_hpo <- phenomix::get_HPO() 
+```
+
+# Plot UMAP
+
+```{r}
+gg_umap <- phenomix::plot_reduction(obj = obj_hpo, 
+                                    reduction = "umap", 
+                                    color_var = "group_depth2")
+```
+
+
+# TF-IDF
+
+```{r}
+tfidf_hpo <- scNLP::plot_tfidf(object = obj_hpo, 
+                               terms_per_cluster = 2,
+                               size_var = "n_genes",
+                               color_var = "group_depth3",
+                               point_palette = unname(c(pals::alphabet(),
+                                                        pals::alphabet2(),
+                                                        pals::glasbey())),
+                               label_var = "description")
+ggplot2::ggsave(filename = file.path("/Desktop/phenome_decomposition",
+                                     "processed_data/HPO/HPO_UMAP_scNLP.png"),
+                plot = tfidf_hpo$plot,
+                height = 7,
+                width = 10) 
+```
+
+
+# MOFA2
+
+```{r}
+obj_hpo <- Seurat::FindVariableFeatures(obj_hpo, 
+                                        assay="specificity",
+                                        nfeatures=2000)
+obj_hpo <- Seurat::ScaleData(obj_hpo, assay="specificity")
+model_obj <- phenomix::run_mofa2(obj = obj_hpo, 
+                                 assay = "specificity")
+obj_hpo <- model_obj$obj
+
+gg_mofa <- phenomix::plot_reduction(obj = obj_hpo, 
+                                    reduction = "mofa2")
+```
+
+
+
+# Session Info 
+
+<details> 
+
+```{r Session Info}
+utils::sessionInfo()
+```
+
+</details>  

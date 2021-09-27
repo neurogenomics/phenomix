@@ -19,6 +19,6 @@ Queries \code{biomaRt} for \code{gene_attributes} and then regresses them out of
 }
 \examples{
 library(MAGMA.Celltyping)
-xmat <- MAGMA.Celltyping::ctd_DRONC_human[[1]]$mean_exp[1:100,]
-adjusted_df <- regress_gene_info(xmat) 
+xmat <- MAGMA.Celltyping::ctd_DRONC_human[[1]]$mean_exp[1:100, ]
+adjusted_df <- regress_gene_info(xmat)
 }

@@ -1,0 +1,313 @@
+---
+title: "GWAS_Atlas"
+author: "<h4>Author: <i>Brian M. Schilder</i></h4>" 
+date: "<h4>Most recent update: <i>`r format( Sys.Date(), '%b-%d-%Y')`</i></h4>"
+output:
+  BiocStyle::html_document:
+    self_contained: yes
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    code_folding: show
+    df_print: paged
+vignette: >
+    %\VignetteIndexEntry{GWAS_Atlas} 
+    %\usepackage[utf8]{inputenc}
+    %\VignetteEngine{knitr::rmarkdown} 
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r style, echo=FALSE, results='asis', message=FALSE}
+BiocStyle::markdown()
+knitr::opts_chunk$set(tidy = FALSE, message  = FALSE)
+```
+
+```{r setup, include=TRUE, message=FALSE} 
+library(phenomix)
+
+library(dplyr)
+library(ggplot2)
+```
+
+
+# Import data
+
+## GWAS Atlas
+
+```{r}
+# dat <- phenomix::get_GWAS_Atlas()
+obj <- readRDS(file.path("/Desktop/phenome_decomposition/raw_data",
+                         "GWAS_Atlas/GWAS_Atlas_all.seurat.rds"))
+knitr::kable(head(obj@meta.data))
+```
+
+## HPO
+
+```{r}
+obj_hpo <- phenomix::get_HPO()
+obj_hpo <- SeuratObject::RenameAssays(obj_hpo, MAGMA = "RNA")
+obj_hpo$source <- "HPO"
+```
+
+## Merge
+
+*NOTE*: Requires a lot of memory and cannot be run on a standard laptop.
+
+```{r, eval=FALSE}
+obj_merge <- merge(obj, obj_hpo)
+obj_merge <- scNLP::seurat_pipeline(seurat_obj = obj_merge,
+                                    add_specificity = TRUE)
+```
+
+
+## UMAP: Domains
+
+```{r}
+gg_umap <- phenomix::plot_reduction(obj = obj, 
+                                    reduction = "umap", 
+                                    color_var = "Domain", 
+                                    size_var = "N")
+```
+
+
+## UMAP: TF-IDF
+
+```{r}
+tfidf_res <- scNLP::plot_tfidf(object = obj, 
+                               reduction = "umap", 
+                               label_var = "Trait", size_var = NULL,
+                               terms_per_cluster = 2) 
+```
+
+## UMAP: merged
+
+
+```{r}
+gg_merged <- gg_umap + tfidf_res$plot + patchwork::plot_layout(ncol = 1)
+print(gg_merged)
+
+ggplot2::ggsave(filename = "/Desktop/phenome_decomposition/processed_data/GWAS_Atlas/UMAP_merged.pdf", 
+                plot = gg_merged, 
+                height = 14, 
+                width = 10)
+```
+
+# MOFA2
+
+```{r}
+# obj <- Seurat::FindVariableFeatures(obj, nfeatures = 10000)
+model_obj <-  phenomix::run_mofa2(obj = obj,  
+                                  # groups = "Domain",
+                                  assay = "MAGMA")
+
+obj <- model_obj$obj
+```
+
+## Plot MOFA2 
+
+### MOFA2 
+
+```{r}
+gg_mofa2 <- phenomix::plot_reduction(obj = obj, 
+                                     color_var = "Domain",
+                                     reduction = "mofa2")
+```
+
+
+### UMAP
+
+```{r}
+gg_mofa2umap <- phenomix::plot_reduction(obj = obj, 
+                                         color_var = "Domain",
+                                         reduction = "mofa2umap")
+print(gg_mofa2umap)
+```
+
+
+
+# Enrichment tests
+
+```{r}
+xmat <- phenomix::extract_loadings(obj = obj, 
+                                   reduction = "pca")
+```
+
+
+## DescartesHuman
+
+Characterise each factor with the DescartesHuman scRNA-seq CellTypeDataset
+
+```{r}
+#### Preprare data #### 
+ctd <- readRDS(file.path("/Desktop/model_celltype_conservation/processed_data",
+                         "EWCE/standardized_CTD/DescartesHuman.rds"))
+ymat <- ctd[[2]]$specificity
+#### Run tests #####
+res <- phenomix::iterate_lm(xmat = xmat,
+                            ymat = ymat)
+res_sig <- subset(res, qvalue<.05)
+data.table::fwrite(res, "/Desktop/phenome_decomposition/processed_data/GWAS_Atlas/PCA_celltypes.csv.gz")
+```
+
+### Plot enrichment 
+
+```{r}
+plot_enrichment <- function(res, 
+                            qvalue_thresh=.05,
+                            top_n=50,
+                            show_plot=TRUE){ 
+  res_sig <- subset(res, qvalue<.05) %>% 
+    # dplyr::group_by(trait) %>%
+    # dplyr::slice_min(order_by = pvalue, n = top_n) %>%
+    dplyr::mutate(negLogP = -log10(pvalue)) %>%
+    tidyr::separate(col = "term", 
+                    sep = "[.]",
+                    into = c("tissue","celltype"),
+                    remove = FALSE)
+  
+  plot_dat <- subset(res_sig, trait=="PC_4") %>% dplyr::arrange(desc(pvalue))
+  plot_dat$term <- factor(plot_dat$term, levels = plot_dat$term, ordered = TRUE)
+  
+  gg_bar <- ggplot(plot_dat,
+                   aes(y=term, x=-log10(pvalue), 
+                       fill=-log10(pvalue))) +
+    geom_bar(stat = "identity") +
+    facet_wrap(facets = trait ~.,
+               scales = "free_x") +
+    theme_bw() 
+  
+  ggplot2::ggsave(filename = "/Desktop/phenome_decomposition/processed_data/GWAS_Atlas/PC4_enrichment.pdf", 
+                  plot = gg_bar, width = 7, height = 4)
+  
+   dmat <- data.table::data.table(res_sig) %>% 
+    data.table::dcast.data.table(formula = term ~ trait,
+                                 value.var = "negLogP",  
+                                 fun.aggregate = mean, 
+                                 fill = 0) %>%
+    tibble::column_to_rownames("term") %>%
+    as.matrix()
+  row_side_colors <- data.frame(stringr::str_split(rownames(dmat),"[.]",
+                                                   simplify = TRUE)) %>%
+    `colnames<-`(c("Tissue","Celltype"))
+  # save_path <- file.path("/Desktop/phenome_decomposition/processed_data",
+  #                        "GWAS_Atlas/GWASatlas_DescartHuman.enrich.pdf")
+  gg_heat <- heatmaply::heatmaply(x = dmat,  
+                                  row_side_colors = list(Tissue=row_side_colors$Tissue),
+                                  fontsize_row=6)
+  
+  # gplots::heatmap.2(dmat)
+  
+  
+  if(show_plot) print(gg_bar)
+  return(gg_bar)
+}
+```
+
+
+
+## HPO 
+
+Characterise each factor with the Human Phenotype Ontology.
+
+```{r}
+top_phenos <- phenomix::get_top_phenotypes(obj = obj_hpo, 
+                                           n_phenotypes = 10,
+                                           show_plot = FALSE)
+obj_hpo_sub <- subset(obj_hpo, (HPO_id %in% top_phenos$phenotype) & n_genes>4)
+# obj_hpo_sub <- subset(obj_hpo, depth>=max(depth-1, na.rm = TRUE))
+ymat <- obj_hpo@assays$RNA@counts
+
+
+res_hpo <- phenomix::iterate_gsea(xmat = xmat[,4:5],
+                                  ymat = ymat)
+res_hpo <- merge(res_hpo, obj_hpo_sub@meta.data,
+                 by.x = "term", by.y = "HPO_id")
+res_hpo_sig <- subset(res_hpo, qvalue<.05)
+knitr::kable(res_hpo_sig)
+
+res_hpo_PC4 <- subset(res_hpo, trait=="PC_4" & depth>10)%>% dplyr::arrange(pvalue)
+# data.table::fwrite(res_hpo_PC4[,c("term","trait",
+#                                   "HPO_label","group_depth2","depth","pvalue")],
+#                    "/Desktop/GWASatlas_HPO.enrich.csv")
+```
+
+
+
+
+# Parkinson's 
+
+## Get top
+
+```{r}
+top_factors <- phenomix::get_top_factors(obj = obj, 
+                                         reduction = "pca", 
+                                         term = "parkinson", 
+                                         search_col = "Trait")
+top_features <- phenomix:: get_top_features(obj = obj, 
+                                           reduction = "pca",
+                                           n_features = 5,
+                                           factors = names(top_factors))
+top_phenos <- phenomix::get_top_phenotypes(obj = obj, 
+                                           reduction = "pca", 
+                                           n_phenotypes = 10, 
+                                           show_plot = FALSE)
+top_phenos_table <- subset(top_phenos, factor %in% names(top_factors))[,c("Trait",
+                                                                          "factor",
+                                                      "loading",
+                                                      "seurat_clusters",
+                                                      "SubchapterLevel")]
+data.table::fwrite(top_phenos_table, "/Desktop/top_phenos_table.csv")
+
+
+
+gprof <- run_gprofiler(obj = obj,
+                                  reduction = "pca",
+                                 n_features = 100,
+                                 factors = 4)
+
+```
+
+## Find markers
+
+```{r}
+dat$PD <- grepl("parkinson",dat$Trait, ignore.case = TRUE)
+
+dat <- Seurat::SetIdent(dat, value="PD")
+PD_markers <- Seurat::FindMarkers(object = dat, ident.1=TRUE)
+data.table::fwrite(PD_markers,
+                   "/Desktop/phenome_decomposition/processed_data/GWAS_Atlas/PD_markers.csv.gz")
+```
+
+
+
+# Trait-trait similarity
+
+```{r}
+mat <- WGCNA::cor(obj@assays$MAGMA@data)
+mat <-  as(as(mat,"sparseMatrix"),"Graph")
+obj@graphs$MAGMA_cor <- mat
+
+obj <- phenomix::compute_cor(obj = obj, 
+                             assay = "MAGMA")
+knn <- phenomix::find_neighbors(obj = obj, 
+                                graph_name = "MAGMA_cor",
+                                var1_search = "alzheimer", 
+                                label_col = "Trait")
+gg_cor <- phenomix:: plot_trait_cor(knn = knn, 
+                                   top_n = 10)
+
+knitr::kable(head(knn))
+```
+
+# Session Info 
+
+<details> 
+
+```{r Session Info}
+utils::sessionInfo()
+```
+
+</details>  
+

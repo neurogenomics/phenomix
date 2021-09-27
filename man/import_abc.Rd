@@ -21,7 +21,7 @@ import_abc(dataset = "Nasser2020", abc = NULL, nCores = 1, verbose = TRUE)
 \code{gene_hits} \link[data.table]{data.table}
 }
 \description{
-Import Activity-By-Contact (ABC) model predictions 
+Import Activity-By-Contact (ABC) model predictions
 from multiple publications.
 }
 \section{References}{

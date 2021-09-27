@@ -9,6 +9,7 @@ map_snps2genes(
   method = c("abc", "txdb"),
   dataset = "Nasser2020",
   abc = NULL,
+  adjust_z = TRUE,
   drop_MHC = TRUE,
   model = NULL,
   log_vars = c("NSNPS", "NPARAM", "GENELEN"),
@@ -20,7 +21,7 @@ map_snps2genes(
 )
 }
 \arguments{
-\item{sumstats_file}{GWAS summary statistics munged by 
+\item{sumstats_file}{GWAS summary statistics munged by
 \link[MungeSumstats]{format_sumstats}.
 Can be a path to the saved file or \link[data.table]{data.table}.}
 
@@ -30,10 +31,13 @@ Can be a path to the saved file or \link[data.table]{data.table}.}
 
 \item{abc}{Use a previously downloaded ABC \link[data.table]{data.table}.}
 
-\item{drop_MHC}{Drop genes from the MHC 
+\item{adjust_z}{Whether to adjust Z-statistic using
+the \code{model} and \code{formula}.}
+
+\item{drop_MHC}{Drop genes from the MHC
 (Major Histocompatibility Complex) region.}
 
-\item{model}{Statistical model to use. 
+\item{model}{Statistical model to use.
 Defaults to \link[stats]{lm}.}
 
 \item{log_vars}{Variables to perform natural log transformation on first.
@@ -57,7 +61,7 @@ using different methods.
 \section{Other packages worth exploring}{
 
 \href{https://github.com/thewonlab/H-MAGMA}{H-MAGMA}
-Really hard to use with no docs on how to create new annot files. 
+Really hard to use with no docs on how to create new annot files.
 It's literally just MAGMA (when you provide some extra args).
 
 \href{https://www.rdocumentation.org/packages/PAGWAS/versions/2.0/topics/snps.to.genes}{PAGWAS}

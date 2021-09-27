@@ -1,6 +1,6 @@
 
 
-add_noise <- function(data) { 
+add_noise <- function(data) {
     if (is.vector(data)) {
         noise <- runif(length(data), -0.00001, 0.00001)
         noisified <- data + noise

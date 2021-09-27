@@ -14,7 +14,7 @@ map_snps2genes_abc(
 )
 }
 \arguments{
-\item{sumstats}{GWAS summary statistics munged by 
+\item{sumstats}{GWAS summary statistics munged by
 \link[MungeSumstats]{format_sumstats}.}
 
 \item{ref_genome}{name of the reference genome used for the GWAS ("GRCh37" or
@@ -29,7 +29,7 @@ reference genome from the data.}
 
 \item{verbose}{Print messages.}
 
-\item{sumstats_file}{GWAS summary statistics munged by 
+\item{sumstats_file}{GWAS summary statistics munged by
 \link[MungeSumstats]{format_sumstats}.
 Can be a path to the saved file or \link[data.table]{data.table}.}
 

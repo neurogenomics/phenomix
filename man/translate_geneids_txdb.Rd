@@ -21,7 +21,7 @@ translate_geneids_txdb(
 \item{verbose}{Print messages.}
 }
 \description{
-Translate \code{GENEID} from 
+Translate \code{GENEID} from
 \link[TxDb.Hsapiens.UCSC.hg19.knownGene]{TxDb.Hsapiens.UCSC.hg19.knownGene}
 or
 \link[TxDb.Hsapiens.UCSC.hg38.knownGene]{TxDb.Hsapiens.UCSC.hg38.knownGene}

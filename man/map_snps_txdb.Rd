@@ -17,7 +17,7 @@ map_snps_txdb(
 )
 }
 \arguments{
-\item{sumstats}{GWAS summary statistics munged by 
+\item{sumstats}{GWAS summary statistics munged by
 \link[MungeSumstats]{format_sumstats}.}
 
 \item{promoter_upstream}{How many basepairs upstream of known promoters
@@ -42,14 +42,14 @@ reference genome from the data.}
 \code{hits} \link[data.table]{data.table}
 }
 \description{
-Map both coding and non-coding SNPs to genes using 
+Map both coding and non-coding SNPs to genes using
 #' \link[TxDb.Hsapiens.UCSC.hg19.knownGene]{TxDb.Hsapiens.UCSC.hg19.knownGene}
 or
 \link[TxDb.Hsapiens.UCSC.hg38.knownGene]{TxDb.Hsapiens.UCSC.hg38.knownGene}
 as a reference.
 }
 \details{
-Permits selection of different region types with 
+Permits selection of different region types with
 \code{queries} argument.
 }
 \keyword{internal}

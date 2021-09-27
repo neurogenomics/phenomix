@@ -21,19 +21,19 @@ get_mhc_genes(
 "GRCh38"). Argument is case-insensitive. Default is NULL which infers the
 reference genome from the data.}
 
-\item{force_new}{Query for all genes within \code{seqnames} using 
+\item{force_new}{Query for all genes within \code{seqnames} using
 \link[TxDb.Hsapiens.UCSC.hg19.knownGene]{TxDb.Hsapiens.UCSC.hg19.knownGene}
 or
 \link[TxDb.Hsapiens.UCSC.hg38.knownGene]{TxDb.Hsapiens.UCSC.hg38.knownGene}
 as a reference.
-If \code{FALSE} \code{(DEFAULT)}, will instead 
-return a stored \link[data.table]{data.table} 
+If \code{FALSE} \code{(DEFAULT)}, will instead
+return a stored \link[data.table]{data.table}
 aligned to the "GRCh37" reference genome.}
 
 \item{verbose}{Print messages.}
 }
 \description{
-Retrieve genes from the MHC 
+Retrieve genes from the MHC
 (Major Histocompatibility Complex) region.
 }
 \details{
@@ -42,5 +42,5 @@ so removing it allows us to focus on non-MHC signals of interest.
 For further information related to the MHC region, see the sources below.
 }
 \examples{
- MHC_genes <- get_mhc_genes()
+MHC_genes <- get_mhc_genes()
 }

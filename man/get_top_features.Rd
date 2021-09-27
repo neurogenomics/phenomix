@@ -11,18 +11,14 @@ get_top_features(
   n_features_plot = 20,
   factors = seq(1, 10),
   invert_vars = FALSE,
+  fill = "factor",
   show_plot = TRUE,
   title = NULL,
-  return_melted = FALSE,
   verbose = TRUE
 )
 }
 \arguments{
-\item{obj}{\pkg{Seurat} object or dimensionality reduction object.}
-
-\item{reduction}{Which reduction to extract from. 
-Defaults to first available reduction. 
-Only used if \code{obj} is of class \code{Seurat}.}
+\item{reduction}{Reduction to use. If \code{NULL}, defaults to first available reduction.}
 
 \item{n_features}{Number of top features per factor to select.}
 
@@ -32,11 +28,13 @@ Only used if \code{obj} is of class \code{Seurat}.}
 
 \item{invert_vars}{Switch the axes of factors and loadings in plot.}
 
+\item{fill}{fill variable.}
+
 \item{show_plot}{Whether to print the plot or simply return it.}
 
 \item{title}{Plot title.}
 
-\item{verbose}{Print messages.}
+\item{seurat}{\pkg{Seurat} object.}
 }
 \value{
 top_features \code{data.table}
@@ -46,5 +44,5 @@ Plot the top feature loadings for from a given reduction.
 }
 \examples{
 data("DEGAS_seurat")
-top_features <- get_top_features(obj=DEGAS_seurat)
+top_features <- get_top_features(seurat = DEGAS_seurat)
 }

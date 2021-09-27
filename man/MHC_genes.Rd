@@ -9,7 +9,7 @@ An object of class \code{data.table} (inherits from \code{data.frame}) with 805 
 }
 \source{
 \href{https://www.nature.com/articles/s41467-019-11953-9}{DeGAs}
- 
+
 \code{
 MHC_genes <- get_mhc_genes()
 usethis::use_data(MHC_genes, overwrite = TRUE)
@@ -19,7 +19,7 @@ usethis::use_data(MHC_genes, overwrite = TRUE)
 MHC_genes
 }
 \description{
-Retrieve genes from the MHC 
+Retrieve genes from the MHC
 (Major Histocompatibility Complex) region.
 }
 \details{

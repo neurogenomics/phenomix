@@ -18,13 +18,13 @@ adjust_zstat_txdb(
 \item{dat}{\code{data.table}
 produced by \link[phenomix]{map_snps2genes_txdb}.}
 
-\item{drop_MHC}{Drop genes from the MHC 
+\item{drop_MHC}{Drop genes from the MHC
 (Major Histocompatibility Complex) region.}
 
 \item{method}{correction method, a \code{\link{character}} string.
     Can be abbreviated.}
 
-\item{model}{Statistical model to use. 
+\item{model}{Statistical model to use.
 Defaults to \link[stats]{lm}.}
 
 \item{formula}{Formula to use in \code{model}.}
@@ -38,6 +38,6 @@ Defaults to \link[stats]{lm}.}
 Adjust the GWAS Z-statistic for confounders like gene length.
 }
 \details{
-Used when you want to directly analyse the gene-level 
+Used when you want to directly analyse the gene-level
 Z-scores corrected for gene length,  etc.
 }

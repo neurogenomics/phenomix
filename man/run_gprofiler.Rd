@@ -8,21 +8,20 @@ run_gprofiler(
   obj,
   n_features = 3,
   factors = seq(1, 4),
+  reduction = NULL,
   show_plot = TRUE,
   verbose = TRUE,
   ...
 )
 }
 \arguments{
-\item{obj}{\pkg{Seurat} object or dimensionality reduction object.}
-
 \item{n_features}{Number of top features per factor to select.}
 
 \item{factors}{Which factors to run gprofiler on.}
 
-\item{show_plot}{Whether to print the plot or simply return it.}
+\item{reduction}{Reduction to use. If \code{NULL}, defaults to first available reduction.}
 
-\item{verbose}{Print messages.}
+\item{show_plot}{Whether to print the plot or simply return it.}
 
 \item{...}{Additional arguments passed to \link[gprofiler2]{gost}.}
 }

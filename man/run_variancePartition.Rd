@@ -20,20 +20,20 @@ run_variancePartition(
 
 \item{metadata}{\link[data.frame]{data.frame} containing metadata
 to use in \code{form}. If \code{obj} is a \pkg{Seurat} object,
-this can be left \code{NULL} and metadata 
+this can be left \code{NULL} and metadata
 will be extracted automatically.}
 
 \item{nCores}{Number of cores to use in parallel.}
 
 \item{is_opengwas}{Whether the data comes from
- \href{https://gwas.mrcieu.ac.uk/}{OpenGWAS}. 
-If \code{TRUE}, a predefined formula and metadata 
+ \href{https://gwas.mrcieu.ac.uk/}{OpenGWAS}.
+If \code{TRUE}, a predefined formula and metadata
 processing procedure will be used.}
 
-\item{...}{Additional arguments passed to 
+\item{...}{Additional arguments passed to
 \link[variancePartition]{fitExtractVarPartModel}.}
 }
 \description{
-Run \link[variancePartition]{fitExtractVarPartModel} 
+Run \link[variancePartition]{fitExtractVarPartModel}
 to evaluate the effect of each metadata variable on your data.
 }

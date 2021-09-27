@@ -27,12 +27,12 @@ with the columns "BETA", "P","SE", and \code{agg_var}.}
 \item{verbose}{Print messages.}
 }
 \value{
-\link[data.table]{data.table} with 
-mean and standard deviation of "BETA", "P", and "SE", as well as 
+\link[data.table]{data.table} with
+mean and standard deviation of "BETA", "P", and "SE", as well as
 number of rows and number of unique SNPs per grouping level.
 }
 \description{
-Efficiently aggregate GWAS/QTL summary statistics 
+Efficiently aggregate GWAS/QTL summary statistics
 according to some grouping column (e.g."GENEID").
 }
 \details{

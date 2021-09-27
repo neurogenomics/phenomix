@@ -19,10 +19,10 @@ get_top_factors(
 \arguments{
 \item{obj}{\pkg{Seurat} object or dimensionality reduction object.}
 
-\item{metadata}{Phenotype metadata. 
+\item{metadata}{Phenotype metadata.
 Not needed if \code{obj} is a \pkg{Seurat} object.}
 
-\item{reduction}{Which reduction to extract from. 
+\item{reduction}{Which reduction to extract from.
 Only used if \code{obj} is of class \code{Seurat}.}
 
 \item{term}{Term with which to perform substring search of observations.}
@@ -46,7 +46,9 @@ Then get the factors with the highest mean loading for the matching features.
 }
 \examples{
 data("DEGAS_seurat")
-top_factors <- get_top_factors(obj=DEGAS_seurat,
-                               term = "parkinson",
-                               select_quantiles=8:10)
+top_factors <- get_top_factors(
+    obj = DEGAS_seurat,
+    term = "parkinson",
+    select_quantiles = 8:10
+)
 }

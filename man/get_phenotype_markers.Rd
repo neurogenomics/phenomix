@@ -31,6 +31,6 @@ get_phenotype_markers(
 }
 \description{
 Identify marker features for a set of phenotypes
-by taking the intersection between 
+by taking the intersection between
 the top \code{n_features} in two assays.
 }

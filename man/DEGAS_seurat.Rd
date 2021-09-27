@@ -13,7 +13,7 @@ An object of class \code{Seurat} with 30084 rows and 2138 columns.
 \href{https://www.nature.com/articles/s41467-019-11953-9}{Publication}
 
 \code{
-#### Embeddings/loadings 
+#### Embeddings/loadings
 DEGAS_contributionGene <- readRDS("/Desktop/phenome_decomposition/raw_data/DEGAS/contributionGene.rds")
 
 #### Metadata
@@ -24,8 +24,8 @@ rownames(DEGAS_metadata) <- DEGAS_metadata$label_phe_code
 
 empty_mat <- Matrix::sparseMatrix(i = nrow(DEGAS_contributionGene@feature.loadings),
                                   j = nrow(DEGAS_contributionGene@cell.embeddings),
-                                  dimnames = list(rownames(DEGAS_contributionGene@feature.loadings), 
-                                                  rownames(DEGAS_contributionGene@cell.embeddings) 
+                                  dimnames = list(rownames(DEGAS_contributionGene@feature.loadings),
+                                                  rownames(DEGAS_contributionGene@cell.embeddings)
                                   )
 )
 DEGAS_seurat <- Seurat::CreateSeuratObject(counts = empty_mat, assay = "genes", meta.data = DEGAS_metadata)
@@ -41,7 +41,7 @@ Contains embeddings/loadings for contributionGene,
 as well as phenotype metadata.
 }
 \details{
-\bold{NOTE:} The assay data is intentionally filled with 
+\bold{NOTE:} The assay data is intentionally filled with
 an empty sparse matrix due to size limits.
 }
 \keyword{datasets}

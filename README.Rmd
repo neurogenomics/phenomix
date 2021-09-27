@@ -1,5 +1,5 @@
 ---
-title: "<img src='./inst/hex/phenomix.png' height='400'><br>" 
+title: "<img src='https://github.com/neurogenomics/phenomix/blob/main/inst/hex/phenomix.png?raw=true' height='400'><br>" 
 author: "<h4>Author: <i>Brian M. Schilder</i></h4>" 
 date: "<h4>Most recent update: <i>`r format( Sys.Date(), '%b-%d-%Y')`</i></h4>"
 output:
@@ -8,8 +8,8 @@ editor_options:
   chunk_output_type: inline
 ---
 
-```{r setup, include=F}
-knitr::opts_chunk$set(echo = T)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R package for the exploration and analysis of many genotype-phenotype datasets at once.

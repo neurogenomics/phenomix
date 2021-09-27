@@ -2,17 +2,26 @@
 title: "celltype_enrichment"
 author: "<h4>Author: <i>Brian M. Schilder</i></h4>" 
 date: "<h4>Most recent update: <i>`r format( Sys.Date(), '%b-%d-%Y')`</i></h4>"
-output: rmarkdown::html_vignette
-editor_options: 
-  chunk_output_type: inline
+output:
+  BiocStyle::html_document:
+    self_contained: yes
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    code_folding: show
+    df_print: paged
 vignette: >
-  %\VignetteIndexEntry{celltype_enrichment}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{celltype_enrichment} 
+    %\usepackage[utf8]{inputenc}
+    %\VignetteEngine{knitr::rmarkdown} 
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(echo = T, fig.width = 7, fig.height = 5)
+```{r style, echo=FALSE, results='asis', message=FALSE}
+BiocStyle::markdown()
+knitr::opts_chunk$set(tidy = FALSE, message  = FALSE)
 ```
 
 ```{r setup, include=TRUE, message=FALSE} 
@@ -27,8 +36,8 @@ library(ggplot2)
 
 ```{r}
 ### DeGAs loadings 
-data("DEGAS_contributionGene")
-xmat <- DEGAS_contributionGene@feature.loadings
+data("DEGAS_seurat")
+xmat <- phenomix::extract_loadings(obj = DEGAS_seurat)
 xmat <- xmat[,1:10] # Let's use just 10 components as an example
 
 ### Celltype Dataset
@@ -41,19 +50,19 @@ ymat <- ctd_BlueLake2018_FrontalCortexOnly[[1]]$specificity
 ## Linear regression 
 
 ```{r}  
-res_lm <- iterate_lm(xmat = xmat, 
-                     ymat = ymat) 
+res_lm <- phenomix::iterate_lm(xmat = xmat, 
+                               ymat = ymat) 
 ```
 
 ### Results 
 
 ```{r}
-create_DT(subset(res_lm, qvalue<.05))
+phenomix:::create_DT(subset(res_lm, qvalue<.05))
 ```
 
 ### Plot 
 
-```{r}
+```{r, fig.width=7, fig.height=5}
 ## Only plot the top 20 significant results
 data_lm <- subset(res_lm, qvalue<.05) %>%
   dplyr::slice_min(qvalue, n = 20) %>%
@@ -72,31 +81,34 @@ ggplot(data_lm, aes(x=trait, y=-log10(qvalue), fill=term)) +
 ## Gene set enrichment analysis 
 
 ```{r}
-res_gsea <- iterate_gsea(xmat = xmat, 
-                         ymat = ymat) 
+res_gsea <- phenomix::iterate_gsea(xmat = xmat, 
+                                   ymat = ymat) 
 ```
 
 
 ### Results 
 
-```{r, eval=F}
-create_DT(subset(res_gsea, qvalue<.05))
+```{r}
+phenomix:::create_DT(subset(res_gsea, qvalue<.05))
 ```
 
 ### Plot 
 
-```{r, eval=F}
+THere are no signfiicant results to plot
+
+```{r, eval=FALSE}
 ## Only plot the top 20 significant results
 data_gsea <- subset(res_gsea, qvalue<.05) %>%
   dplyr::slice_min(qvalue, n = 20) %>%
   dplyr::arrange(term, qvalue)
-
-ggplot(data_gsea, aes(x=trait, y=-log10(qvalue), fill=term)) +
+if(nrow(data_gsea)>0){
+  ggplot(data_gsea, aes(x=trait, y=-log10(qvalue), fill=term)) +
   geom_bar(stat = "identity") +
   facet_grid(facets = gsub("_","\n",term) ~.) +
   labs(x="celltype", title="GSEA results") + 
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust=1)) 
+  theme(axis.text.x = element_text(angle = 45, hjust=1))  
+} 
 ```
 
  
