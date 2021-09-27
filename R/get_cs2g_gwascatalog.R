@@ -32,32 +32,35 @@ get_cs2g_gwascatalog <- function(URL = file.path(
                                  as_matrix = TRUE,
                                  nThread = 1,
                                  verbose = TRUE) {
-    dat <- data.table::fread(URL, nThread = nThread) 
+    dat <- data.table::fread(URL, nThread = nThread)
     #### Assign unique trait IDs to differentiate them after truncation ####
-    dat[,trait_id:=.GRP, by=.(DISEASE.TRAIT,PUBMEDID)]
+    dat[, trait_id := .GRP, by = .(DISEASE.TRAIT, PUBMEDID)]
     #### Remove non-ASCI characters ####
     dat[, ID :=
-            paste(
-                stringr::str_trunc(
-                    iconv(
-                        paste(
-                            gsub(" ", "-", DISEASE.TRAIT),
-                            PUBMEDID, sep = "_"
-                            ),
-                        "latin1", "ASCII", sub=""
-                        ), 
-                width = 40), # MOFA2 doesn't let you have IDs > 50 characters
-                trait_id, sep="_"
-            )
-        ]
-   
-    
-    metadata <- dat[, .( 
+        paste(
+            stringr::str_trunc(
+                iconv(
+                    paste(
+                        gsub(" ", "-", DISEASE.TRAIT),
+                        PUBMEDID,
+                        sep = "_"
+                    ),
+                    "latin1", "ASCII",
+                    sub = ""
+                ),
+                width = 40
+            ), # MOFA2 doesn't let you have IDs > 50 characters
+            trait_id,
+            sep = "_"
+        )]
+
+
+    metadata <- dat[, .(
         N_SNP = data.table::uniqueN(SNP),
         N_GENE = data.table::uniqueN(gene),
         cS2G_mean = mean(cS2G)
     ),
-    by = c("ID","DISEASE.TRAIT","PUBMEDID")
+    by = c("ID", "DISEASE.TRAIT", "PUBMEDID")
     ]
     metadata <- data.frame(metadata, row.names = metadata$ID)
 

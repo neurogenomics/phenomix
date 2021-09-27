@@ -17,7 +17,7 @@
 #'
 #' @return \code{dat} with the new column "ADJ_ZSTAT".
 #'
-#' @export
+#' @keywords internal
 #' @importFrom stats lm p.adjust
 #' @importFrom data.table setkey
 adjust_zstat_txdb <- function(dat,

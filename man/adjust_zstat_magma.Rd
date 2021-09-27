@@ -38,3 +38,4 @@ Adjust MAGMA Z-statistic from \emph{.genes.out} files
 Used when you want to directly analyse the gene-level
 Z-scores corrected for gene length,  etc.
 }
+\keyword{internal}

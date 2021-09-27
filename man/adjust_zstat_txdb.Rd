@@ -41,3 +41,4 @@ Adjust the GWAS Z-statistic for confounders like gene length.
 Used when you want to directly analyse the gene-level
 Z-scores corrected for gene length,  etc.
 }
+\keyword{internal}

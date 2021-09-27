@@ -21,7 +21,7 @@ get_top_features <- function(obj,
                              reduction = NULL,
                              n_features = 3,
                              n_features_plot = 20,
-                             factors = seq(1,10),
+                             factors = seq(1, 10),
                              invert_vars = FALSE,
                              fill = "factor",
                              show_plot = TRUE,
@@ -48,9 +48,11 @@ get_top_features <- function(obj,
             fill = fill,
             title = title
         )
-    }else {
+    } else {
         gp <- NULL
     }
-    return( list(data=top_features,
-                 plot=gp))
+    return(list(
+        data = top_features,
+        plot = gp
+    ))
 }

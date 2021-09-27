@@ -14,9 +14,9 @@
 #'
 #' @importFrom Matrix t
 #' @importFrom MASS lda
-#' 
-#' @examples 
-#' mat <- as.matrix(iris[,seq(1,4)])
+#'
+#' @examples
+#' mat <- as.matrix(iris[, seq(1, 4)])
 #' grouping <- iris$Species
 #' @export
 run_lda <- function(mat,
@@ -28,8 +28,10 @@ run_lda <- function(mat,
                     ...) {
     if (transpose) {
         mat <- Matrix::t(mat)
-    } 
-    lda_res <- MASS::lda(x = mat,
-                         grouping = grouping)
+    }
+    lda_res <- MASS::lda(
+        x = mat,
+        grouping = grouping
+    )
     return(lda_res)
 }

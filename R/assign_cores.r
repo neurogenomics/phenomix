@@ -1,11 +1,10 @@
-
 #' Assign cores
 #'
 #' Automatically infer the number of available cores and
 #'  allocate the majority of them to parallel processing.
 #'  Reserves a small proportion of cores to avoid slowing or crashing.
 #'
-#' @export
+#' @keywords internal
 #' @importFrom DelayedArray setAutoBPPARAM
 #' @importFrom BiocParallel MulticoreParam
 #' @importFrom parallel detectCores

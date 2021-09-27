@@ -34,15 +34,20 @@ library(ggplot2)
 
 # Import data
 
-```{r}
-### DeGAs loadings 
-data("DEGAS_seurat")
-xmat <- phenomix::extract_loadings(obj = DEGAS_seurat)
-xmat <- xmat[,1:10] # Let's use just 10 components as an example
 
-### Celltype Dataset
-data("ctd_BlueLake2018_FrontalCortexOnly")
-ymat <- ctd_BlueLake2018_FrontalCortexOnly[[1]]$specificity
+## DeGAs loadings 
+
+```{r}
+degas <- phenomix::get_DEGAS()
+xmat <- phenomix::extract_loadings(obj = degas)
+xmat <- xmat[,1:10] # Let's use just 10 components as an example
+```
+
+## Celltype Dataset
+
+```{r}
+ctd <- phenomix::get_BlueLake2018_FrontalCortexOnly()
+ymat <- ctd[[1]]$specificity
 ```
 
 # Enrichment tests
@@ -51,64 +56,39 @@ ymat <- ctd_BlueLake2018_FrontalCortexOnly[[1]]$specificity
 
 ```{r}  
 res_lm <- phenomix::iterate_lm(xmat = xmat, 
-                               ymat = ymat) 
+                               ymat = ymat, 
+                               nCores = 1) 
 ```
 
 ### Results 
 
 ```{r}
-phenomix:::create_DT(subset(res_lm, qvalue<.05))
+knitr::kable(subset(res_lm, qvalue<.05))
 ```
 
 ### Plot 
 
 ```{r, fig.width=7, fig.height=5}
-## Only plot the top 20 significant results
-data_lm <- subset(res_lm, qvalue<.05) %>%
-  dplyr::slice_min(qvalue, n = 20) %>%
-  dplyr::arrange(term, qvalue)
-
-ggplot(data_lm, aes(x=trait, y=-log10(qvalue), fill=term)) +
-  geom_bar(stat = "identity") +
-  facet_grid(facets = gsub("_","\n",term) ~.) +
-  labs(x="celltype", title="Linear regession results") + 
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust=1)) 
+gg_bar <- phenomix::plot_enrichment(res = res_lm, 
+                                    types = "bar")
 ```
-
 
 
 ## Gene set enrichment analysis 
 
 ```{r}
 res_gsea <- phenomix::iterate_gsea(xmat = xmat, 
-                                   ymat = ymat) 
+                                   ymat = ymat, 
+                                   nCores = 1) 
 ```
 
 
 ### Results 
 
+There are not significant results.
+
 ```{r}
-phenomix:::create_DT(subset(res_gsea, qvalue<.05))
-```
-
-### Plot 
-
-THere are no signfiicant results to plot
-
-```{r, eval=FALSE}
-## Only plot the top 20 significant results
-data_gsea <- subset(res_gsea, qvalue<.05) %>%
-  dplyr::slice_min(qvalue, n = 20) %>%
-  dplyr::arrange(term, qvalue)
-if(nrow(data_gsea)>0){
-  ggplot(data_gsea, aes(x=trait, y=-log10(qvalue), fill=term)) +
-  geom_bar(stat = "identity") +
-  facet_grid(facets = gsub("_","\n",term) ~.) +
-  labs(x="celltype", title="GSEA results") + 
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust=1))  
-} 
+knitr::kable(subset(res_gsea, qvalue<.05))
 ```
 
  

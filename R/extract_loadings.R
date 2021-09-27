@@ -37,10 +37,10 @@ extract_loadings <- function(obj,
     } else if (methods::is(obj, "prcomp")) {
         messager("Extracting loadings from prcomp.", v = verbose)
         loadings <- obj$rotation
-    } else if (methods::is(obj)){
+    } else if (methods::is(obj)) {
         messager("Extracting loadings from lda.", v = verbose)
-        loadings <- obj$scaling 
-    }else if (methods::is(obj, "list") &
+        loadings <- obj$scaling
+    } else if (methods::is(obj, "list") &
         methods::is(obj, "AssayData")) {
         messager("Extracting loadings from list.", v = verbose)
         if ("pca_models" %in% names(obj)) {

@@ -1,3 +1,3 @@
-is_installed <- function(pkg){
-    pkg %in% rownames(installed.packages()) 
+is_installed <- function(pkg) {
+    pkg %in% rownames(installed.packages())
 }

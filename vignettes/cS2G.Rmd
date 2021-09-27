@@ -35,18 +35,19 @@ set.seed(2020)
 
 ## Import data
 
-47 UKB traits that have been fine-mapped and 
+47 UKB traits that have been fine-mapped and mapped to genes using the
+combined SNPs to Genes (cS2G) model.
 
-```{r}
-ukb_cs2g <- phenomix::get_cs2g_ukb(value.var = "cS2G")
-ukb_pip <- phenomix::get_cs2g_ukb(value.var = "PIP")
+```{r, eval=FALSE}
+ukb_cs2g <- phenomix::get_cs2g_ukb(value_var = "cS2G")
+ukb_pip <- phenomix::get_cs2g_ukb(value_var = "PIP")
 ```
 
 ## Decompose
 
 ### UMAP
 
-```{r, fig.height=7, fig.width=8}
+```{r, fig.height=7, fig.width=8, eval=FALSE}
 umap <- phenomix::run_umap(mat = ukb_cs2g$data)
 
 gg_umap <- phenomix::plot_reduction(obj = umap, 

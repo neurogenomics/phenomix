@@ -13,7 +13,7 @@
 run_gprofiler <- function(obj,
                           n_features = 3,
                           factors = seq(1, 4),
-                          reduction=NULL,
+                          reduction = NULL,
                           show_plot = TRUE,
                           verbose = TRUE,
                           ...) {
@@ -27,14 +27,14 @@ run_gprofiler <- function(obj,
     messager("Running gprofiler on", length(factors), "factors",
         v = verbose
     )
-    if(!is.character(factors)){
+    if (!is.character(factors)) {
         factors <- as.character(sort(unique(top_genes$factor))[factors])
     }
-    
-    gene_lists <- lapply(factors, function(f){
+
+    gene_lists <- lapply(factors, function(f) {
         as.character(subset(top_genes, factor %in% f)$feature)
     }) %>% `names<-`(factors)
-    
+
     gres <- gprofiler2::gost(query = gene_lists, ...)
     if (show_plot) {
         gg_gprof <- gprofiler2::gostplot(gres)

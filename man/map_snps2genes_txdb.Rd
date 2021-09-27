@@ -47,3 +47,4 @@ or
 \link[TxDb.Hsapiens.UCSC.hg38.knownGene]{TxDb.Hsapiens.UCSC.hg38.knownGene}
 as a reference.
 }
+\keyword{internal}

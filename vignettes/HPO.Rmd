@@ -54,34 +54,32 @@ gg_umap <- phenomix::plot_reduction(obj = obj_hpo,
 tfidf_hpo <- scNLP::plot_tfidf(object = obj_hpo, 
                                terms_per_cluster = 2,
                                size_var = "n_genes",
-                               color_var = "group_depth3",
+                               color_var = "group_depth2",
                                point_palette = unname(c(pals::alphabet(),
                                                         pals::alphabet2(),
                                                         pals::glasbey())),
                                label_var = "description")
-ggplot2::ggsave(filename = file.path("/Desktop/phenome_decomposition",
-                                     "processed_data/HPO/HPO_UMAP_scNLP.png"),
-                plot = tfidf_hpo$plot,
-                height = 7,
-                width = 10) 
+# ggplot2::ggsave(filename = file.path("/Desktop/phenome_decomposition",
+#                                      "processed_data/HPO/HPO_UMAP_scNLP.png"),
+#                 plot = tfidf_hpo$plot,
+#                 height = 7,
+#                 width = 10) 
 ```
 
 
 # MOFA2
 
-```{r}
-obj_hpo <- Seurat::FindVariableFeatures(obj_hpo, 
-                                        assay="specificity",
-                                        nfeatures=2000)
-obj_hpo <- Seurat::ScaleData(obj_hpo, assay="specificity")
+```{r, eval=FALSE}
+#### Run ####
 model_obj <- phenomix::run_mofa2(obj = obj_hpo, 
-                                 assay = "specificity")
+                                 assay = "RNA")
 obj_hpo <- model_obj$obj
-
-gg_mofa <- phenomix::plot_reduction(obj = obj_hpo, 
-                                    reduction = "mofa2")
+#### Plot ####
+gg_mofa2 <- phenomix::plot_reduction(obj = obj_hpo, 
+                                     reduction = "mofa2")
+gg_mofa2umap <- phenomix::plot_reduction(obj = obj_hpo, 
+                                         reduction = "mofa2umap")
 ```
-
 
 
 # Session Info 

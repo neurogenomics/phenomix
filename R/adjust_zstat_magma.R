@@ -15,7 +15,7 @@
 #' @param ... Additional arguments passed to \code{model}.
 #' @inheritParams stats::p.adjust
 #'
-#' @export
+#' @keywords internal
 #' @importFrom stats lm p.adjust
 #' @importFrom data.table setkey
 adjust_zstat_magma <- function(magma,

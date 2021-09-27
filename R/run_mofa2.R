@@ -42,7 +42,7 @@ run_mofa2 <- function(obj,
                       stochastic_options = NULL,
                       mefisto_options = NULL,
                       outfile = file.path(tempdir(), "model.hdf5"),
-                      reductions=c("umap"),
+                      reductions = c("umap"),
                       seed = 2020,
                       verbose = TRUE,
                       ...) {
@@ -56,12 +56,14 @@ run_mofa2 <- function(obj,
     #### Fix colnames ####
     # Can't be non-ASCI
     # Can't be >50 characters
-    obj <- fix_colnames(obj = obj, 
-                        width = 40, 
-                        make_unique = TRUE)
+    obj <- fix_colnames(
+        obj = obj,
+        width = 40,
+        make_unique = TRUE
+    )
     #### Prepare groups ####
-    metadata <- if(is.null(metadata)) extract_metadata(obj)
-    groups <- if((!is.null(groups)) & length(groups)==1) metadata[[groups]]
+    metadata <- if (is.null(metadata)) extract_metadata(obj)
+    groups <- if ((!is.null(groups)) & length(groups) == 1) metadata[[groups]]
     # #### Use all features ####
     # if(features[1]=="all") {
     #     obj@assays[[assay]]@var.features <- rownames(
@@ -111,16 +113,22 @@ run_mofa2 <- function(obj,
         }
     }
     #### Reduce further ####
-    model <- run_mofa2_reductions(model = model, 
-                                  reductions = reductions,
-                                  verbose = verbose)
+    model <- run_mofa2_reductions(
+        model = model,
+        reductions = reductions,
+        verbose = verbose
+    )
     #### Add MOFA/MOFA+UMAP reductions back into obj ####
-    for(x in c("mofa2","umap")){
-        obj <- add_mofa2_dimred(obj = obj, 
-                                model = model, 
-                                assay = assay,
-                                reduction = x)
+    for (x in c("mofa2", "umap")) {
+        obj <- add_mofa2_dimred(
+            obj = obj,
+            model = model,
+            assay = assay,
+            reduction = x
+        )
     }
-    return(list(model=model, 
-                obj=obj))
+    return(list(
+        model = model,
+        obj = obj
+    ))
 }

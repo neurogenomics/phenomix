@@ -51,18 +51,9 @@ obj_hpo <- SeuratObject::RenameAssays(obj_hpo, MAGMA = "RNA")
 obj_hpo$source <- "HPO"
 ```
 
-## Merge
+# Plot UMAP
 
-*NOTE*: Requires a lot of memory and cannot be run on a standard laptop.
-
-```{r, eval=FALSE}
-obj_merge <- merge(obj, obj_hpo)
-obj_merge <- scNLP::seurat_pipeline(seurat_obj = obj_merge,
-                                    add_specificity = TRUE)
-```
-
-
-## UMAP: Domains
+## Domains
 
 ```{r}
 gg_umap <- phenomix::plot_reduction(obj = obj, 
@@ -72,7 +63,7 @@ gg_umap <- phenomix::plot_reduction(obj = obj,
 ```
 
 
-## UMAP: TF-IDF
+## TF-IDF
 
 ```{r}
 tfidf_res <- scNLP::plot_tfidf(object = obj, 
@@ -88,10 +79,10 @@ tfidf_res <- scNLP::plot_tfidf(object = obj,
 gg_merged <- gg_umap + tfidf_res$plot + patchwork::plot_layout(ncol = 1)
 print(gg_merged)
 
-ggplot2::ggsave(filename = "/Desktop/phenome_decomposition/processed_data/GWAS_Atlas/UMAP_merged.pdf", 
-                plot = gg_merged, 
-                height = 14, 
-                width = 10)
+# ggplot2::ggsave(filename = "/Desktop/phenome_decomposition/processed_data/GWAS_Atlas/UMAP_merged.pdf", 
+#                 plot = gg_merged, 
+#                 height = 14, 
+#                 width = 10)
 ```
 
 # MOFA2
@@ -154,55 +145,7 @@ data.table::fwrite(res, "/Desktop/phenome_decomposition/processed_data/GWAS_Atla
 ### Plot enrichment 
 
 ```{r}
-plot_enrichment <- function(res, 
-                            qvalue_thresh=.05,
-                            top_n=50,
-                            show_plot=TRUE){ 
-  res_sig <- subset(res, qvalue<.05) %>% 
-    # dplyr::group_by(trait) %>%
-    # dplyr::slice_min(order_by = pvalue, n = top_n) %>%
-    dplyr::mutate(negLogP = -log10(pvalue)) %>%
-    tidyr::separate(col = "term", 
-                    sep = "[.]",
-                    into = c("tissue","celltype"),
-                    remove = FALSE)
-  
-  plot_dat <- subset(res_sig, trait=="PC_4") %>% dplyr::arrange(desc(pvalue))
-  plot_dat$term <- factor(plot_dat$term, levels = plot_dat$term, ordered = TRUE)
-  
-  gg_bar <- ggplot(plot_dat,
-                   aes(y=term, x=-log10(pvalue), 
-                       fill=-log10(pvalue))) +
-    geom_bar(stat = "identity") +
-    facet_wrap(facets = trait ~.,
-               scales = "free_x") +
-    theme_bw() 
-  
-  ggplot2::ggsave(filename = "/Desktop/phenome_decomposition/processed_data/GWAS_Atlas/PC4_enrichment.pdf", 
-                  plot = gg_bar, width = 7, height = 4)
-  
-   dmat <- data.table::data.table(res_sig) %>% 
-    data.table::dcast.data.table(formula = term ~ trait,
-                                 value.var = "negLogP",  
-                                 fun.aggregate = mean, 
-                                 fill = 0) %>%
-    tibble::column_to_rownames("term") %>%
-    as.matrix()
-  row_side_colors <- data.frame(stringr::str_split(rownames(dmat),"[.]",
-                                                   simplify = TRUE)) %>%
-    `colnames<-`(c("Tissue","Celltype"))
-  # save_path <- file.path("/Desktop/phenome_decomposition/processed_data",
-  #                        "GWAS_Atlas/GWASatlas_DescartHuman.enrich.pdf")
-  gg_heat <- heatmaply::heatmaply(x = dmat,  
-                                  row_side_colors = list(Tissue=row_side_colors$Tissue),
-                                  fontsize_row=6)
-  
-  # gplots::heatmap.2(dmat)
-  
-  
-  if(show_plot) print(gg_bar)
-  return(gg_bar)
-}
+
 ```
 
 

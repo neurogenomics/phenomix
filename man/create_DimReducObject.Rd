@@ -7,8 +7,15 @@
 create_DimReducObject(reconstruction, assay, key)
 }
 \arguments{
-\item{reconstruction}{Output of \code{reconstruct_matrix} with embeddings and loadings.}
+\item{reconstruction}{Output of \code{reconstruct_matrix}
+with embeddings and loadings.}
+
+\item{assay}{Assay to use.}
+
+\item{key}{Key to use (name of embedding).}
 }
 \description{
-Create a \pkg{Seurat} \code{DimReducObject} from DeGAs embeddings and loadings.
+Create a \pkg{Seurat} \code{DimReducObject}
+from DeGAs embeddings and loadings.
 }
+\keyword{internal}

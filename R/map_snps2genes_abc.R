@@ -22,7 +22,7 @@
 #'
 #' @return \code{gene_hits} \link[data.table]{data.table}
 #'
-#' @export
+#' @keywords internal
 #' @importFrom data.table setkey fread
 map_snps2genes_abc <- function(sumstats,
                                ref_genome = "GRCh37",

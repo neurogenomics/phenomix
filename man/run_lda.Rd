@@ -37,6 +37,6 @@ Run Linear Discriminant Analysis (LDA).
 Uses \link[stats]{prcomp}.
 }
 \examples{
-mat <- as.matrix(iris[,seq(1,4)])
+mat <- as.matrix(iris[, seq(1, 4)])
 grouping <- iris$Species
 }

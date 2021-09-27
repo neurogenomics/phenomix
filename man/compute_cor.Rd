@@ -24,8 +24,8 @@ for correlations.}
 \item{slot}{If \code{obj} is a \pkg{Seurat} object, which slot to extract
 for correlations.}
 
-\item{reduction}{If not \code{NULL}, extracts the embedding from the 
-specified reduction (e.g. "pca") and uses that to 
+\item{reduction}{If not \code{NULL}, extracts the embedding from the
+specified reduction (e.g. "pca") and uses that to
 compute trait-trait similarities instead.}
 
 \item{transpose}{Whether to transpose the matrix first.}
@@ -35,15 +35,15 @@ compute trait-trait similarities instead.}
     \code{"pearson"} (default), \code{"kendall"}, or \code{"spearman"}:
     can be abbreviated.}
 
-\item{return_obj}{Whether to return the \pkg{Seurat} object with a new 
+\item{return_obj}{Whether to return the \pkg{Seurat} object with a new
 \code{obj@graphs} slot, or to simply return the sparse correlation matrix.}
 }
 \value{
-A \pkg{Seurat} object with a new \code{obj@graphs} slot, 
+A \pkg{Seurat} object with a new \code{obj@graphs} slot,
 or the sparse correlation matrix.
 }
 \description{
-Computes pairwise correlations for all traits 
- using either \link[WGNCA]{cor} (faster) or 
+Computes pairwise correlations for all traits
+ using either \link[WGNCA]{cor} (faster) or
 \link[stats]{cor} (slower).
 }

@@ -25,7 +25,9 @@ get_ontology_groups(
 Searches for higher-level groups within the ontology
  (at depths 2-4 by default), and then assigns each term
   in the ontology to one of those groups.
- 
-If a given term matches with >1 group at a given depth, 
+}
+\details{
+If a given term matches with >1 group at a given depth,
 the term will be assigned to the first group arbitrarily.
 }
+\keyword{internal}

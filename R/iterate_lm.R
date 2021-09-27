@@ -47,9 +47,10 @@ iterate_lm <- function(xmat,
             if (!is.null(y_quantiles)) {
                 lm_dat <- data.frame(
                     trait = xmat[gene_intersect, tt],
-                    celltype = cut(ymat[gene_intersect, ct], 
-                                   breaks = y_quantiles, 
-                                   labels = 1:y_quantiles)
+                    celltype = cut(ymat[gene_intersect, ct],
+                        breaks = y_quantiles,
+                        labels = 1:y_quantiles
+                    )
                 )
             } else {
                 lm_dat <- data.frame(

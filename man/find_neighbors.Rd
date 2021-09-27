@@ -17,26 +17,26 @@ find_neighbors(
 )
 }
 \arguments{
-\item{graph_name}{Name of the graph to use. 
+\item{graph_name}{Name of the graph to use.
 If none provided, will use the last graph available.
 If no graphs are available, new ones will be computed using
  Pearson's correlation on the raw counts matrix.}
 
-\item{var1_search}{Substring search term to filter var1 by. 
+\item{var1_search}{Substring search term to filter var1 by.
 If a vector is supplied instead, this will be interpreted as an "or" query.}
 
 \item{label_col}{\code{meta.data} column used to name the rows/columns of the graph.
 \code{label_col} will also be used in the search for \code{var1_search} substring.}
 
-\item{var2_group}{Substring search term to filter var2 by, 
+\item{var2_group}{Substring search term to filter var2 by,
 according to  \code{group_col}.}
 
-\item{group_col}{\code{meta.data} column used to filter var2 
+\item{group_col}{\code{meta.data} column used to filter var2
 when \code{var2_group} is used.}
 
 \item{max_neighbors}{The max number of neighbors (var2) per term (var1).}
 
-\item{add_original_names}{Add original names into the results. 
+\item{add_original_names}{Add original names into the results.
 This can be useful when var1 names are forced to be unique internally.}
 
 \item{verbose}{Whether to print messages.}
@@ -52,13 +52,17 @@ library(scNLP)
 data("pseudo_seurat")
 
 ### No group filter
-top_neighbors <- search_neighbors(seurat = pseudo_seurat, 
-                                  var1_search = "purkinje", 
-                                  max_neighbors=5)
+top_neighbors <- search_neighbors(
+    seurat = pseudo_seurat,
+    var1_search = "purkinje",
+    max_neighbors = 5
+)
 ### With group filter
-top_neighbors2 <- search_neighbors(seurat = pseudo_seurat,
-                                  var1_search = "purkinje",
-                                  var2_group = "human",
-                                  group_col = "species",
-                                  max_neighbors=5)
+top_neighbors2 <- search_neighbors(
+    seurat = pseudo_seurat,
+    var1_search = "purkinje",
+    var2_group = "human",
+    group_col = "species",
+    max_neighbors = 5
+)
 }

@@ -17,7 +17,7 @@
 #'
 #' @return \code{gene_hits} \link[data.table]{data.table}
 #'
-#' @export
+#' @keywords internal
 #' @importFrom data.table setkey fread
 map_snps2genes_txdb <- function(sumstats,
                                 promoter_upstream = 35000,

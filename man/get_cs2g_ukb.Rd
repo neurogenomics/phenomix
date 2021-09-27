@@ -8,7 +8,8 @@ get_cs2g_ukb(
   URL = file.path("https://storage.googleapis.com", "broad-alkesgroup-public/cS2G",
     "finemapping_cS2G_UKBB", "finemapping_cS2G_UKBB_PIP05.annot"),
   as_matrix = TRUE,
-  value.var = c("cS2G", "PIP"),
+  value_var = c("cS2G", "PIP"),
+  min_value = 0,
   nThread = 1,
   verbose = TRUE
 )
@@ -17,6 +18,12 @@ get_cs2g_ukb(
 \item{URL}{URL to cS2G dataset.}
 
 \item{as_matrix}{Convert the data to a sparse matrix.}
+
+\item{value_var}{Which column you want to fill the matrix with. 
+Only used when \code{as_matrix==TRUE}.}
+
+\item{min_value}{Minimum value of \code{value_var} to include in data.
+Helpful when you're using a machine that can't handle large data.}
 
 \item{nThread}{Number of threads to use when reading in data.}
 

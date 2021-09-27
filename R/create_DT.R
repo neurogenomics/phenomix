@@ -1,6 +1,6 @@
 #' Create an interactive data table with download buttons
-#' 
-#' 
+#'
+#'
 create_DT <- function(DF,
                       caption = "",
                       scrollY = 400) {

@@ -4,10 +4,32 @@
 Author: <i>Brian M. Schilder</i>
 </h4>
 <h4>
-Most recent update: <i>Sep-08-2021</i>
+Most recent update: <i>Sep-27-2021</i>
 </h4>
 
+<!-- badges: start -->
+<!-- badger::badge_codecov() -->
+<!-- badger::badge_last_commit()  -->
+<!-- badger::badge_license() -->
+
+[![](https://codecov.io/gh/neurogenomics/phenomix/branch/main/graph/badge.svg)](https://codecov.io/gh/neurogenomics/phenomix)
+[![R-CMD-check](https://github.com/neurogenomics/phenomix/workflows/R-full/badge.svg)](https://github.com/neurogenomics/phenomix/actions)
+[![](https://img.shields.io/github/last-commit/neurogenomics/phenomix.svg)](https://github.com/neurogenomics/phenomix/commits/main)
+<!-- badges: end -->
+
 ## R package for the exploration and analysis of many genotype-phenotype datasets at once.
+
+## Installation
+
+``` r
+if(!"remotes" %in% rownames(install.packages())){install.packages("remotes")}
+
+remotes::install_github("neurogenomics/phenomix")
+```
+
+## Documentation
+
+### [Documentation site](https://neurogenomics.github.io/phenomix).
 
 ### [Vignette: Celltype enrichment](https://neurogenomics.github.io/phenomix/articles/celltype_enrichment.html)
 

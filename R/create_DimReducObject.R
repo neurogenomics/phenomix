@@ -1,11 +1,14 @@
 #' Create a \code{DimReducObject} from DeGAs
 #'
-#' Create a \pkg{Seurat} \code{DimReducObject} from DeGAs embeddings and loadings.
+#' Create a \pkg{Seurat} \code{DimReducObject}
+#' from DeGAs embeddings and loadings.
 #'
-#' @param reconstruction Output of \code{reconstruct_matrix} with embeddings and loadings.
-#' @inheritParams Seurat::CreateDimReducObject
+#' @param reconstruction Output of \code{reconstruct_matrix}
+#'  with embeddings and loadings.
+#' @param assay Assay to use.
+#' @param key Key to use (name of embedding).
 #'
-#' @export
+#' @keywords internal
 #' @importFrom Seurat CreateDimReducObject
 create_DimReducObject <- function(reconstruction,
                                   assay,
@@ -13,7 +16,11 @@ create_DimReducObject <- function(reconstruction,
     DR <- Seurat::CreateDimReducObject(
         embeddings = reconstruction$embeddings,
         loadings = reconstruction$loadings,
-        stdev = if (is.null(reconstruction$stdev)) numeric() else as.numeric(reconstruction$stdev),
+        stdev = if (is.null(reconstruction$stdev)) {
+            numeric()
+        } else {
+            as.numeric(reconstruction$stdev)
+        },
         assay = assay,
         key = key
     )
