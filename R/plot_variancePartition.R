@@ -12,9 +12,9 @@
 #' @param ... Additional arguments passed to
 #'  \link[patchwork]{wrap_plots}.
 #'
-#' @importFrom variancePartition sortCols plotPercentBars  plotVarPart
-#'
 #' @export
+#' @importFrom variancePartition sortCols plotPercentBars  plotVarPart
+#' @importFrom stats median
 plot_variancePartition <- function(varPart,
                                    plot_PercentBars = TRUE,
                                    plot_VarPart = TRUE,
@@ -47,7 +47,7 @@ plot_variancePartition <- function(varPart,
         ) +
             stat_summary(aes(label = ..y..),
                 fun = function(x) {
-                    round(median(x), 2)
+                    round(stats::median(x), 2)
                 },
                 geom = "label", size = 3, alpha = .75
             )

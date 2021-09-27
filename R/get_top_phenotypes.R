@@ -18,8 +18,8 @@
 #' @importFrom dplyr %>% rename group_by slice_max
 #' @importFrom data.table data.table
 #' @examples
-#' data("DEGAS_seurat")
-#' top_phenos <- get_top_phenotypes(obj = DEGAS_seurat)
+#' degas <- get_DEGAS()
+#' top_phenos <- get_top_phenotypes(obj = degas)
 get_top_phenotypes <- function(obj,
                                metadata = NULL,
                                reduction = NULL,

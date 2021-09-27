@@ -44,6 +44,6 @@ or the sparse correlation matrix.
 }
 \description{
 Computes pairwise correlations for all traits
- using either \link[WGNCA]{cor} (faster) or
+ using either \link[WGCNA]{cor} (faster) or
 \link[stats]{cor} (slower).
 }

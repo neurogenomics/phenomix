@@ -17,21 +17,23 @@ Depends: R (>= 3.6.0)
 SystemRequirements: Python (>= 3.7.0)
 biocViews:
 Imports: 
-    remotes,  
-    magrittr,
     stats,
     utils,
+    methods,
+    Matrix,
     orthogene,
     MungeSumstats,
+    scNLP,
     variancePartition,
-    BiocParallel,
-    dplyr,  
+    dplyr,
+    tibble,
     broom,
     here,
     data.table, 
-    ggplot2,
-    plotly, 
+    ggplot2, 
+    ggrepel,
     heatmaply,
+    patchwork,
     Seurat,
     future,   
     pals,
@@ -46,9 +48,16 @@ Imports:
     stringr,
     MOFA2,
     MASS,
+    sparsesvd,
+    uwot,
+    GenomicRanges,
+    ontologyIndex,
+    VariantAnnotation,
+    GenomeInfoDb,
     piggyback
 Remotes:
-    github::neurogenomics/scNLP
+    github::neurogenomics/scNLP,
+    github::neurogenomics/orthogene
 Suggests:
     markdown,
     rmarkdown,
@@ -56,10 +65,15 @@ Suggests:
     BiocStyle,
     covr,
     testthat (>= 3.0.0),
-    scNLP,
-    heatmaply, 
+    remotes, 
+    plotly, 
     sparklyr,
     ggpubr,
-    BiocManager
+    BiocManager,
+    GenomicFeatures,
+    TxDb.Hsapiens.UCSC.hg19.knownGene,
+    TxDb.Hsapiens.UCSC.hg38.knownGene,
+    org.Hs.eg.db,
+    WGCNA
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr 

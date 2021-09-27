@@ -5,6 +5,9 @@ get_gene_length <- function(gene_hits,
                             drop_na = TRUE,
                             verbose = TRUE) {
     messager("Computing gene lengths.", v = verbose)
+    if(!methods::is(gene_hits,"data.table")){
+        gene_hits <- data.table::data.table(gene_hits)
+    }
     txdb <- select_txdb_build(
         ref_genome = ref_genome,
         verbose = verbose
@@ -18,7 +21,8 @@ get_gene_length <- function(gene_hits,
     )
     length_key$GENELEN <- as.integer(GenomicRanges::width(length_key))
     length_key$GENEID <- as.character(length_key$GENEID)
-    length_key <- data.table::data.table(data.frame(length_key), key = "GENEID")
+    length_key <- data.table::data.table(data.frame(length_key),
+                                         key = "GENEID")
     #### Translate gene IDs back to gene symbols ####
     if (gene_var != "GENEID" & use_symbols) {
         length_key <- translate_geneids_txdb(
@@ -39,7 +43,7 @@ get_gene_length <- function(gene_hits,
             "genes without GENELEN.",
             v = verbose
         )
-        gene_hits <- na.omit(gene_hits, cols = "GENELEN")
+        gene_hits <- stats::na.omit(gene_hits, cols = "GENELEN")
     }
     return(gene_hits)
 }

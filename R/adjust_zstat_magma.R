@@ -17,7 +17,7 @@
 #'
 #' @keywords internal
 #' @importFrom stats lm p.adjust
-#' @importFrom data.table setkey
+#' @importFrom data.table setkey :=
 adjust_zstat_magma <- function(magma,
                                drop_MHC = TRUE,
                                method = "bonferroni",

@@ -16,13 +16,13 @@
 #' @importFrom stats p.adjust
 #' @examples
 #' ### DeGAs loadings
-#' data("DEGAS_seurat")
-#' xmat <- DEGAS_seurat@reductions$contributionGene@feature.loadings
+#' degas <- get_DEGAS()
+#' xmat <- extract_loadings(obj = degas)
 #' xmat <- xmat[, 1:10] # Let's use just 10 components as an example
 #'
 #' ### Celltype Dataset
-#' data("ctd_BlueLake2018_FrontalCortexOnly")
-#' ymat <- ctd_BlueLake2018_FrontalCortexOnly[[1]]$specificity
+#' ctd <- get_BlueLake2018_FrontalCortexOnly()
+#' ymat <- ctd[[1]]$specificity
 #' res_gsea <- iterate_gsea(xmat = xmat, ymat = ymat)
 iterate_gsea <- function(xmat,
                          ymat,
@@ -44,8 +44,7 @@ iterate_gsea <- function(xmat,
     gsea_res <- parallel::mclapply(1:ncol(xmat), function(i) {
         tt <- colnames(xmat)[i]
         message_parallel(" - ", tt, ": (", i, "/", ncol(xmat), ")")
-        lapply(colnames(ymat), function(ct) {
-            # EWCE:::message_parallel(" - ",ct)
+        lapply(colnames(ymat), function(ct) { 
             dat <- data.frame(
                 trait = cut(xmat[gene_intersect, tt], breaks = x_quantiles, labels = 1:x_quantiles),
                 celltype = cut(ymat[gene_intersect, ct], breaks = y_quantiles, labels = 1:y_quantiles),

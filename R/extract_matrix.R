@@ -10,7 +10,7 @@ extract_matrix <- function(obj,
             slot = slot
         )
         return(mat)
-    } else if (orthogene:::is_sparse_matrix(X = obj) |
+    } else if (is_sparse_matrix(X = obj) |
         methods::is(obj, "matrix") |
         methods::is(obj, "Matrix")) {
         messager("Returning matrix obj directly.", v = verbose)

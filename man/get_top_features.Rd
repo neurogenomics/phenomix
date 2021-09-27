@@ -43,6 +43,6 @@ top_features \code{data.table}
 Plot the top feature loadings for from a given reduction.
 }
 \examples{
-data("DEGAS_seurat")
-top_features <- get_top_features(seurat = DEGAS_seurat)
+degas <- get_DEGAS()
+top_features <- get_top_features(obj = degas)
 }

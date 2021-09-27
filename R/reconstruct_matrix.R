@@ -1,6 +1,7 @@
 #' Reconstruct original matrix from DeGAs components
 #'
-#' @source
+#' @keywords internal
+#' @importFrom stats quantile
 reconstruct_matrix <- function(u_name = "contribution_phe",
                                v_name = "contribution_var",
                                d_name = NULL,
@@ -58,7 +59,7 @@ reconstruct_matrix <- function(u_name = "contribution_phe",
     }
     if (filter_quantiles) {
         print("+ Removing values in the lowest percentile")
-        quants <- quantile(abs(M2), probs = seq(0, 1, length.out = 100))
+        quants <- stats::quantile(abs(M2), probs = seq(0, 1, length.out = 100))
         M2_remove <- abs(M2) < unname(quants[2])
         M2[abs(M2) < quants[2]] <- NA
     }

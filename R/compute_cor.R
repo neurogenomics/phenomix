@@ -1,7 +1,7 @@
 #' Compute all pairwise trait correlations
 #'
 #' Computes pairwise correlations for all traits
-#'  using either \link[WGNCA]{cor} (faster) or
+#'  using either \link[WGCNA]{cor} (faster) or
 #' \link[stats]{cor} (slower).
 #'
 #' @param obj Either a \pkg{Seurat} object or a feature*trait matrix.

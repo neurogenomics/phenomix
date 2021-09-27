@@ -15,6 +15,7 @@
 #' @importFrom AnnotationDbi select
 #' @importFrom data.table data.table setkey
 #' @importFrom dplyr %>%
+#' @importFrom stats na.omit
 translate_geneids_txdb <- function(gene_hits,
                                    gene_var = "GENEID",
                                    drop_na = TRUE,
@@ -36,7 +37,7 @@ translate_geneids_txdb <- function(gene_hits,
         messager("Dropping", na_count, "genes without SYMBOL.",
             v = verbose
         )
-        gene_hits <- na.omit(gene_hits, "SYMBOL")
+        gene_hits <- stats::na.omit(gene_hits, "SYMBOL")
     }
     return(gene_hits)
 }

@@ -31,12 +31,12 @@ Iterate linear regression across all traits and celltypes
 }
 \examples{
 ### DeGAs loadings
-data("DEGAS_seurat")
-xmat <- DEGAS_seurat@reductions$contributionGene@feature.loadings
+degas <- get_DEGAS()
+xmat <- extract_loadings(degas)
 xmat <- xmat[, 1:10] # Let's use just 10 components as an example
 
 ### Celltype Dataset
-data("ctd_BlueLake2018_FrontalCortexOnly")
-ymat <- ctd_BlueLake2018_FrontalCortexOnly[[1]]$specificity
+ctd <- get_BlueLake2018_FrontalCortexOnly()
+ymat <- ctd[[1]]$specificity
 res_lm <- iterate_lm(xmat = xmat, ymat = ymat)
 }

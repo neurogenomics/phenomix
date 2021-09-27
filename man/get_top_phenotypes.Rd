@@ -53,8 +53,6 @@ Not needed if \code{obj} is a \pkg{Seurat} object.}
 \item{y}{y-axis variable.}
 
 \item{verbose}{Print messages.}
-
-\item{seurat}{\code{Seurat} object or \code{Seurat::DimReducObject}.}
 }
 \value{
 \code{data.table} of top phenotypes
@@ -69,8 +67,8 @@ Create a radar chart of the phenotypes with the
 highest loadings for each reduction factor.
 }
 \examples{
-data("DEGAS_seurat")
-top_phenos <- get_top_phenotypes(seurat = DEGAS_seurat)
-data("DEGAS_seurat")
-top_phenos <- get_top_phenotypes(obj = DEGAS_seurat)
+degas <- get_DEGAS()
+top_phenos <- get_top_phenotypes(obj = degas)
+degas <- get_DEGAS()
+top_phenos <- get_top_phenotypes(obj = degas)
 }

@@ -45,9 +45,9 @@ Search a reduction for observations (e.g. traits) that match a given \code{term}
 Then get the factors with the highest mean loading for the matching features.
 }
 \examples{
-data("DEGAS_seurat")
+degas <- get_DEGAS()
 top_factors <- get_top_factors(
-    obj = DEGAS_seurat,
+    obj = degas,
     term = "parkinson",
     select_quantiles = 8:10
 )

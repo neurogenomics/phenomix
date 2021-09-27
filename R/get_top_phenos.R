@@ -3,7 +3,7 @@
 #' Create a radar chart of the phenotypes with the
 #' highest loadings for each reduction factor.
 #'
-#' @param seurat \code{Seurat} object or \code{Seurat::DimReducObject}.
+#' @param obj \code{Seurat} object or \code{Seurat::DimReducObject}.
 #' @param reduction Reduction to use. If \code{NULL}, defaults to first available reduction.
 #' @param n_phenotypes Number of top phenotypes per reduction factor to select.
 #' @inheritParams plot_top
@@ -15,9 +15,9 @@
 #' @importFrom dplyr %>% rename group_by slice_max
 #' @importFrom data.table data.table
 #' @examples
-#' data("DEGAS_seurat")
-#' top_phenos <- get_top_phenotypes(seurat = DEGAS_seurat)
-get_top_phenotypes <- function(seurat,
+#' degas <- get_DEGAS()
+#' top_phenos <- get_top_phenotypes(obj = degas)
+get_top_phenotypes <- function(obj,
                                reduction = NULL,
                                n_phenotypes = 3,
                                factors_plot = 1:10,
@@ -26,8 +26,8 @@ get_top_phenotypes <- function(seurat,
                                title = NULL,
                                x = "phenotype",
                                y = "loading") {
-    loadings <- extract_loadings(obj = seurat, reduction = reduction)
-    metadata <- extract_metadata(obj = seurat)
+    loadings <- extract_loadings(obj = obj, reduction = reduction)
+    metadata <- extract_metadata(obj = obj)
     top_phenos <- reshape2::melt(loadings) %>%
         merge(metadata,
             by.x = "Var1", by.y = 0, all.x = TRUE

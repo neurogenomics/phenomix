@@ -3,30 +3,36 @@
 #' Queries \code{biomaRt} for \code{gene_attributes} and then regresses them out of \code{xmat}.
 #'
 #' @param xmat gene x sample matrix.
-#' @param attributes Gene attributes to extract from \code{biomaRt}
+#' @param attributes Gene attributes to extract from 
+#' \code{TxDb.Hsapiens.UCSC.hg38.knownGene}.
 #'  and then regress from \code{xmat}.
 #' @inheritParams iterate_lm
-#'
+#' 
+#' @keywords internal
 #' @examples
-#' library(MAGMA.Celltyping)
-#' xmat <- MAGMA.Celltyping::ctd_DRONC_human[[1]]$mean_exp[1:100, ]
-#' adjusted_df <- regress_gene_info(xmat)
+#' \dontrun{
+#' ctd <- phenomix::get_BlueLake2018_FrontalCortexOnly()
+#' xmat <- ctd[[1]]$mean_exp[1:100, ]
+#' adjusted_df <- phenomix:::regress_gene_info(xmat)
+#' } 
+#' @export
 regress_gene_info <- function(xmat,
-                              attributes = c("size"),
-                              correction_method = "BH") {
-    gene_info <- get_gene_info(
-        genelist = rownames(xmat),
-        attributes = attributes,
-        one_row_per_gene = T
+                              attributes = c("GENELEN"),
+                              correction_method = "BH",
+                              verbose=TRUE) {
+    gene_info <- get_gene_length(
+        gene_hits = data.table::data.table(gene=rownames(xmat)), 
+        gene_var = "gene",
+        use_symbols = TRUE,
+        verbose = verbose
     )
-    gene_intersect <- intersect(rownames(xmat), gene_info$hgnc_symbol)
-    message(length(gene_intersect), " intersecting genes between xmat and bioMart query.")
+    gene_intersect <- intersect(rownames(xmat), gene_info$gene)
     xdat <- as.matrix(xmat[gene_intersect, ])
-    ydat <- as.matrix(gene_info[gene_intersect, attributes])
+    ydat <- as.matrix(gene_info[gene %in% gene_intersect, get(attributes)])
     #### Run model
-    message("+ Training model")
+    messager("Training model.",v=verbose)
     mod <- stats::lm(xdat ~ ydat)
-    message("+ Generating predictions")
+    messager("Generating predictions.",v=verbose)
     adjusted_df <- stats::predict(mod, data.frame(xdat))
     return(adjusted_df)
 }

@@ -19,7 +19,7 @@
 #'
 #' @export
 #' @importFrom data.table uniqueN
-#' @importFrom stats complete.cases
+#' @importFrom stats complete.cases na.omit
 aggregate_sumstats <- function(merged_hits,
                                drop_na = TRUE,
                                agg_var = "GENEID",
@@ -61,7 +61,7 @@ aggregate_sumstats <- function(merged_hits,
             "rows with NAs in any column.",
             v = verbose
         )
-        gene_hits <- na.omit(gene_hits)
+        gene_hits <- stats::na.omit(gene_hits)
     }
     #### Report ####
     messager("Returning gene_hits data.table with",

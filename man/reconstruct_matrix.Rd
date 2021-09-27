@@ -3,9 +3,6 @@
 \name{reconstruct_matrix}
 \alias{reconstruct_matrix}
 \title{Reconstruct original matrix from DeGAs components}
-\source{
-
-}
 \usage{
 reconstruct_matrix(
   u_name = "contribution_phe",
@@ -24,3 +21,4 @@ reconstruct_matrix(
 \description{
 Reconstruct original matrix from DeGAs components
 }
+\keyword{internal}

@@ -30,8 +30,8 @@ knitr::opts_chunk$set(tidy = FALSE, message  = FALSE)
 
 # devtools::install_github("neurogenomics/MungeSumstats")
 library(phenomix)
-library(MAGMA.Celltyping)
-library(MungeSumstats)
+# library(MAGMA.Celltyping)
+# library(MungeSumstats)
 
 library(ggplot2)
 library(dplyr)
@@ -63,9 +63,9 @@ munged_files <- MungeSumstats::import_sumstats(ids = metagwas$id,
 Instead, infer the genome build here with the `infer_builds=TRUE` argument.
 
 
-```{r}  
+```{r, eval=FALSE}  
 munged_files = list.files(save_dir,".tsv.gz", full.names = TRUE)
-metagwas_all <- generate_metadata(munged_files = munged_files, 
+metagwas_all <- phenomix::generate_metadata(munged_files = munged_files, 
                                   infer_builds = TRUE,
                                   trait_groups = c("alzheimer","parkinson","amyotrophic",
                                                    "frontotemporal dementia","dementia"),
@@ -80,13 +80,13 @@ metagwas_all <- generate_metadata(munged_files = munged_files,
 
 ### Genome reference
 
-```{r Prepare genome reference}
+```{r Prepare genome reference, eval=FALSE}
 genome_ref_path <- MAGMA.Celltyping::get_genome_ref(storage_dir = storage_dir)
 ```
  
 ### Map SNPs 
 
-```{r}
+```{r, eval=FALSE}
 magma_files <- parallel::mclapply(seq(1,nrow(metagwas_all)),
                                   function(i){
   MAGMA.Celltyping:::message_parallel("----- ", metagwas_all$id[i]," -----")
@@ -105,7 +105,7 @@ magma_files <- parallel::mclapply(seq(1,nrow(metagwas_all)),
 
 Can construct gene x trait matrix from gene-level MAGMA results across multiple GWAS traits.
 
-```{r}
+```{r, eval=FALSE}
 magma_matrix <- phenomix::gwas_matrix_magma(magma_files = magma_files,
                                             metric = "ADJ_ZSTAT", 
                                             save_path = file.path(save_dir,"OpenGWAS_neurodegenGWAS_ADJZSTAT.rds"),
@@ -118,12 +118,12 @@ magma_matrix <- phenomix::gwas_matrix_magma(magma_files = magma_files,
 
 ABC method requires hg19 at the moment.
 
-```{r}
+```{r, eval=FALSE}
 metagwas <- subset(metagwas_all, build_inferred=="GRCH37")
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 # preload file to make faster 
 abc <- phenomix::import_abc(dataset = "Nasser2020")
 
@@ -176,7 +176,7 @@ magma_genes_counts <- Matrix::colSums(magma_matrix>0)
 
 Use a linear mixed model to determine how much each metadata attribute affects each GWAS.
 
-```{r}
+```{r, eval=FALSE}
 #### Run ####
 varPart <- phenomix::run_variancePartition(obj = magma_matrix, 
                                            metadata = metagwas_all, 
@@ -191,7 +191,7 @@ varPlots <- phenomix::plot_variancePartition(varPart = varPart)
 
 ## PCA
 
-```{r}
+```{r, eval=FALSE}
 #### Run ####
 pca <- phenomix::run_pca(mat = magma_matrix)
 #### Plot ####
@@ -213,7 +213,7 @@ gres <- run_gprofiler(obj = pca)
 
 ### Sparse SVD
 
-```{r}
+```{r, eval=FALSE}
 #### Run ####
 ssvd <- phenomix::run_sparsesvd(mat = magma_matrix)
 #### Plot ####
@@ -236,7 +236,7 @@ gres <- run_gprofiler(obj = ssvd)
 
 ### UMAP
 
-```{r}
+```{r, eval=FALSE}
 #### Run ####
 umap <- phenomix::run_umap(mat = magma_matrix) 
 #### Plot ####

@@ -36,7 +36,7 @@ library(ggplot2)
 
 ## GWAS Atlas
 
-```{r}
+```{r, eval=FALSE}
 # dat <- phenomix::get_GWAS_Atlas()
 obj <- readRDS(file.path("/Desktop/phenome_decomposition/raw_data",
                          "GWAS_Atlas/GWAS_Atlas_all.seurat.rds"))
@@ -45,7 +45,7 @@ knitr::kable(head(obj@meta.data))
 
 ## HPO
 
-```{r}
+```{r, eval=FALSE}
 obj_hpo <- phenomix::get_HPO()
 obj_hpo <- SeuratObject::RenameAssays(obj_hpo, MAGMA = "RNA")
 obj_hpo$source <- "HPO"
@@ -55,7 +55,7 @@ obj_hpo$source <- "HPO"
 
 ## Domains
 
-```{r}
+```{r, eval=FALSE}
 gg_umap <- phenomix::plot_reduction(obj = obj, 
                                     reduction = "umap", 
                                     color_var = "Domain", 
@@ -65,7 +65,7 @@ gg_umap <- phenomix::plot_reduction(obj = obj,
 
 ## TF-IDF
 
-```{r}
+```{r, eval=FALSE}
 tfidf_res <- scNLP::plot_tfidf(object = obj, 
                                reduction = "umap", 
                                label_var = "Trait", size_var = NULL,
@@ -75,7 +75,7 @@ tfidf_res <- scNLP::plot_tfidf(object = obj,
 ## UMAP: merged
 
 
-```{r}
+```{r, eval=FALSE}
 gg_merged <- gg_umap + tfidf_res$plot + patchwork::plot_layout(ncol = 1)
 print(gg_merged)
 
@@ -87,7 +87,7 @@ print(gg_merged)
 
 # MOFA2
 
-```{r}
+```{r, eval=FALSE}
 # obj <- Seurat::FindVariableFeatures(obj, nfeatures = 10000)
 model_obj <-  phenomix::run_mofa2(obj = obj,  
                                   # groups = "Domain",
@@ -100,7 +100,7 @@ obj <- model_obj$obj
 
 ### MOFA2 
 
-```{r}
+```{r, eval=FALSE}
 gg_mofa2 <- phenomix::plot_reduction(obj = obj, 
                                      color_var = "Domain",
                                      reduction = "mofa2")
@@ -109,7 +109,7 @@ gg_mofa2 <- phenomix::plot_reduction(obj = obj,
 
 ### UMAP
 
-```{r}
+```{r, eval=FALSE}
 gg_mofa2umap <- phenomix::plot_reduction(obj = obj, 
                                          color_var = "Domain",
                                          reduction = "mofa2umap")
@@ -120,7 +120,7 @@ print(gg_mofa2umap)
 
 # Enrichment tests
 
-```{r}
+```{r, eval=FALSE}
 xmat <- phenomix::extract_loadings(obj = obj, 
                                    reduction = "pca")
 ```
@@ -130,22 +130,21 @@ xmat <- phenomix::extract_loadings(obj = obj,
 
 Characterise each factor with the DescartesHuman scRNA-seq CellTypeDataset
 
-```{r}
+```{r, eval=FALSE}
 #### Preprare data #### 
-ctd <- readRDS(file.path("/Desktop/model_celltype_conservation/processed_data",
-                         "EWCE/standardized_CTD/DescartesHuman.rds"))
+ctd <- phenomix::get_DescartesHuman()
 ymat <- ctd[[2]]$specificity
 #### Run tests #####
 res <- phenomix::iterate_lm(xmat = xmat,
                             ymat = ymat)
-res_sig <- subset(res, qvalue<.05)
-data.table::fwrite(res, "/Desktop/phenome_decomposition/processed_data/GWAS_Atlas/PCA_celltypes.csv.gz")
+res_sig <- subset(res, qvalue<.05) 
 ```
 
 ### Plot enrichment 
 
-```{r}
-
+```{r, eval=FALSE}
+gg_bar <- phenomix::plot_enrichment(res = res,
+                                    types = "bar")
 ```
 
 
@@ -154,7 +153,7 @@ data.table::fwrite(res, "/Desktop/phenome_decomposition/processed_data/GWAS_Atla
 
 Characterise each factor with the Human Phenotype Ontology.
 
-```{r}
+```{r, eval=FALSE}
 top_phenos <- phenomix::get_top_phenotypes(obj = obj_hpo, 
                                            n_phenotypes = 10,
                                            show_plot = FALSE)
@@ -183,7 +182,7 @@ res_hpo_PC4 <- subset(res_hpo, trait=="PC_4" & depth>10)%>% dplyr::arrange(pvalu
 
 ## Get top
 
-```{r}
+```{r, eval=FALSE}
 top_factors <- phenomix::get_top_factors(obj = obj, 
                                          reduction = "pca", 
                                          term = "parkinson", 
@@ -214,7 +213,7 @@ gprof <- run_gprofiler(obj = obj,
 
 ## Find markers
 
-```{r}
+```{r, eval=FALSE}
 dat$PD <- grepl("parkinson",dat$Trait, ignore.case = TRUE)
 
 dat <- Seurat::SetIdent(dat, value="PD")
@@ -227,7 +226,7 @@ data.table::fwrite(PD_markers,
 
 # Trait-trait similarity
 
-```{r}
+```{r, eval=FALSE}
 mat <- WGCNA::cor(obj@assays$MAGMA@data)
 mat <-  as(as(mat,"sparseMatrix"),"Graph")
 obj@graphs$MAGMA_cor <- mat

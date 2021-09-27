@@ -5,7 +5,7 @@
 #'
 #' @param obj Matrix or \pkg{Seurat} object to run
 #' \link[variancePartition]{fitExtractVarPartModel} on.
-#' @param metadata \link[data.frame]{data.frame} containing metadata
+#' @param metadata \code{data.frame} containing metadata
 #' to use in \code{form}. If \code{obj} is a \pkg{Seurat} object,
 #' this can be left \code{NULL} and metadata
 #' will be extracted automatically.

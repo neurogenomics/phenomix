@@ -1,3 +1,8 @@
+#' prepare_agg_funcs
+#' 
+#' @keywords internal
+#' @importFrom stats sd
+#' @importFrom data.table uniqueN
 prepare_agg_funcs <- function(merged_hits,
                               extra_cols = c("ABC.Score", "CellType"),
                               verbose = TRUE) {
@@ -6,7 +11,7 @@ prepare_agg_funcs <- function(merged_hits,
         mean(as.numeric(x), na.rm = T)
     }
     sd_ <- function(x) {
-        sd(as.numeric(x), na.rm = T)
+        stats::sd(as.numeric(x), na.rm = T)
     }
     uniqueN_ <- function(x) {
         data.table::uniqueN(x, na.rm = TRUE)

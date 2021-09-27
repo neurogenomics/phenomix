@@ -20,10 +20,11 @@
 #' @importFrom reshape2 melt
 #' @importFrom dplyr %>% rename group_by slice_max
 #' @importFrom data.table data.table
+#' @importFrom graphics hist
 #' @examples
-#' data("DEGAS_seurat")
+#' degas <- get_DEGAS()
 #' top_factors <- get_top_factors(
-#'     obj = DEGAS_seurat,
+#'     obj = degas,
 #'     term = "parkinson",
 #'     select_quantiles = 8:10
 #' )
@@ -43,11 +44,14 @@ get_top_factors <- function(obj,
     )
     if (is.null(metadata)) metadata <- extract_metadata(obj = obj)
     if (!search_col %in% colnames(metadata) | is.null(search_col)) {
-        message(search_col, " not in metadata. Using ", colnames(metadata)[1], " instead.")
+        message(search_col, " not in metadata. Using ", colnames(metadata)[1],
+                " instead.")
         search_col <- colnames(metadata)[1]
     }
 
-    select_cols <- rownames(metadata[grepl(term, unname(metadata[[search_col]]), ignore.case = T), ])
+    select_cols <- rownames(metadata[grepl(term,
+                                           unname(metadata[[search_col]]),
+                                           ignore.case = TRUE), ])
     if (length(select_cols) > 0) {
         message(
             "+ ", length(select_cols), " matching phenotypes identified:\n",
@@ -58,10 +62,16 @@ get_top_factors <- function(obj,
     }
 
     #### Handle multiple phenotypes per term
-    if (!is(embeddings, "numeric")) embeddings <- colMeans(embeddings, na.rm = T)
-    if (plot_hist) print(hist(embeddings, 50, main = paste("Top", reduction, "factors:", term)))
+    if (!is(embeddings, "numeric")) embeddings <- colMeans(embeddings, 
+                                                           na.rm = TRUE)
+    if (plot_hist) {
+        print(graphics::hist(embeddings, 50, 
+                             main = paste("Top", reduction, "factors:", term)))
+    }
 
-    quantiles <- cut(abs(embeddings), breaks = n_quantiles, labels = 1:n_quantiles)
+    quantiles <- cut(abs(embeddings),
+                     breaks = n_quantiles,
+                     labels = seq(1,n_quantiles))
     top_factors <- embeddings[quantiles %in% select_quantiles]
     return(top_factors)
 }

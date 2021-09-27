@@ -39,7 +39,8 @@ set.seed(2020)
 combined SNPs to Genes (cS2G) model.
 
 ```{r, eval=FALSE}
-ukb_cs2g <- phenomix::get_cs2g_ukb(value_var = "cS2G")
+ukb_cs2g <- phenomix::get_cs2g_ukb(value_var = "cS2G", 
+                                   min_value = .75)
 ukb_pip <- phenomix::get_cs2g_ukb(value_var = "PIP")
 ```
 
@@ -66,7 +67,7 @@ Integrate the cS2G and PIP scores with MOFA2.
 
 *Note*: We've set `maxiter=10` for fast demonstration purposes only. The recommended default is `1000`.
 
-```{r}
+```{r, eval=FALSE}
 model <- phenomix::run_mofa2(mat_list = list(cS2G=ukb_cs2g$data, 
                                              PIP=ukb_pip$data), 
                    metadata = ukb_cs2g$metadata,
@@ -78,7 +79,7 @@ MOFA2::plot_data_overview(model)
 
 ### Evaluate model 
 
-```{r}
+```{r, eval=FALSE}
 head(model@cache$variance_explained$r2_total[[1]]) # group 1
 head(model@cache$variance_explained$r2_per_factor[[1]]) # group 1
 
@@ -123,7 +124,7 @@ MOFA2::plot_data_heatmap(model,
 
 Run UMAP on the MOFA factors and visualize.
 
-```{r} 
+```{r, eval=FALSE} 
 MOFA2::plot_dimred(object = model,
                    method = "UMAP", 
                    color_by = "GROUP")

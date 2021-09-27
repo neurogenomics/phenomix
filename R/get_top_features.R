@@ -15,8 +15,8 @@
 #' @importFrom dplyr %>% rename group_by slice_max
 #' @importFrom data.table data.table
 #' @examples
-#' data("DEGAS_seurat")
-#' top_features <- get_top_features(seurat = DEGAS_seurat)
+#' degas <- get_DEGAS()
+#' top_features <- get_top_features(obj = degas)
 get_top_features <- function(obj,
                              reduction = NULL,
                              n_features = 3,

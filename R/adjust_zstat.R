@@ -20,7 +20,7 @@
 #' @return \code{dat} with the new column "ADJ_ZSTAT".
 #'
 #' @export
-#' @importFrom stats lm p.adjust
+#' @importFrom stats lm p.adjust na.omit
 #' @importFrom data.table setkey
 adjust_zstat <- function(dat,
                          drop_MHC = TRUE,
@@ -56,7 +56,7 @@ adjust_zstat <- function(dat,
     }
 
     dat_og <- dat
-    dat <- na.omit(dat, "ZSTAT")
+    dat <- stats::na.omit(dat, "ZSTAT")
     if (nrow(dat) < 10) {
         messager("WARNING: <10 rows remainings in gene-level data. Unable to compute ADJ_ZSTAT.")
         return(dat_og)
