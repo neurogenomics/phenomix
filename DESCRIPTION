@@ -74,6 +74,7 @@ Suggests:
     TxDb.Hsapiens.UCSC.hg19.knownGene,
     TxDb.Hsapiens.UCSC.hg38.knownGene,
     org.Hs.eg.db,
-    WGCNA
+    WGCNA,
+    reticulate
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr 
