@@ -24,23 +24,14 @@
 #' This can be useful when var1 names are forced to be unique internally.
 #' @param verbose Whether to print messages.
 #'
-#' @examples
-#' library(scNLP)
-#' data("pseudo_seurat")
+#' @examples 
+#' degas <- get_DEGAS()
 #'
 #' ### No group filter
-#' top_neighbors <- search_neighbors(
-#'     seurat = pseudo_seurat,
-#'     var1_search = "purkinje",
-#'     max_neighbors = 5
-#' )
-#' ### With group filter
-#' top_neighbors2 <- search_neighbors(
-#'     seurat = pseudo_seurat,
-#'     var1_search = "purkinje",
-#'     var2_group = "human",
-#'     group_col = "species",
-#'     max_neighbors = 5
+#' top_neighbors <- find_neighbors(
+#'     obj = degas,
+#'     var1_search = "parkinson", 
+#'     label_col = "label_phe"
 #' )
 #' @export
 #' @importFrom dplyr %>% mutate_at arrange group_by slice_max desc rename

@@ -23,7 +23,6 @@ Imports:
     Matrix,
     orthogene,
     MungeSumstats,
-    scNLP,
     variancePartition,
     dplyr,
     tibble,
@@ -56,8 +55,7 @@ Imports:
     GenomeInfoDb,
     piggyback
 Remotes:
-    github::neurogenomics/scNLP,
-    github::neurogenomics/orthogene
+    github::neurogenomics/scNLP
 Suggests:
     markdown,
     rmarkdown,
@@ -75,6 +73,7 @@ Suggests:
     TxDb.Hsapiens.UCSC.hg38.knownGene,
     org.Hs.eg.db,
     WGCNA,
-    reticulate
+    reticulate,
+    scNLP
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr 

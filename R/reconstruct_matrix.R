@@ -4,7 +4,6 @@
 #' @importFrom stats quantile
 #' @importFrom scales rescale
 #' @importFrom dplyr %>%
-#' @importFrom reticulate py
 reconstruct_matrix <- function(u_name = "contribution_phe",
                                v_name = "contribution_var",
                                d_name = NULL,

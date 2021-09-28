@@ -4,8 +4,8 @@ prepare_HPO <- function(save_path = tempfile(
                         ),
                         as_seurat = TRUE) {
     HPO_id <- HPOid <- HPO_label <- entrez_gene_symbol <- NULL;
-    requireNamespace("ontologyIndex")
-    data("hpo")
+    requireNamespace("ontologyIndex","hpo")
+    # data("hpo")
     HPO <- data.table::fread(
         file.path(
             "https://ci.monarchinitiative.org/view/hpo/job",
