@@ -18,6 +18,8 @@ get_top_features(
 )
 }
 \arguments{
+\item{obj}{\pkg{Seurat} object.}
+
 \item{reduction}{Reduction to use. If \code{NULL}, defaults to first available reduction.}
 
 \item{n_features}{Number of top features per factor to select.}
@@ -34,7 +36,7 @@ get_top_features(
 
 \item{title}{Plot title.}
 
-\item{seurat}{\pkg{Seurat} object.}
+\item{verbose}{Print messages.}
 }
 \value{
 top_features \code{data.table}

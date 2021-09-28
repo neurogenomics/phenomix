@@ -4,6 +4,7 @@ get_gene_length <- function(gene_hits,
                             use_symbols = TRUE,
                             drop_na = TRUE,
                             verbose = TRUE) {
+    GENELEN <- NULL;
     messager("Computing gene lengths.", v = verbose)
     if(!methods::is(gene_hits,"data.table")){
         gene_hits <- data.table::data.table(gene_hits)

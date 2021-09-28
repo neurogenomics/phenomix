@@ -24,6 +24,10 @@ with the columns "BETA", "P","SE", and \code{agg_var}.}
 
 \item{agg_var}{Variable to aggregate \code{merged_hits} by.}
 
+\item{extra_cols}{Extra columns to include.}
+
+\item{sort_rows}{Sort rows alphanumerically.}
+
 \item{verbose}{Print messages.}
 }
 \value{

@@ -20,6 +20,7 @@ regress_gene_info <- function(xmat,
                               attributes = c("GENELEN"),
                               correction_method = "BH",
                               verbose=TRUE) {
+    gene <- NULL;
     gene_info <- get_gene_length(
         gene_hits = data.table::data.table(gene=rownames(xmat)), 
         gene_var = "gene",

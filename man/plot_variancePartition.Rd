@@ -26,6 +26,8 @@ output.}
 
 \item{n_genes}{Number of genes to select when \code{genes=NULL}.}
 
+\item{show_plot}{Print the plot.}
+
 \item{...}{Additional arguments passed to
 \link[patchwork]{wrap_plots}.}
 }

@@ -9,6 +9,7 @@
 #' @param top_n Number of top results to plot
 #' (sorted by smallest p-values).
 #' @param show_plot Print the plot.
+#' @param save_path Path to save plot to.
 #' @param verbose Print messages.
 #' @param ... Additional arguments passed to \link[heatmaply]{heatmaply}.
 #'

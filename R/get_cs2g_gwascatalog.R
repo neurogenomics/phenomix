@@ -19,7 +19,7 @@
 #' @return Named with two items: "data" and "metadata"
 #'
 #' @export
-#' @importFrom data.table fread dcast
+#' @importFrom data.table fread dcast .GRP
 #' @importFrom tibble column_to_rownames
 #' @importFrom dplyr %>%
 #' @import Matrix
@@ -32,6 +32,8 @@ get_cs2g_gwascatalog <- function(URL = file.path(
                                  as_matrix = TRUE,
                                  nThread = 1,
                                  verbose = TRUE) {
+    DISEASE.TRAIT <- . <- PUBMEDID <- ID <- SNP <- gene <- 
+        cS2G <- trait_id <- NULL;
     dat <- data.table::fread(URL, nThread = nThread)
     #### Assign unique trait IDs to differentiate them after truncation ####
     dat[, trait_id := .GRP, by = .(DISEASE.TRAIT, PUBMEDID)]

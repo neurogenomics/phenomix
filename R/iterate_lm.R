@@ -2,10 +2,13 @@
 #'
 #' @param xmat gene x trait matrix.
 #' @param ymat gene x celltype matrix.
-#' @param correction_method Multiple-testing correction method to be passed to \code{stats::p.adjust}.
-#' @param qvalue_thresh q.value threshold to use when report significant results summary.
+#' @param correction_method Multiple-testing correction 
+#' method to be passed to \code{stats::p.adjust}.
+#' @param qvalue_thresh q.value threshold to use when report
+#'  significant results summary.
 #' @param y_quantiles The number of quantiles to bin \code{ymat} data into.
-#' @param nCores Number of cores to use in parallel. Will optimize if \code{NULL}.
+#' @param nCores Number of cores to use in parallel. 
+#' Will optimize if \code{NULL}.
 #'
 #' @export
 #' @importFrom parallel mclapply
@@ -22,16 +25,22 @@
 #' ### Celltype Dataset
 #' ctd <- get_BlueLake2018_FrontalCortexOnly()
 #' ymat <- ctd[[1]]$specificity
-#' res_lm <- iterate_lm(xmat = xmat, ymat = ymat)
+#' res_lm <- iterate_lm(xmat = xmat,
+#'                      ymat = ymat, 
+#'                      nCores = 1)
 iterate_lm <- function(xmat,
                        ymat,
                        correction_method = "BH",
                        qvalue_thresh = .05,
                        y_quantiles = NULL,
                        nCores = NULL) {
-    if (is.null(nCores)) nCores <- assign_cores(worker_cores = nCores)$worker_cores
+    term <- p.value <- qvalue <- NULL;
+    if (is.null(nCores)) {
+        nCores <- assign_cores(worker_cores = nCores)$worker_cores
+    }
     gene_intersect <- intersect(rownames(xmat), rownames(ymat))
-    message(length(gene_intersect), " intersecting genes between xmat and ymat")
+    message(length(gene_intersect), 
+            " intersecting genes between xmat and ymat")
     ### Run lm  for all celltypes against this trait
     message(
         "Running ", formatC(ncol(xmat) * ncol(ymat), big.mark = ","),
@@ -72,12 +81,15 @@ iterate_lm <- function(xmat,
 
     ### Multiple-testing correction
     lm_res <- lm_res %>%
-        dplyr::mutate(qvalue = stats::p.adjust(p = p.value, method = correction_method)) %>%
+        dplyr::mutate(qvalue = stats::p.adjust(p = p.value,
+                                               method = correction_method)) %>%
         dplyr::rename(pvalue = p.value)
     ### Filter only sig results
     sig_res <- lm_res %>%
         subset(qvalue < qvalue_thresh)
-    message("\n", formatC(nrow(sig_res), big.mark = ","), " significant results @ ", correction_method, "<", qvalue_thresh)
+    message("\n", formatC(nrow(sig_res), big.mark = ","),
+            " significant results @ ",
+            correction_method, "<", qvalue_thresh)
     ### Return FULL results (not just sig)
     return(lm_res)
 }

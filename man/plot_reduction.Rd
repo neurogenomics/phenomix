@@ -28,6 +28,27 @@ plot_reduction(
 
 \item{reduction}{Which reduction to extract from.
 Only used if \code{obj} is of class \code{Seurat}.}
+
+\item{metadata}{Metadata associated with \code{obj}. 
+Will be automatically extracted from \code{obj} if it is a
+ \code{Seurat} object.}
+
+\item{fix_rownames}{Replace non-ASCII characters in row names.}
+
+\item{color_var}{\code{metadata} variable to use as point color.}
+
+\item{label_var}{\code{metadata} variable to use as point labels}
+
+\item{size_var}{\code{metadata} variable to use as point size.}
+
+\item{labels}{Whether to show labels using \link[ggrepel]{geom_text_repel}.}
+
+\item{max.overlaps}{Exclude text labels that overlap too many things.
+Defaults to 10.}
+
+\item{show_plot}{Whether to print the plot.}
+
+\item{point_alpha}{Opacity of data points.}
 }
 \value{
 ggplot object

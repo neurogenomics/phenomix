@@ -6,35 +6,39 @@
 #' @param obj Matrix or \pkg{Seurat} object to run
 #' \link[variancePartition]{fitExtractVarPartModel} on.
 #' @param metadata \code{data.frame} containing metadata
-#' to use in \code{form}. If \code{obj} is a \pkg{Seurat} object,
+#' to use in \code{formula}. If \code{obj} is a \pkg{Seurat} object,
 #' this can be left \code{NULL} and metadata
 #' will be extracted automatically.
 #' @param is_opengwas Whether the data comes from
 #'  \href{https://gwas.mrcieu.ac.uk/}{OpenGWAS}.
 #' If \code{TRUE}, a predefined formula and metadata
 #' processing procedure will be used.
+#' @param show_plot Print plot.
 #' @param nCores Number of cores to use in parallel.
 #' @param ... Additional arguments passed to
 #' \link[variancePartition]{fitExtractVarPartModel}.
 #' @inheritParams variancePartition::fitExtractVarPartModel
-#'
+#' 
+#' @returns \code{varPart} results.
+#' 
+#' @export
 #' @importFrom BiocParallel register SnowParam
 #' @importFrom methods is
 #' @importFrom variancePartition fitExtractVarPartModel
-#'
-#' @export
 run_variancePartition <- function(obj,
                                   metadata = NULL,
                                   nCores = NULL,
-                                  form = NULL,
+                                  formula = NULL,
                                   is_opengwas = FALSE,
                                   show_plot = TRUE,
                                   ...) {
-    if (is.null(form) & (!is_opengwas)) {
-        stop("Must provide form or set is_opengwas=TRUE (when applicable).")
+    if (is.null(formula) & (!is_opengwas)) {
+        stop("Must provide formula or set is_opengwas=TRUE (when applicable).")
     }
     #### Register cores ####
-    if (is.null(nCores)) nCores <- assign_cores(worker_cores = nCores)$worker_cores
+    if (is.null(nCores)) {
+        nCores <- assign_cores(worker_cores = nCores)$worker_cores
+    }
     BiocParallel::register(BiocParallel::SnowParam(nCores))
     #### Extract matrix ####
     mat <- extract_matrix(obj = obj)
@@ -44,14 +48,14 @@ run_variancePartition <- function(obj,
     }
     #### Prepare formula #####
     if (is_opengwas) {
-        form <- ~ log10(N) + log10(nsnp) +
+        formula <- ~ log10(N) + log10(nsnp) +
             (1 | population) + (1 | build_inferred) +
             (1 | priority) + (1 | author) + (1 | pmid) +
             (1 | category) + (1 | subcategory) +
             (1 | year)
         messager(
             "Using predefined formula for OpenGWAS metadata:\n",
-            c(form)
+            c(formula)
         )
         #### Prepare metadata #####
         metadata <- metadata[colnames(mat), ]
@@ -62,22 +66,21 @@ run_variancePartition <- function(obj,
         )
         metadata[is.na(metadata)] <- "NA" # Make NA its own category
     }
-    if (is.null(form)) {
-        stop("Must provide formula to form argument.")
+    if (is.null(formula)) {
+        stop("Must provide formula argument.")
     }
     #### Run VP ####
     varPart <- variancePartition::fitExtractVarPartModel(
         exprObj = mat,
-        formula = form,
+        formula = formula,
         data = metadata,
         ...
     )
 
     if (show_plot) {
-
-    }
-
-
-
+        out_merged <- plot_variancePartition(varPart = varPart, 
+                                             plot_PercentBars = TRUE, 
+                                             plot_VarPart = TRUE)
+    } 
     return(varPart)
 }

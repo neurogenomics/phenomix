@@ -3,7 +3,7 @@ p_adjust <- function(dat,
                      P_var = NULL,
                      Q_var = "Q",
                      verbose = TRUE) {
-
+    Q <- NULL;
     #### Figure out which column to use for P ####
     if (all(!is.null(P_var), P_var %in% colnames(dat))) {
         P_use <- P_var

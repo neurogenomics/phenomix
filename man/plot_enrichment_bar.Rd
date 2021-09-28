@@ -9,6 +9,9 @@ plot_enrichment_bar(
   qvalue_thresh = 0.05,
   show_plot = TRUE,
   save_path = NULL,
+  width = NA,
+  height = NA,
+  dpi = 300,
   verbose = TRUE
 )
 }

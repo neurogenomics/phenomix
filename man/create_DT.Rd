@@ -6,6 +6,14 @@
 \usage{
 create_DT(DF, caption = "", scrollY = 400)
 }
+\arguments{
+\item{DF}{Data table.}
+
+\item{caption}{Table caption.}
+
+\item{scrollY}{Max height in pixels before scrolling.}
+}
 \description{
 Create an interactive data table with download buttons
 }
+\keyword{internal}

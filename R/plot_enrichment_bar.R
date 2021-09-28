@@ -6,14 +6,17 @@ plot_enrichment_bar <- function(res,
                                 qvalue_thresh = .05,
                                 show_plot = TRUE,
                                 save_path = NULL,
+                                width = NA,
+                                height = NA,
+                                dpi = 300,
                                 verbose = TRUE) {
+    qvalue <- pvalue <- term <- NULL;
     plot_dat <- subset(res, qvalue < .05) %>%
         dplyr::arrange(dplyr::desc(pvalue))
     plot_dat$term <- factor(plot_dat$term,
         levels = unique(plot_dat$term),
         ordered = TRUE
-    )
-
+    ) 
     gg_bar <- ggplot(
         plot_dat,
         aes(

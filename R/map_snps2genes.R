@@ -29,6 +29,7 @@
 #' @param method Method to use for mapping SNPs to genes.
 #' @param save_dir Where to save results.
 #' @param verbose Print messages.
+#' @param return_path Whether to return the path to the saved results.
 #' @inheritParams import_abc
 #' @inheritParams adjust_zstat
 #'

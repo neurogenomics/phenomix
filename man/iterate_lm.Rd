@@ -18,13 +18,16 @@ iterate_lm(
 
 \item{ymat}{gene x celltype matrix.}
 
-\item{correction_method}{Multiple-testing correction method to be passed to \code{stats::p.adjust}.}
+\item{correction_method}{Multiple-testing correction 
+method to be passed to \code{stats::p.adjust}.}
 
-\item{qvalue_thresh}{q.value threshold to use when report significant results summary.}
+\item{qvalue_thresh}{q.value threshold to use when report
+significant results summary.}
 
 \item{y_quantiles}{The number of quantiles to bin \code{ymat} data into.}
 
-\item{nCores}{Number of cores to use in parallel. Will optimize if \code{NULL}.}
+\item{nCores}{Number of cores to use in parallel. 
+Will optimize if \code{NULL}.}
 }
 \description{
 Iterate linear regression across all traits and celltypes
@@ -38,5 +41,7 @@ xmat <- xmat[, 1:10] # Let's use just 10 components as an example
 ### Celltype Dataset
 ctd <- get_BlueLake2018_FrontalCortexOnly()
 ymat <- ctd[[1]]$specificity
-res_lm <- iterate_lm(xmat = xmat, ymat = ymat)
+res_lm <- iterate_lm(xmat = xmat,
+                     ymat = ymat, 
+                     nCores = 1)
 }

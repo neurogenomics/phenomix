@@ -1,4 +1,5 @@
-compute_snn <- function(obj) {
+compute_snn <- function(obj,
+                        verbose=TRUE) {
     if (is.null(names(obj@graphs))) {
         if (!"pca" %in% names(obj@reductions)) {
             if (length(Seurat::VariableFeatures(obj)) == 0) {

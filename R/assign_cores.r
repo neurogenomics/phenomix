@@ -23,7 +23,7 @@ assign_cores <- function(worker_cores = .90,
     }
     message("+ ", workers, " core(s) assigned as workers (", reserved_cores, " reserved).")
     DelayedArray::setAutoBPPARAM(BiocParallel::MulticoreParam(workers))
-    DelayedArray:::set_verbose_block_processing(verbose)
+    # DelayedArray:::set_verbose_block_processing(verbose)
     return(list(
         worker_cores = workers,
         reserved_cores = reserved_cores,

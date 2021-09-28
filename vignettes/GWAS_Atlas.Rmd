@@ -154,9 +154,9 @@ gg_bar <- phenomix::plot_enrichment(res = res,
 Characterise each factor with the Human Phenotype Ontology.
 
 ```{r, eval=FALSE}
-top_phenos <- phenomix::get_top_phenotypes(obj = obj_hpo, 
-                                           n_phenotypes = 10,
-                                           show_plot = FALSE)
+top_phenos <- phenomix::get_top_traits(obj = obj_hpo, 
+                                       n_traits = 10,
+                                       show_plot = FALSE)
 obj_hpo_sub <- subset(obj_hpo, (HPO_id %in% top_phenos$phenotype) & n_genes>4)
 # obj_hpo_sub <- subset(obj_hpo, depth>=max(depth-1, na.rm = TRUE))
 ymat <- obj_hpo@assays$RNA@counts
@@ -191,9 +191,9 @@ top_features <- phenomix:: get_top_features(obj = obj,
                                            reduction = "pca",
                                            n_features = 5,
                                            factors = names(top_factors))
-top_phenos <- phenomix::get_top_phenotypes(obj = obj, 
+top_phenos <- phenomix::get_top_traits(obj = obj, 
                                            reduction = "pca", 
-                                           n_phenotypes = 10, 
+                                           n_traits = 10, 
                                            show_plot = FALSE)
 top_phenos_table <- subset(top_phenos, factor %in% names(top_factors))[,c("Trait",
                                                                           "factor",

@@ -28,6 +28,8 @@ adjust_zstat_txdb <- function(dat,
                                   GENELEN + logGENELEN,
                               verbose = TRUE,
                               ...) {
+    Q <- P_mean <- logNSNPS <- NSNPS <- SYMBOL <- logGENELEN <- GENELEN <- NULL;
+    
     if (is.null(model)) {
         messager("Defaulting to model stats::lm.",
             v = verbose

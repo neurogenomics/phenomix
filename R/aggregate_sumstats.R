@@ -9,6 +9,8 @@
 #' with the columns "BETA", "P","SE", and \code{agg_var}.
 #' @param drop_na Drop rows with \code{NA} in any column.
 #' @param agg_var Variable to aggregate \code{merged_hits} by.
+#' @param extra_cols Extra columns to include.
+#' @param sort_rows Sort rows alphanumerically.
 #' @param verbose Print messages.
 #'
 #' @return \link[data.table]{data.table} with
@@ -18,7 +20,7 @@
 #' @source \href{https://stackoverflow.com/questions/59059743/apply-different-functions-to-different-columns-programmatically-in-data-table-r}{data.table aggregation solution}
 #'
 #' @export
-#' @importFrom data.table uniqueN
+#' @importFrom data.table uniqueN .SD
 #' @importFrom stats complete.cases na.omit
 aggregate_sumstats <- function(merged_hits,
                                drop_na = TRUE,

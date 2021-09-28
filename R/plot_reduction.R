@@ -3,7 +3,19 @@
 #' Plot dimensionality reduction results
 #' from \code{run_<method>} or a Seurat object.
 #'
+#' @param metadata Metadata associated with \code{obj}. 
+#' Will be automatically extracted from \code{obj} if it is a
+#'  \code{Seurat} object.
+#' @param fix_rownames Replace non-ASCII characters in row names.
+#' @param color_var \code{metadata} variable to use as point color.
+#' @param label_var \code{metadata} variable to use as point labels
+#' @param size_var \code{metadata} variable to use as point size.
+#' @param labels Whether to show labels using \link[ggrepel]{geom_text_repel}.
+#' @param show_plot Whether to print the plot.
+#' @param point_alpha Opacity of data points.
+#' 
 #' @inheritParams extract_embeddings
+#' @inheritParams ggrepel::geom_text_repel
 #'
 #' @return ggplot object
 #'

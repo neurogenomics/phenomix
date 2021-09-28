@@ -7,6 +7,15 @@
 #' set number of factors.
 #'
 #' @param obj Named list of input data matrices, or a \pkg{Seurat} object.
+#' @param metadata Metadata associated with \code{obj}. 
+#' Will be extracted automatically if \code{obj} is a \pkg{Seurat} object.
+#' @param assay Assay to use in \code{obj}.
+#' @param slot Slot to use in \code{obj}.
+#' @param features Features to use in reduction. 
+#' If \code{NULL} and \code{obj} is a \pkg{Seurat} object, 
+#' will use precalculated variable genes.
+#' @param metadata_idcol The name of the column to add to \code{metadata} 
+#' after fixing IDs.
 #' @param transpose First transpose each matrix in \code{mat_list}.
 #' @param maxiter Maximum number of training iterations (\emph{DEFAULT} = 1000).
 #' @param reductions In addition to returning  MOFA factors,
@@ -17,6 +26,7 @@
 #' @param ... Additional parameters passed to \link[MOFA2]{run_mofa}.
 #' @inheritParams MOFA2::run_mofa
 #' @inheritParams MOFA2::create_mofa
+#' @inheritParams MOFA2::prepare_mofa
 #'
 #' @source \href{https://biofam.github.io/MOFA2/}{MOFA2 site}
 #'

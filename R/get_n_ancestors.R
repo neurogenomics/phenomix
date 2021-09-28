@@ -1,3 +1,7 @@
+#' get_n_ancestors
+#' 
+#' @keywords internal
+#' @importFrom ontologyIndex get_ancestors
 get_n_ancestors <- function(ontology,
                             term_ids = NULL) {
     if (is.null(term_ids)) term_ids <- unique(ontology$id)

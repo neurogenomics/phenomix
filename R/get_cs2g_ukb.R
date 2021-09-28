@@ -38,6 +38,7 @@ get_cs2g_ukb <- function(URL = file.path(
                          min_value=0,
                          nThread = 1,
                          verbose = TRUE) {
+    ID <- DISEASE.TRAIT <- . <- SNP <- gene <- PIP <- GROUP <- TRAIT <- NULL;
     value_var <- value_var[1]
     dat <- data.table::fread(URL, nThread = nThread)
     #### Prepare metadata ####

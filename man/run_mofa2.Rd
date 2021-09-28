@@ -34,9 +34,38 @@ run_mofa2(
 
 \item{groups}{group information, only relevant when using the multi-group framework.}
 
+\item{metadata}{Metadata associated with \code{obj}. 
+Will be extracted automatically if \code{obj} is a \pkg{Seurat} object.}
+
+\item{assay}{Assay to use in \code{obj}.}
+
+\item{slot}{Slot to use in \code{obj}.}
+
+\item{features}{Features to use in reduction. 
+If \code{NULL} and \code{obj} is a \pkg{Seurat} object, 
+will use precalculated variable genes.}
+
+\item{metadata_idcol}{The name of the column to add to \code{metadata} 
+after fixing IDs.}
+
 \item{transpose}{First transpose each matrix in \code{mat_list}.}
 
 \item{maxiter}{Maximum number of training iterations (\emph{DEFAULT} = 1000).}
+
+\item{data_options}{list of data_options (see \code{\link[MOFA2]{get_default_data_options}} details). 
+If NULL, default options are used.}
+
+\item{model_options}{list of model options (see \code{\link[MOFA2]{get_default_model_options}} for details). 
+If NULL, default options are used.}
+
+\item{training_options}{list of training options (see \code{\link[MOFA2]{get_default_training_options}} for details). 
+If NULL, default options are used.}
+
+\item{stochastic_options}{list of options for stochastic variational inference (see \code{\link[MOFA2]{get_default_stochastic_options}} for details). 
+If NULL, default options are used.}
+
+\item{mefisto_options}{list of options for mefisto (see \code{\link[MOFA2]{get_default_mefisto_options}} for details). 
+If NULL, default options are used.}
 
 \item{outfile}{output file for the model (.hdf5 format). If \code{NULL}, a temporary file is created.}
 

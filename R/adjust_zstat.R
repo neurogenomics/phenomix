@@ -14,6 +14,7 @@
 #' @param log_vars Variables to perform natural log transformation on first.
 #' Only run on variables available in \code{dat}.
 #' @param formula Formula to use in \code{model}.
+#' @param verbose Print messages.
 #' @param ... Additional arguments passed to \code{model}.
 #' @inheritParams stats::p.adjust
 #'

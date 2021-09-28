@@ -1,6 +1,9 @@
 #' Create an interactive data table with download buttons
 #'
-#'
+#' @param DF Data table.
+#' @param caption Table caption.
+#' @param scrollY Max height in pixels before scrolling.
+#' @keywords internal
 create_DT <- function(DF,
                       caption = "",
                       scrollY = 400) {

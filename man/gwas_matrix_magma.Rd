@@ -9,9 +9,10 @@ gwas_matrix_magma(
   metric = c("ADJ_ZSTAT", "ZSTAT", "P"),
   drop_MHC = TRUE,
   save_path = NULL,
-  mc.cores = 1,
+  nCores = 1,
   fillna = TRUE,
-  agg_FUN = "mean"
+  agg_FUN = "mean",
+  verbose = TRUE
 )
 }
 \arguments{
@@ -30,6 +31,14 @@ produced by \link[MAGMA.Celltyping]{map.snps.to.genes}.}
 (Major Histocompatibility Complex) region.}
 
 \item{save_path}{Path to save results as RDS object.}
+
+\item{nCores}{Number of cores to parallelise across.}
+
+\item{fillna}{Value to fill \code{NA}s with.}
+
+\item{agg_FUN}{Aggregation function.}
+
+\item{verbose}{Print messages.}
 }
 \value{
 Sparse matrix

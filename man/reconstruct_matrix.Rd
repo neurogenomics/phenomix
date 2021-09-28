@@ -8,14 +8,14 @@ reconstruct_matrix(
   u_name = "contribution_phe",
   v_name = "contribution_var",
   d_name = NULL,
-  DEGAS = py$DEGAS,
+  DEGAS = NULL,
   annot = NULL,
-  gene_level = F,
-  remove_nongenes = T,
-  filter_quantiles = F,
-  norm = T,
+  gene_level = FALSE,
+  remove_nongenes = TRUE,
+  filter_quantiles = FALSE,
+  norm = TRUE,
   norm_scale = c(1, 100),
-  replace_underscores = T
+  replace_underscores = TRUE
 )
 }
 \description{

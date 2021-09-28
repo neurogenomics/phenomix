@@ -4,6 +4,7 @@
 #'  Gene Set  Enrichment Analysis (GSEA).
 #'
 #' @param factors Which factors to run gprofiler on.
+#' @param verbose Print messages.
 #' @param ... Additional arguments passed to \link[gprofiler2]{gost}.
 #' @inheritParams get_top_features
 #' @inheritParams gprofiler2::gost

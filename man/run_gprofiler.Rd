@@ -15,6 +15,8 @@ run_gprofiler(
 )
 }
 \arguments{
+\item{obj}{\pkg{Seurat} object.}
+
 \item{n_features}{Number of top features per factor to select.}
 
 \item{factors}{Which factors to run gprofiler on.}
@@ -22,6 +24,8 @@ run_gprofiler(
 \item{reduction}{Reduction to use. If \code{NULL}, defaults to first available reduction.}
 
 \item{show_plot}{Whether to print the plot or simply return it.}
+
+\item{verbose}{Print messages.}
 
 \item{...}{Additional arguments passed to \link[gprofiler2]{gost}.}
 }

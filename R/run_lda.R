@@ -22,9 +22,6 @@
 run_lda <- function(mat,
                     grouping,
                     transpose = TRUE,
-                    center = TRUE,
-                    scale. = FALSE,
-                    rank. = NULL,
                     ...) {
     if (transpose) {
         mat <- Matrix::t(mat)

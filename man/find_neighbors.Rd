@@ -7,6 +7,9 @@
 find_neighbors(
   obj,
   graph_name = NULL,
+  assay = NULL,
+  slot = NULL,
+  reduction = NULL,
   var1_search = NULL,
   label_col = NULL,
   var2_group = NULL,
@@ -17,10 +20,18 @@ find_neighbors(
 )
 }
 \arguments{
+\item{obj}{\pkg{Seurat} object.}
+
 \item{graph_name}{Name of the graph to use.
 If none provided, will use the last graph available.
 If no graphs are available, new ones will be computed using
  Pearson's correlation on the raw counts matrix.}
+
+\item{assay}{Assay to use.}
+
+\item{slot}{Slot to use.}
+
+\item{reduction}{Reduction to use.}
 
 \item{var1_search}{Substring search term to filter var1 by.
 If a vector is supplied instead, this will be interpreted as an "or" query.}
@@ -40,8 +51,6 @@ when \code{var2_group} is used.}
 This can be useful when var1 names are forced to be unique internally.}
 
 \item{verbose}{Whether to print messages.}
-
-\item{seurat}{\pkg{Seurat} object.}
 }
 \description{
 Search [shared] K-nearest neighbor graph to find the

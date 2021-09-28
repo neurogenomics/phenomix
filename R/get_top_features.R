@@ -2,10 +2,11 @@
 #'
 #' Plot the top feature loadings for from a given reduction.
 #'
-#' @param seurat \pkg{Seurat} object.
+#' @param obj \pkg{Seurat} object.
 #' @param reduction Reduction to use. If \code{NULL}, defaults to first available reduction.
 #' @param n_features Number of top features per factor to select.
 #' @param n_features_plot Number of top features to plot.
+#' @param verbose Print messages.
 #' @inheritParams plot_top
 #'
 #' @return top_features \code{data.table}
@@ -27,6 +28,7 @@ get_top_features <- function(obj,
                              show_plot = TRUE,
                              title = NULL,
                              verbose = TRUE) {
+    Var1 <- Var2 <- value <- loading <- NULL;
     loadings <- extract_loadings(
         obj = obj,
         reduction = reduction,

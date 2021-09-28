@@ -15,6 +15,7 @@
 #' @param transpose Whether to transpose the matrix first.
 #' @param return_obj Whether to return the \pkg{Seurat} object with a new
 #' \code{obj@graphs} slot, or to simply return the sparse correlation matrix.
+#' @param verbose Print messages.
 #' @inheritParams stats::cor
 #'
 #' @returns A \pkg{Seurat} object with a new \code{obj@graphs} slot,
@@ -22,7 +23,7 @@
 #'
 #' @export
 #' @importFrom Matrix t
-#' @importFrom methods as
+#' @importFrom methods as slot
 compute_cor <- function(obj,
                         assay = NULL,
                         slot = NULL,

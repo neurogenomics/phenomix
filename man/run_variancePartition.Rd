@@ -8,7 +8,7 @@ run_variancePartition(
   obj,
   metadata = NULL,
   nCores = NULL,
-  form = NULL,
+  formula = NULL,
   is_opengwas = FALSE,
   show_plot = TRUE,
   ...
@@ -19,19 +19,26 @@ run_variancePartition(
 \link[variancePartition]{fitExtractVarPartModel} on.}
 
 \item{metadata}{\code{data.frame} containing metadata
-to use in \code{form}. If \code{obj} is a \pkg{Seurat} object,
+to use in \code{formula}. If \code{obj} is a \pkg{Seurat} object,
 this can be left \code{NULL} and metadata
 will be extracted automatically.}
 
 \item{nCores}{Number of cores to use in parallel.}
+
+\item{formula}{specifies variables for the linear (mixed) model.  Must only specify covariates, since the rows of exprObj are automatically used a a response. e.g.: \code{~ a + b + (1|c)}}
 
 \item{is_opengwas}{Whether the data comes from
  \href{https://gwas.mrcieu.ac.uk/}{OpenGWAS}.
 If \code{TRUE}, a predefined formula and metadata
 processing procedure will be used.}
 
+\item{show_plot}{Print plot.}
+
 \item{...}{Additional arguments passed to
 \link[variancePartition]{fitExtractVarPartModel}.}
+}
+\value{
+\code{varPart} results.
 }
 \description{
 Run \link[variancePartition]{fitExtractVarPartModel}

@@ -13,7 +13,8 @@ compare_snps2genes_methods <- function(res1,
     #
     # res1 <- magma
     # res2 <- gene_hits
-
+    
+    mean.ADJ_ZSTAT <- res1.ADJ_ZSTAT <- res2.ADJ_ZSTAT <- NULL;
     #### Set keys ####
     data.table::setnames(res1, key1, "GENE")
     data.table::setkeyv(res1, "GENE")

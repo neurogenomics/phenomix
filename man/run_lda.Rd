@@ -7,15 +7,7 @@
 \url{https://towardsdatascience.com/linear-discriminant-analysis-lda-101-using-r-6a97217a55a6}
 }
 \usage{
-run_lda(
-  mat,
-  grouping,
-  transpose = TRUE,
-  center = TRUE,
-  scale. = FALSE,
-  rank. = NULL,
-  ...
-)
+run_lda(mat, grouping, transpose = TRUE, ...)
 }
 \arguments{
 \item{mat}{Matrix to run PCA on.}

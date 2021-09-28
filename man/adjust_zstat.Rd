@@ -33,6 +33,8 @@ Only run on variables available in \code{dat}.}
 
 \item{formula}{Formula to use in \code{model}.}
 
+\item{verbose}{Print messages.}
+
 \item{...}{Additional arguments passed to \code{model}.}
 }
 \value{

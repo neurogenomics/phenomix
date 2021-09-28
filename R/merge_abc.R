@@ -3,6 +3,7 @@ merge_abc <- function(sumstats,
                       abc = NULL,
                       nCores = 1,
                       verbose = TRUE) {
+    CHR <- NULL;
     #### Import ABC model predictions ####
     abc <- import_abc(
         dataset = dataset,

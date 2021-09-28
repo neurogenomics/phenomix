@@ -26,6 +26,9 @@ adjust_zstat_magma <- function(magma,
                                    logNPARAM + GENELEN + logGENELEN,
                                verbose = TRUE,
                                ...) {
+    Q <- P <- logNSNPS <- NSNPS <- logNPARAM <- NPARAM <-
+        GENELEN <- STOP <- START <- logGENELEN <- NULL;
+        
     if (is.null(model)) {
         messager("Defaulting to model stats::lm.",
             v = verbose

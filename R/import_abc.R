@@ -15,8 +15,7 @@
 #' \href{https://www.engreitzlab.org/resources/}{ABC models from multiple Engreitz Lab publications}
 #'
 #' @param dataset Which ABC model to import.
-#' @param nCores Number of cores to parallelise across.
-#' @param method Method to use for mapping SNPs to genes.
+#' @param nCores Number of cores to parallelise across. 
 #' @param abc Use a previously downloaded ABC \link[data.table]{data.table}.
 #' @param verbose Print messages.
 #'

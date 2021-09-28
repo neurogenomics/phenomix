@@ -9,6 +9,7 @@
 #' @param plot_VarPart Add  \link[variancePartition]{plotPercentBars}.
 #' @param genes Genes to plot in \link[variancePartition]{plotVarPart}.
 #' @param n_genes Number of genes to select when \code{genes=NULL}.
+#' @param show_plot Print the plot.
 #' @param ... Additional arguments passed to
 #'  \link[patchwork]{wrap_plots}.
 #'
@@ -22,6 +23,7 @@ plot_variancePartition <- function(varPart,
                                    n_genes = 10,
                                    show_plot = TRUE,
                                    ...) {
+    ..y.. <- NULL;
     out <- list()
     vp <- variancePartition::sortCols(varPart)
     #### Select genes ####

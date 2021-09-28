@@ -11,6 +11,7 @@ plot_enrichment_heat <- function(res,
                                  save_path = NULL,
                                  verbose = TRUE,
                                  ...) {
+    pvalue <- qvalue <- 
     plot_dat <- subset(res, qvalue < .05) %>%
         dplyr::arrange(dplyr::desc(pvalue))
     plot_dat$term <- factor(plot_dat$term,
@@ -18,7 +19,7 @@ plot_enrichment_heat <- function(res,
         ordered = TRUE
     )
 
-    dmat <- data.table::data.table(res_sig) %>%
+    dmat <- data.table::data.table(plot_dat) %>%
         data.table::dcast.data.table(
             formula = term ~ trait,
             value.var = "negLogP",

@@ -49,6 +49,8 @@ Only run on variables available in \code{dat}.}
 
 \item{save_dir}{Where to save results.}
 
+\item{return_path}{Whether to return the path to the saved results.}
+
 \item{verbose}{Print messages.}
 }
 \value{

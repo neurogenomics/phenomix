@@ -15,6 +15,7 @@ plot_trait_cor <- function(knn,
                            top_n = 10,
                            non_self = TRUE,
                            show_plot = TRUE) {
+    trait2 <- trait1 <- similarity <- NULL;
     if (non_self) {
         plot_dat <- subset(knn, !trait2 %in% trait1)
     } else {

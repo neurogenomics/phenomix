@@ -29,7 +29,7 @@
 #' @importFrom VariantAnnotation PromoterVariants CodingVariants
 #' @importFrom VariantAnnotation AllVariants IntronVariants
 #' @importFrom VariantAnnotation ThreeUTRVariants SpliceSiteVariants
-#' @importFrom GenomicRanges GRangesList
+#' @importFrom GenomicRanges GRangesList makeGRangesFromDataFrame
 #' @importFrom parallel mclapply
 #' @importFrom methods is
 map_snps_txdb <- function(sumstats,
@@ -47,7 +47,12 @@ map_snps_txdb <- function(sumstats,
 
     #### Convert to GRanges ####
     if (!methods::is(sumstats, "GRanges")) {
-        gr <- MungeSumstats:::to_GRanges(sumstats)
+        gr <- GenomicRanges::makeGRangesFromDataFrame(
+            sumstats, 
+            keep.extra.columns = TRUE, 
+            seqnames.field = "CHR", 
+            start.field = "BP", 
+            end.field = "BP")
     }
     GenomeInfoDb::seqlevelsStyle(gr) <- "UCSC"
     #### Get txdb ####

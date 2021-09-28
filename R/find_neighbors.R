@@ -3,7 +3,10 @@
 #' Search [shared] K-nearest neighbor graph to find the
 #'  samples that are most similar to those matching a substring search.
 #'
-#' @param seurat \pkg{Seurat} object.
+#' @param obj \pkg{Seurat} object.
+#' @param assay Assay to use.
+#' @param slot Slot to use.
+#' @param reduction Reduction to use.
 #' @param graph_name Name of the graph to use.
 #' If none provided, will use the last graph available.
 #' If no graphs are available, new ones will be computed using
@@ -47,6 +50,9 @@
 #' @importFrom data.table data.table
 find_neighbors <- function(obj,
                            graph_name = NULL,
+                           assay = NULL,
+                           slot = NULL,
+                           reduction=NULL,
                            var1_search = NULL,
                            label_col = NULL,
                            var2_group = NULL,
@@ -54,6 +60,7 @@ find_neighbors <- function(obj,
                            max_neighbors = Inf,
                            add_original_names = TRUE,
                            verbose = TRUE) {
+    Var1 <- Var2 <- trait1 <- trait2 <- similarity <- NULL;
     #### Extract/compute correlation matrix ####
     cmat <- extract_cor(
         obj = obj,

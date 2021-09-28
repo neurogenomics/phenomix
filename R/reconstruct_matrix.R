@@ -2,22 +2,28 @@
 #'
 #' @keywords internal
 #' @importFrom stats quantile
+#' @importFrom scales rescale
+#' @importFrom dplyr %>%
+#' @importFrom reticulate py
 reconstruct_matrix <- function(u_name = "contribution_phe",
                                v_name = "contribution_var",
                                d_name = NULL,
-                               DEGAS = py$DEGAS,
+                               DEGAS = NULL,
                                annot = NULL,
-                               gene_level = F,
-                               remove_nongenes = T,
-                               filter_quantiles = F,
-                               norm = T,
+                               gene_level = FALSE,
+                               remove_nongenes = TRUE,
+                               filter_quantiles = FALSE,
+                               norm = TRUE,
                                norm_scale = c(1, 100),
-                               replace_underscores = T) {
-    if (!exists("DEGAS")) DEGAS <- py$DEGAS
+                               replace_underscores = TRUE) {
+    if (is.null(DEGAS)){
+        py <- reticulate::py
+        DEGAS <- py$DEGAS
+    }
     label_phe_code <- DEGAS["label_phe_code"]
     if (gene_level) {
         ## NOTE:  Genes symbols are provided directly in label_gene
-        print("+ Annotating at the gene-level")
+        message("+ Annotating at the gene-level")
         label_var_gene <- DEGAS["label_gene"]
     } else {
         ## NOTE: Variants must be translated from positions to RSIDs
@@ -26,17 +32,17 @@ reconstruct_matrix <- function(u_name = "contribution_phe",
             vec = DEGAS["label_var"],
             annot = annot
         ) %>% unname()
-    }
-
+    } 
     if (replace_underscores) {
-        print("+ Replacing _ with -")
-        ### Seurat requires this, and tries to enforce it but doesn't do it very well
+        message("+ Replacing _ with -")
+        ## Seurat requires this, and tries 
+        ## to enforce it but doesn't do it very well
         ## https://github.com/satijalab/seurat/issues/1296
         label_var_gene <- gsub("_", "-", label_var_gene)
     }
-    print("+ Preparing input matrices")
+    message("+ Preparing input matrices")
     u <- DEGAS[u_name]
-    label_dim <- paste0("dim", 1:ncol(u))
+    label_dim <- paste0("dim", seq(1,ncol(u)))
     u <- u %>%
         `rownames<-`(label_phe_code) %>%
         `colnames<-`(label_dim)
@@ -45,21 +51,23 @@ reconstruct_matrix <- function(u_name = "contribution_phe",
         `colnames<-`(label_dim)
     if (gene_level & remove_nongenes) {
         ## NOTE: Most of the "genes" do not have any gene symbols. Remove them.
-        print("+ Removing non-genes")
-        yes_genes <- grep(paste(paste0("^", 1:23, "-"), collapse = "|"), rownames(v), value = T, invert = T)
+        message("+ Removing non-genes")
+        yes_genes <- grep(paste(paste0("^", seq(1,23), "-"), collapse = "|"), 
+                          rownames(v), value = TRUE, invert = TRUE)
         v <- v[yes_genes, ]
     }
     if (is.null(d_name)) {
-        print("+ Reconstructing matrix from `u %*% t(v)`")
+        message("+ Reconstructing matrix from `u %*% t(v)`")
         M2 <- u %*% t(v)
     } else {
         print("+ Reconstructing matrix from `u %*% diag(d) %*% t(v)`")
-        d <- py$DEGAS[d_name]
+        d <- DEGAS[d_name]
         M2 <- u %*% diag(d) %*% t(v)
     }
     if (filter_quantiles) {
         print("+ Removing values in the lowest percentile")
-        quants <- stats::quantile(abs(M2), probs = seq(0, 1, length.out = 100))
+        quants <- stats::quantile(abs(M2), 
+                                  probs = seq(0, 1, length.out = 100))
         M2_remove <- abs(M2) < unname(quants[2])
         M2[abs(M2) < quants[2]] <- NA
     }

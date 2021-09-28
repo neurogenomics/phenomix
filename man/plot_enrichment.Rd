@@ -27,6 +27,8 @@ plot_enrichment(
 
 \item{show_plot}{Print the plot.}
 
+\item{save_path}{Path to save plot to.}
+
 \item{verbose}{Print messages.}
 
 \item{...}{Additional arguments passed to \link[heatmaply]{heatmaply}.}

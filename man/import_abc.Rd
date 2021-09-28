@@ -14,8 +14,6 @@ import_abc(dataset = "Nasser2020", abc = NULL, nCores = 1, verbose = TRUE)
 \item{nCores}{Number of cores to parallelise across.}
 
 \item{verbose}{Print messages.}
-
-\item{method}{Method to use for mapping SNPs to genes.}
 }
 \value{
 \code{gene_hits} \link[data.table]{data.table}

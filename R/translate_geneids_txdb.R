@@ -20,6 +20,7 @@ translate_geneids_txdb <- function(gene_hits,
                                    gene_var = "GENEID",
                                    drop_na = TRUE,
                                    verbose = TRUE) {
+    SYMBOL <- NULL;
     messager("Translating", gene_var, "to SYMBOL.", v = verbose)
     symbol_key <- AnnotationDbi::select(org.Hs.eg.db::org.Hs.eg.db,
         keys = gene_hits[[gene_var]],

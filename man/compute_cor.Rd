@@ -37,6 +37,8 @@ compute trait-trait similarities instead.}
 
 \item{return_obj}{Whether to return the \pkg{Seurat} object with a new
 \code{obj@graphs} slot, or to simply return the sparse correlation matrix.}
+
+\item{verbose}{Print messages.}
 }
 \value{
 A \pkg{Seurat} object with a new \code{obj@graphs} slot,

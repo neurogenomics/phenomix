@@ -18,7 +18,8 @@ regress_gene_info(
 \code{TxDb.Hsapiens.UCSC.hg38.knownGene}.
  and then regress from \code{xmat}.}
 
-\item{correction_method}{Multiple-testing correction method to be passed to \code{stats::p.adjust}.}
+\item{correction_method}{Multiple-testing correction 
+method to be passed to \code{stats::p.adjust}.}
 }
 \description{
 Queries \code{biomaRt} for \code{gene_attributes} and then regresses them out of \code{xmat}.

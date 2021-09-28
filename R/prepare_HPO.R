@@ -3,6 +3,9 @@ prepare_HPO <- function(save_path = tempfile(
                             fileext = ".rds"
                         ),
                         as_seurat = TRUE) {
+    HPO_id <- HPOid <- HPO_label <- entrez_gene_symbol <- NULL;
+    requireNamespace("ontologyIndex")
+    data("hpo")
     HPO <- data.table::fread(
         file.path(
             "https://ci.monarchinitiative.org/view/hpo/job",
@@ -70,7 +73,7 @@ prepare_HPO <- function(save_path = tempfile(
     } else {
         obj <- list(
             mat = mat,
-            metadata = ancest_df
+            metadata = meta
         )
     }
     if (!is.null(save_path)) {

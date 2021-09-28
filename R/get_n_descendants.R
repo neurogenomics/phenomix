@@ -1,3 +1,7 @@
+#' get_n_descendants
+#' 
+#' @keywords internal
+#' @importFrom ontologyIndex get_descendants
 get_n_descendants <- function(ontology,
                               term_ids = NULL) {
     if (is.null(term_ids)) term_ids <- unique(ontology$id)
