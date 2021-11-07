@@ -50,3 +50,4 @@ plot_trait_cor <- function(knn,
     if (show_plot) print(gg_cor)
     return(gg_cor)
 }
+

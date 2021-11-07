@@ -59,6 +59,7 @@ find_neighbors <- function(obj,
         assay = assay,
         slot = slot,
         reduction = reduction,
+        return_obj = FALSE,
         verbose = verbose
     )
     metadata <- extract_metadata(obj = obj)
@@ -75,8 +76,8 @@ find_neighbors <- function(obj,
         `colnames<-`(sample_names)
 
     if (!is.null(var1_search)) {
-        messager("+ Filtering results by var1_search:",
-            var1_search,
+        messager("Filtering results by var1_search:",
+            paste(var1_search,collapse = " | "),
             v = verbose
         )
         targets1 <- grep(

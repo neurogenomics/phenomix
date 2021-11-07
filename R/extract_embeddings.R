@@ -26,7 +26,7 @@ extract_embeddings <- function(obj,
         embeddings <- DR@cell.embeddings
     } else if (methods::is(obj, "Seurat")) {
         if (is.null(reduction)) reduction <- Seurat::Reductions(obj)[1]
-        messager("Extracting embeddings from Seurat reduction: ",
+        messager("Extracting embeddings from Seurat reduction:",
             reduction,
             v = verbose
         )

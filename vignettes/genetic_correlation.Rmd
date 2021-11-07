@@ -27,46 +27,48 @@ library(ggplot2)
 degas <- phenomix::get_DEGAS()
 ```
 
-# Reconstruct gene x trait matrix
-
-You can  matrix multiplication to reconstruct the original gene x trait matrix
-from the. 
-
-However, we've already run this step for you and stored it within the
-assay "genes" so you can skip ahead to the next step.
-
-```R
-u <- phenomix::extract_embeddings(obj = degas)
-v <- phenomix::extract_loadings(obj = degas)
-M <-  (u %*% t(v)) %>% Matrix::t() %>% as("sparseMatrix")
-```
 
 # Compute correlations
 
 ## Full matrix 
 
 Next, we will compute all pairwise trait-trait correlations.
-`compute_cor` returns the object with the correlation matrix 
+`extract_cor` returns the object with the correlation matrix 
 (within `degas@graphs$cor`).
 
 ```{r}
-degas <- phenomix::compute_cor(obj = degas)
+degas <- phenomix::extract_cor(obj = degas,
+                               return_obj = TRUE)
 ```
 
-The correlation matrix can easily be extracted with with the
-convenience function `extract_cor`.
+The correlation matrix by itself 
+can easily be extracted by setting `return_obj = FALSE`.
 
-```{r}
-cmat <- phenomix::extract_cor(obj = degas)
+```R
+cmat <- phenomix::extract_cor(obj = degas,
+                              return_obj = FALSE)
 ```
 
 ### Find neighbors
 
+`find_neighbors` makes finding traits that correlate with your 
+traits of interest even easier. You can enter a list of terms to `var1_search`
+to perform a case-insensitive substring search to find traits of interest. 
+
+`find_neighbors` will then melt and sort the correlation matrix into a 
+data.table for further processing.
+
 ```{r}
 knn <- phenomix::find_neighbors(obj = degas, 
-                                graph_name = "cor",
-                                var1_search = "parkinson|alzheimer", 
+                                var1_search = c("parkinson","alzheimer"), 
                                 label_col = "label_phe")
+```
+
+### Plot
+
+Finally, we can plot the top N most similar traits to your traits of interest.
+
+```{r}
 gg_cor <- phenomix::plot_trait_cor(knn = knn,
                                    group_var = "trait1",
                                    top_n = 5)
@@ -83,9 +85,16 @@ This approach will be faster than running correlations on the full matrix,
 but also tends to be less accurate since some information is thrown out during 
 dimensionality reduction.
 
+It's also worth mentioned that if the graph of interest doesn't exist, `find_neighbors` will automatically compute it based on the input arguments.
+
 ```{r}
-cmat2 <- phenomix::compute_cor(obj = degas, 
-                               reduction = "contributionGene")
+knn <- phenomix::find_neighbors(obj = degas, 
+                                reduction = "contributionGene",
+                                var1_search = c("parkinson","alzheimer"), 
+                                label_col = "label_phe")
+gg_cor <- phenomix::plot_trait_cor(knn = knn,
+                                   group_var = "trait1",
+                                   top_n = 5)
 ```
 
 # Session Info 

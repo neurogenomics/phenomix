@@ -21,10 +21,11 @@
 #' @returns A \pkg{Seurat} object with a new \code{obj@graphs} slot,
 #' or the sparse correlation matrix.
 #'
-#' @export
+#' @keywords internal
 #' @importFrom Matrix t
 #' @importFrom methods as slot
 compute_cor <- function(obj,
+                        graph_name = NULL,
                         assay = NULL,
                         slot = NULL,
                         reduction = NULL,
@@ -39,6 +40,8 @@ compute_cor <- function(obj,
             reduction = reduction,
             verbose = verbose
         )
+        #### Important! must transpose ####
+        transpose <- TRUE
     } else {
         mat <- extract_matrix(
             obj = obj,
@@ -53,12 +56,18 @@ compute_cor <- function(obj,
         messager("Computing r with WGCNA.", v = verbose)
         cmat <- WGCNA::cor(mat, method = method)
     } else {
-        messager("Computing r with stats", v = verbose)
+        messager("Computing r with stats.", v = verbose)
         cmat <- stats::cor(mat, method = method)
     }
+    #### Convert to sparse graph ####
     cmat <- methods::as(methods::as(cmat, "sparseMatrix"), "Graph")
-    if (return_obj & is_seurat(obj)) {
-        graph_name <- if (is.null(assay)) "cor" else paste0(assay, "_", "cor")
+    if (return_obj && is_seurat(obj)) {
+        graph_name <- infer_graph_name(obj = obj, 
+                                       graph_name = graph_name,
+                                       assay = assay, 
+                                       reduction = reduction, 
+                                       ignore_has_graph = TRUE, 
+                                       verbose = FALSE)
         messager("Adding new graph to obj:", graph_name, v = verbose)
         obj@graphs[[graph_name]] <- cmat
         return(obj)
