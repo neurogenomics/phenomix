@@ -8,14 +8,18 @@ reconstruct_matrix(
   u_name = "contribution_phe",
   v_name = "contribution_var",
   d_name = NULL,
-  DEGAS = NULL,
+  u_labels = "label_phe_code",
+  v_labels = if (gene_level) {     "label_gene" } else {     "label_var" },
+  npz_obj = NULL,
   annot = NULL,
   gene_level = FALSE,
   remove_nongenes = TRUE,
   filter_quantiles = FALSE,
   norm = TRUE,
   norm_scale = c(1, 100),
-  replace_underscores = TRUE,
+  replace_underscores = c(u = TRUE, v = TRUE),
+  translate_snp_positions = FALSE,
+  invert_UV_labels = FALSE,
   verbose = TRUE
 )
 }

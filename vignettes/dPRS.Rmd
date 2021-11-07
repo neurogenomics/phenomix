@@ -1,0 +1,122 @@
+---
+title: "dPRS"
+author: "<h4>Author: <i>Brian M. Schilder</i></h4>" 
+date: "<h4>Most recent update: <i>`r format( Sys.Date(), '%b-%d-%Y')`</i></h4>"
+output:
+  BiocStyle::html_document:
+vignette: >
+    %\VignetteIndexEntry{phenomix} 
+    %\usepackage[utf8]{inputenc}
+    %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=TRUE, message=FALSE} 
+library(phenomix)
+
+library(dplyr) 
+```
+
+
+# Import data
+
+```{r}
+storage_dir <-  
+    "/home/rstudio/raid1/bschilder/projects/phenome_decomposition/raw_data/dPRS"
+```
+
+## Download model weights 
+
+```{r, eval=FALSE}
+npz_file <- file.path(storage_dir,
+                      "all_beta_center_p1e-06_20200506_500PCs.npz")
+if(!file.exists(npz_file)){
+    download.file(
+        file.path("https://biobankengine.stanford.edu/static",
+                  "degas-risk/all_beta_center_p1e-06_20200506_500PCs.npz"))
+}
+
+np <- reticulate::import("numpy")
+dprs <- np$load(file = npz_file, allow_pickle = TRUE)
+
+#### List npz contents ####
+print(dprs$files) 
+```
+
+## Extract metadata
+
+```{r, eval=FALSE}
+meta_file <- file.path(storage_dir,"degas_n_977_traits.tsv")
+if(!file.exists(meta_file)){
+    download.file(
+        file.path("https://biobankengine.stanford.edu/static",
+                  "degas-risk/degas_n_977_traits.tsv"),
+        meta_file
+    )
+}
+
+meta <- data.table::fread(meta_file, data.table = FALSE)
+colnames(meta) <- gsub("#","",colnames(meta))
+meta <- meta %>% dplyr::mutate(GBE_ID=gsub("_","-",GBE_ID))  
+rownames(meta) <- meta$GBE_ID
+```
+
+## Reconstruct matrix
+
+U and V are swapped from what they represent in the DeGAs paper.
+So in the next step `reconstruct_matrix`, we'll supply "V" to `u_name`, and 
+"U" to `v_name`.
+
+```{r, eval=FALSE}
+M_list <- phenomix:::reconstruct_matrix(u_name = "V",
+                                       v_name = "U",
+                                       d_name = "D", 
+                                       npz_obj = dprs,
+                                       gene_level = FALSE,  
+                                       translate_snp_positions = FALSE)
+```
+
+# Construct Seurat object
+
+```{r, eval=FALSE}
+#### Variants assay ####
+seurat <- Seurat::CreateSeuratObject(
+    counts = Matrix::t(M_list$M2),  
+    meta.data = meta[rownames(M_list$M2),],  
+    assay = "variants")  
+
+#### DimReductions ####
+DR.contributionVar <- phenomix:::create_DimReducObject(reconstruction = M_list, 
+                                                       assay = "variants", 
+                                                       key = "contributionVar")
+seurat[["contributionVar"]] <- DR.contributionVar 
+```
+
+# Save 
+
+## Local
+
+```{r, eval=FALSE}
+save_path <- file.path(storage_dir,"dPRS.rds")
+saveRDS(seurat,save_path)
+```
+
+## Remote
+
+Upload to GitHub Releases.
+
+```{r, eval=FALSE}
+piggyback::pb_upload(file = save_path,
+                     repo = "neurogenomics/phenomix",
+                     overwrite = TRUE)
+```
+
+# Session Info 
+
+<details> 
+
+```{r Session Info}
+utils::sessionInfo()
+```
+
+</details>  
+

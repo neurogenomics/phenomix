@@ -11,28 +11,29 @@ extract_cor(
   reduction = NULL,
   graph_name = NULL,
   method = "pearson",
+  return_obj = TRUE,
   verbose = TRUE
 )
 }
 \arguments{
-\item{obj}{Object of class:
-\itemize{
-\item{\code{DimReduc}}
-\item{\code{Seurat}}
-\item{\code{Seurat}}
-}}
+\item{obj}{Either a \pkg{Seurat} object or a feature*trait matrix.}
 
 \item{assay}{Assay to used to compute correlation graph 
 if one does not already exist.}
 
-\item{slot}{Name of component object to return}
+\item{slot}{If \code{obj} is a \pkg{Seurat} object, which slot to extract
+for correlations.}
 
-\item{reduction}{Which reduction to extract from.
-Only used if \code{obj} is of class \code{Seurat}.}
+\item{reduction}{If not \code{NULL}, extracts the embedding from the
+specified reduction (e.g. "pca") and uses that to
+compute trait-trait similarities instead.}
 
 \item{graph_name}{Name of the graph to extract.}
 
 \item{method}{Pairwise correlation method.}
+
+\item{return_obj}{Whether to return the \pkg{Seurat} object with a new
+\code{obj@graphs} slot, or to simply return the sparse correlation matrix.}
 
 \item{verbose}{Print messages.}
 }
@@ -41,4 +42,9 @@ Trait-trait correlation matrix.
 }
 \description{
 Extract correlation matrix stored as a graph.
+}
+\examples{
+hpo <- phenomix::get_HPO()
+cmat <- extract_cor(obj = hpo,
+                    reduction = "pca")
 }

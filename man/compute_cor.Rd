@@ -6,12 +6,16 @@
 \usage{
 compute_cor(
   obj,
+  graph_name = NULL,
   assay = NULL,
   slot = NULL,
   reduction = NULL,
   transpose = FALSE,
   method = "pearson",
+  fill_na = NULL,
+  use = "all.obs",
   return_obj = TRUE,
+  nThreads = 1,
   verbose = TRUE
 )
 }
@@ -35,8 +39,24 @@ compute trait-trait similarities instead.}
     \code{"pearson"} (default), \code{"kendall"}, or \code{"spearman"}:
     can be abbreviated.}
 
+\item{use}{an optional character string giving a
+    method for computing covariances in the presence
+    of missing values.  This must be (an abbreviation of) one of the strings
+    \code{"everything"}, \code{"all.obs"}, \code{"complete.obs"},
+    \code{"na.or.complete"}, or \code{"pairwise.complete.obs"}.}
+
 \item{return_obj}{Whether to return the \pkg{Seurat} object with a new
 \code{obj@graphs} slot, or to simply return the sparse correlation matrix.}
+
+\item{nThreads}{ non-negative integer specifying the number of parallel threads to be used by certain
+parts of correlation calculations. 
+This option only has an effect on systems on which a POSIX thread
+library is available (which currently includes Linux and Mac OSX, but excludes Windows).
+If zero, the number of online processors will be used if it can be determined dynamically, otherwise
+correlation calculations will use 2 threads. 
+Note that this option does not affect what is usually the most expensive part of the
+calculation, namely the matrix multiplication. The matrix multiplication is carried out by BLAS routines provided by R;
+these can be sped up by installing a fast BLAS and making R use it. }
 
 \item{verbose}{Print messages.}
 }
@@ -49,3 +69,4 @@ Computes pairwise correlations for all traits
  using either \link[WGCNA]{cor} (faster) or
 \link[stats]{cor} (slower).
 }
+\keyword{internal}

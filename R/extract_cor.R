@@ -13,6 +13,7 @@
 #' @return Trait-trait correlation matrix.
 #' 
 #' @export
+#' @examples 
 #' hpo <- phenomix::get_HPO()
 #' cmat <- extract_cor(obj = hpo,
 #'                     reduction = "pca")

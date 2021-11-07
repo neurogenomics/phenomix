@@ -17,6 +17,7 @@
 #' \code{obj@graphs} slot, or to simply return the sparse correlation matrix.
 #' @param verbose Print messages.
 #' @inheritParams stats::cor
+#' @inheritParams WGCNA::cor
 #'
 #' @returns A \pkg{Seurat} object with a new \code{obj@graphs} slot,
 #' or the sparse correlation matrix.
@@ -31,7 +32,10 @@ compute_cor <- function(obj,
                         reduction = NULL,
                         transpose = FALSE,
                         method = "pearson",
+                        fill_na = NULL,
+                        use = "all.obs",
                         return_obj = TRUE,
+                        nThreads = 1,
                         verbose = TRUE) {
     #### Extract relevant matrix ####
     if (!is.null(reduction)) {
@@ -51,13 +55,20 @@ compute_cor <- function(obj,
         )
     }
     if (transpose) mat <- Matrix::t(mat)
+    if (!is.null(fill_na)) mat[is.na(mat)] <- fill_na
     #### Compute corr ####
     if (is_installed(pkg = "WGCNA")) {
         messager("Computing r with WGCNA.", v = verbose)
-        cmat <- WGCNA::cor(mat, method = method)
+        cmat <- WGCNA::cor(x = mat,
+                           method = method,
+                           use = use,
+                           nThreads = nThreads, 
+                           verbose = verbose)
     } else {
         messager("Computing r with stats.", v = verbose)
-        cmat <- stats::cor(mat, method = method)
+        cmat <- stats::cor(x = mat,
+                           use = use,
+                           method = method)
     }
     #### Convert to sparse graph ####
     cmat <- methods::as(methods::as(cmat, "sparseMatrix"), "Graph")

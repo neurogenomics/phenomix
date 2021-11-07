@@ -8,6 +8,7 @@ melt_to_mat <- function(dat,
                                          formula = formula, 
                                          fun.aggregate = fun.aggregate, 
                                          fill = fill,
+                                         drop = FALSE,
                                          value.var = value.var) %>%
         tibble::column_to_rownames(var1) %>% 
         as.matrix()

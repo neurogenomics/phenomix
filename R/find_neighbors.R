@@ -89,8 +89,12 @@ find_neighbors <- function(obj,
             messager("+", formatC(length(targets1), big.mark = ","),
                 "entries matching var1_search identified.",
                 v = verbose
-            )
-            fgraph <- fgraph[targets1, ]
+            ) 
+                #### Ensure the rest doesn't break when only 1 var1 hit ####
+                # Matrices get converted to vectors if there's only 1 col  
+            if(length(targets1)!=1){
+                fgraph <- fgraph[targets1,,drop=FALSE]
+            } 
         } else {
             stop(
                 "0 entries in label_col match the ",
@@ -99,8 +103,11 @@ find_neighbors <- function(obj,
         }
     }
 
-    if (!is.null(group_col) && (group_col %in% colnames(metadata))) {
-        messager("+ Filtering results by var2_group:", var2_group, v = verbose)
+    if (!is.null(group_col) &&
+        (group_col %in% colnames(metadata)) &&
+        (!is.null(var2_group))) {
+        messager("+ Filtering results by var2_group:", var2_group,
+                 v = verbose)
         targets2 <- metadata[
             grepl(pattern = paste(var2_group, collapse = "|"), 
                   x = metadata[[group_col]],
@@ -120,14 +127,15 @@ find_neighbors <- function(obj,
                 "substring search for var2_group."
             )
         }
-    }
+    } 
 
     top_candidates <- fgraph %>%
-        Matrix::as.matrix() %>%
-        reshape2::melt(value.name = "similarity") %>%
+        Matrix::as.matrix(drop=FALSE) %>%
+        reshape2::melt(value.name = "similarity", drop=FALSE) %>%
         dplyr::rename(trait1 = Var1, trait2 = Var2) %>%
         data.table::data.table() %>%
         dplyr::mutate_at(c("trait1", "trait2"), as.character) %>%
+        subset(trait1 %in% targets1) %>%
         subset(trait1 != trait2) %>%
         subset(similarity > 0) %>%
         dplyr::group_by(trait1) %>%

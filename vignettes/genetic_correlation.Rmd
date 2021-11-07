@@ -20,8 +20,7 @@ library(ggplot2)
 
 # Import data
 
-
-## DeGAs loadings 
+## DeGAs 
 
 ```{r}
 degas <- phenomix::get_DEGAS()
@@ -70,7 +69,6 @@ Finally, we can plot the top N most similar traits to your traits of interest.
 
 ```{r}
 gg_cor <- phenomix::plot_trait_cor(knn = knn,
-                                   group_var = "trait1",
                                    top_n = 5)
 ```
 
@@ -87,15 +85,50 @@ dimensionality reduction.
 
 It's also worth mentioned that if the graph of interest doesn't exist, `find_neighbors` will automatically compute it based on the input arguments.
 
+## Find neighbors
+
 ```{r}
 knn <- phenomix::find_neighbors(obj = degas, 
                                 reduction = "contributionGene",
                                 var1_search = c("parkinson","alzheimer"), 
                                 label_col = "label_phe")
+```
+
+## Plot
+
+```{r}
 gg_cor <- phenomix::plot_trait_cor(knn = knn,
-                                   group_var = "trait1",
                                    top_n = 5)
 ```
+
+
+
+# dPRS
+
+## Import dPRS data
+
+Now let's try with another GWAS decomposition dataste: dPRS.
+
+```{r}
+dprs <- phenomix::get_dPRS()
+```
+
+## Find neighbors
+
+```{r}
+knn <- phenomix::find_neighbors(obj = dprs, 
+                                var1_search = c("parkinson"), 
+                                label_col = "GBE_NAME")
+```
+
+## Plot
+
+```{r}
+gg_cor <- phenomix::plot_trait_cor(knn = knn, 
+                                   top_n = 5)
+```
+
+
 
 # Session Info 
 

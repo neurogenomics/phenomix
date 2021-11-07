@@ -41,11 +41,18 @@ plot_trait_cor <- function(knn,
     if(type=="bar"){
         gg_cor <- plot_trait_cor_barplot(plot_dat = plot_dat)    
     } else if(type=="heat"){ 
-        mat <- melt_to_mat(dat = knn) 
+        mat <- melt_to_mat(dat = knn)
         ### Subset original knn to just the top selected traits ####
         mat <- mat[unique(plot_dat$trait1),
-                   unique(plot_dat$trait2)]
-        gg_cor <- heatmaply::heatmaply(x = mat)
+                   unique(plot_dat$trait2), drop=FALSE] 
+        #### Draw dendrogram only on axes with >1 sample ####
+        dendrogram <- if(sum(dim(mat)>1)==2){
+            "both"
+        } else if (nrow(mat)==1){"column"} else {
+            "row"
+        }
+        gg_cor <- heatmaply::heatmaply(x = mat, 
+                                       dendrogram = dendrogram)
     }
     if (show_plot) print(gg_cor)
     return(gg_cor)
