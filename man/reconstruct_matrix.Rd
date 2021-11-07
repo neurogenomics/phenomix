@@ -15,7 +15,8 @@ reconstruct_matrix(
   filter_quantiles = FALSE,
   norm = TRUE,
   norm_scale = c(1, 100),
-  replace_underscores = TRUE
+  replace_underscores = TRUE,
+  verbose = TRUE
 )
 }
 \description{

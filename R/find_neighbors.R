@@ -80,7 +80,8 @@ find_neighbors <- function(obj,
             v = verbose
         )
         targets1 <- grep(
-            pattern = var1_search, x = sample_names,
+            pattern = paste(var1_search,collapse="|"),
+            x = sample_names,
             ignore.case = TRUE, value = TRUE
         )
         if (length(targets1) > 0) {
@@ -100,7 +101,8 @@ find_neighbors <- function(obj,
     if (!is.null(group_col) && (group_col %in% colnames(metadata))) {
         messager("+ Filtering results by var2_group:", var2_group, v = verbose)
         targets2 <- metadata[
-            grepl(var2_group, metadata[[group_col]],
+            grepl(pattern = paste(var2_group, collapse = "|"), 
+                  x = metadata[[group_col]],
                 ignore.case = TRUE
             ),
             "sample_names"

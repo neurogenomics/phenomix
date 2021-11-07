@@ -21,20 +21,14 @@ colnames(DEGAS_metadata) <- gsub(" ","_",colnames(DEGAS_metadata))
 colnames(DEGAS_metadata) <- gsub("[(]|[)]","",colnames(DEGAS_metadata))
 rownames(DEGAS_metadata) <- DEGAS_metadata$label_phe_code
 
-empty_mat <- Matrix::sparseMatrix(
-    i = nrow(DEGAS_contributionGene@feature.loadings),
-    j = nrow(DEGAS_contributionGene@cell.embeddings),
-    dimnames = list(rownames(DEGAS_contributionGene@feature.loadings),
-                  rownames(DEGAS_contributionGene@cell.embeddings)
-                                  )
-)
-DEGAS_seurat <- Seurat::CreateSeuratObject(counts = empty_mat,
-                                           assay = "genes", 
-                                           meta.data = DEGAS_metadata)
-DEGAS_seurat[["contributionGene"]]  <- DEGAS_contributionGene
+M <-  (u %*% t(v)) %>% Matrix::t() %>% as("sparseMatrix")
+degas <- Seurat::CreateSeuratObject(counts = M,
+                                    assay = "genes", 
+                                    meta.data = DEGAS_metadata)
+degas[["contributionGene"]]  <- DEGAS_contributionGene
 
 save_path <- file.path(tempdir(),"DEGAS.rds")
-saveRDS(DEGAS_seurat, save_path)
+saveRDS(degas, save_path)
 piggyback::pb_upload(file = save_path,
                      repo = "neurogenomics/phenomix",
                      overwrite = TRUE)

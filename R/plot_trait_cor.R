@@ -11,32 +11,42 @@
 #'
 #' @export
 #' @import ggplot2
+#' @importFrom data.table setDT
+#' @importFrom utils head 
 plot_trait_cor <- function(knn,
                            top_n = 10,
                            non_self = TRUE,
-                           show_plot = TRUE) {
+                           group_var = "trait1",
+                           show_plot = TRUE,
+                           type = "heat") {
+
     trait2 <- trait1 <- similarity <- NULL;
+    
+    if(type=="heat") requireNamespace("heatmaply")
     if (non_self) {
         plot_dat <- subset(knn, !trait2 %in% trait1)
     } else {
         plot_dat <- knn
     }
     if (!is.null(top_n)) {
-        plot_dat <- plot_dat[seq(1, top_n)]
+        if(!is.null(group_var)){
+            plot_dat <- data.table::setDT(plot_dat)[
+                order(abs(get("similarity")),decreasing = TRUE),
+                utils::head(.SD, top_n),
+                by = get(group_var)]
+        } else {
+            plot_dat <- plot_dat[seq(1, top_n)]
+        } 
+    } 
+    if(type=="bar"){
+        gg_cor <- plot_trait_cor_barplot(plot_dat = plot_dat)    
+    } else if(type=="heat"){ 
+        mat <- melt_to_mat(dat = knn) 
+        ### Subset original knn to just the top selected traits ####
+        mat <- mat[unique(plot_dat$trait1),
+                   unique(plot_dat$trait2)]
+        gg_cor <- heatmaply::heatmaply(x = mat)
     }
-
-    gg_bar <- ggplot(
-        plot_dat,
-        aes(x = trait1, y = similarity, fill = similarity)
-    ) +
-        geom_bar(stat = "identity") +
-        facet_grid(facets = trait2 ~ .) +
-        theme_bw() +
-        theme(
-            axis.text.x = element_text(angle = 45, hjust = 1),
-            strip.background = element_rect(fill = "white"),
-            strip.text.y = element_text(angle = 0)
-        )
-    if (show_plot) print(gg_bar)
-    return(gg_bar)
+    if (show_plot) print(gg_cor)
+    return(gg_cor)
 }

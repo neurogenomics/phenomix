@@ -14,7 +14,7 @@
 #'
 #' @export
 #' @importFrom methods is
-#' @importFrom Seurat Reductions
+#' @importFrom SeuratObject Reductions
 extract_embeddings <- function(obj,
                                reduction = NULL,
                                verbose = TRUE) {

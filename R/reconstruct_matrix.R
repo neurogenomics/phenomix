@@ -14,7 +14,9 @@ reconstruct_matrix <- function(u_name = "contribution_phe",
                                filter_quantiles = FALSE,
                                norm = TRUE,
                                norm_scale = c(1, 100),
-                               replace_underscores = TRUE) {
+                               replace_underscores = TRUE,
+                               verbose = TRUE) {
+    requireNamespace("reticulate")
     if (is.null(DEGAS)){
         py <- reticulate::py
         DEGAS <- py$DEGAS
@@ -22,7 +24,7 @@ reconstruct_matrix <- function(u_name = "contribution_phe",
     label_phe_code <- DEGAS["label_phe_code"]
     if (gene_level) {
         ## NOTE:  Genes symbols are provided directly in label_gene
-        message("+ Annotating at the gene-level")
+        messager("+ Annotating at the gene-level",v=verbose)
         label_var_gene <- DEGAS["label_gene"]
     } else {
         ## NOTE: Variants must be translated from positions to RSIDs

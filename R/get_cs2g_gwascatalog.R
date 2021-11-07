@@ -21,8 +21,7 @@
 #' @export
 #' @importFrom data.table fread dcast .GRP
 #' @importFrom tibble column_to_rownames
-#' @importFrom dplyr %>%
-#' @import Matrix
+#' @importFrom dplyr %>% 
 get_cs2g_gwascatalog <- function(URL = file.path(
                                      "https://storage.googleapis.com",
                                      "broad-alkesgroup-public/cS2G",

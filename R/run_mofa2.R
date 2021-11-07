@@ -31,10 +31,6 @@
 #' @source \href{https://biofam.github.io/MOFA2/}{MOFA2 site}
 #'
 #' @export
-#' @importFrom MOFA2 create_mofa prepare_mofa samples_metadata
-#' @importFrom MOFA2 get_default_data_options
-#' @importFrom MOFA2 get_default_model_options
-#' @importFrom MOFA2 get_default_training_options
 #' @importFrom Matrix t
 #' @importFrom methods is
 run_mofa2 <- function(obj,
@@ -56,6 +52,7 @@ run_mofa2 <- function(obj,
                       seed = 2020,
                       verbose = TRUE,
                       ...) {
+    requireNamespace("MOFA2")
     if (!is.null(seed)) set.seed(seed)
     #### Transpose matrices ####
     if (transpose & methods::is(obj, "list")) {

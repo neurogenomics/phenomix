@@ -1,0 +1,100 @@
+---
+title: "Genetic Correlation"
+author: "<h4>Author: <i>Brian M. Schilder</i></h4>" 
+date: "<h4>Most recent update: <i>`r format( Sys.Date(), '%b-%d-%Y')`</i></h4>"
+output:
+  BiocStyle::html_document:
+vignette: >
+    %\VignetteIndexEntry{phenomix} 
+    %\usepackage[utf8]{inputenc}
+    %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=TRUE, message=FALSE} 
+library(phenomix)
+
+library(dplyr)
+library(ggplot2)
+```
+
+
+# Import data
+
+
+## DeGAs loadings 
+
+```{r}
+degas <- phenomix::get_DEGAS()
+```
+
+# Reconstruct gene x trait matrix
+
+You can  matrix multiplication to reconstruct the original gene x trait matrix
+from the. 
+
+However, we've already run this step for you and stored it within the
+assay "genes" so you can skip ahead to the next step.
+
+```R
+u <- phenomix::extract_embeddings(obj = degas)
+v <- phenomix::extract_loadings(obj = degas)
+M <-  (u %*% t(v)) %>% Matrix::t() %>% as("sparseMatrix")
+```
+
+# Compute correlations
+
+## Full matrix 
+
+Next, we will compute all pairwise trait-trait correlations.
+`compute_cor` returns the object with the correlation matrix 
+(within `degas@graphs$cor`).
+
+```{r}
+degas <- phenomix::compute_cor(obj = degas)
+```
+
+The correlation matrix can easily be extracted with with the
+convenience function `extract_cor`.
+
+```{r}
+cmat <- phenomix::extract_cor(obj = degas)
+```
+
+### Find neighbors
+
+```{r}
+knn <- phenomix::find_neighbors(obj = degas, 
+                                graph_name = "cor",
+                                var1_search = "parkinson|alzheimer", 
+                                label_col = "label_phe")
+gg_cor <- phenomix::plot_trait_cor(knn = knn,
+                                   group_var = "trait1",
+                                   top_n = 5)
+```
+
+
+## Reductions
+
+By default, correlations are performed on the gene x trait matrix.
+However, it is possible to also compute correlations from the 
+reduced embeddings matrix stored within the same object.
+
+This approach will be faster than running correlations on the full matrix,
+but also tends to be less accurate since some information is thrown out during 
+dimensionality reduction.
+
+```{r}
+cmat2 <- phenomix::compute_cor(obj = degas, 
+                               reduction = "contributionGene")
+```
+
+# Session Info 
+
+<details> 
+
+```{r Session Info}
+utils::sessionInfo()
+```
+
+</details>  
+

@@ -26,7 +26,6 @@
 #' @importFrom data.table fread dcast
 #' @importFrom tibble column_to_rownames
 #' @importFrom dplyr %>%
-#' @import Matrix
 get_cs2g_ukb <- function(URL = file.path(
                              "https://storage.googleapis.com",
                              "broad-alkesgroup-public/cS2G",

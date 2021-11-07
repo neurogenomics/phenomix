@@ -4,25 +4,11 @@ author: "Brian M. Schilder"
 date: "`r Sys.Date()`"
 output:
   BiocStyle::html_document:
-    self_contained: yes
-    toc: true
-    toc_float: true
-    toc_depth: 3
-    code_folding: show
-    df_print: paged
 vignette: >
     %\VignetteIndexEntry{map_snps2genes} 
     %\usepackage[utf8]{inputenc}
-    %\VignetteEngine{knitr::rmarkdown} 
-editor_options: 
-  markdown: 
-    wrap: 72
+    %\VignetteEngine{knitr::rmarkdown}
 ---
-
-```{r style, echo=FALSE, results='asis', message=FALSE}
-BiocStyle::markdown()
-knitr::opts_chunk$set(tidy = FALSE, message  = FALSE)
-```
 
 ```{r setup, include=TRUE}
 #### To install the dev branch of MAGMA.Celltyping, use:

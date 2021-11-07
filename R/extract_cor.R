@@ -1,3 +1,17 @@
+#' Extract correlation matrix
+#' 
+#' Extract correlation matrix stored as a graph.
+#' 
+#' @param assay Assay to used to compute correlation graph 
+#' if one does not already exist.
+#' @param graph_name Name of the graph to extract.
+#' @param method Pairwise correlation method.
+#' @inheritParams extract_embeddings
+#' @inheritParams SeuratObject::Reductions
+#' 
+#' @return Trait-trait correlation matrix.
+#' 
+#' @export
 extract_cor <- function(obj,
                         assay = NULL,
                         slot = NULL,

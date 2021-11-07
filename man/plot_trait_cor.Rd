@@ -4,7 +4,14 @@
 \alias{plot_trait_cor}
 \title{Plot top trait-trait correlations}
 \usage{
-plot_trait_cor(knn, top_n = 10, non_self = TRUE, show_plot = TRUE)
+plot_trait_cor(
+  knn,
+  top_n = 10,
+  non_self = TRUE,
+  group_var = "trait1",
+  show_plot = TRUE,
+  type = "heat"
+)
 }
 \arguments{
 \item{knn}{A melted similarity matrix or K-nearest neighbor graph.}
