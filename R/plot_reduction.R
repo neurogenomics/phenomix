@@ -26,40 +26,57 @@
 plot_reduction <- function(obj,
                            reduction = NULL,
                            metadata = NULL,
+                           x_dim = 1,
+                           y_dim = 2,
                            fix_rownames = FALSE,
                            color_var = NULL,
                            label_var = NULL,
                            size_var = NULL,
-                           labels = TRUE,
+                           labels = !is.null(label_var),
                            max.overlaps = 30,
                            show_plot = TRUE,
-                           point_alpha = .6) {
-    if (is.null(label_var)) labels <- FALSE
+                           point_alpha = .6) { 
     if (is.null(metadata)) {
         metadata <- extract_metadata(obj = obj)
     }
     if (is.null(rownames(metadata))) {
         stop("metadata must have rownames to merge with obj.")
+    } 
+    #### Prepare data ####
+    embeddings <- extract_embeddings(
+        obj = obj,
+        reduction = reduction
+    ) 
+    if(x_dim>ncol(embeddings) || x_dim<1) {
+        stop("x_dim must be an integer >= the number of embeddings dimensions.") 
+    }
+    if(y_dim>ncol(embeddings) || y_dim<1) {
+        stop("y_dim must be an integer >= the number of embeddings dimensions.") 
     }
     #### Fix rownames to match metadata rownames ####
     if (fix_rownames) {
         metadata <- metadata %>%
             `rownames<-`(gsub("-|[:]|[.]", "_", rownames(metadata)))
+        embeddings <- embeddings %>%
+            `rownames<-`(gsub("-|[:]|[.]", "_", rownames(embeddings)))
     }
-    #### Prepare data ####
-    embeddings <- extract_embeddings(
-        obj = obj,
-        reduction = reduction
-    )
-    umap_df <- merge(
+    plot_df <- merge(
         x = embeddings,
-        y = metadata,
+        y = metadata[,!startsWith(colnames(metadata),"UMAP")],
         by = 0
     )
+    if(nrow(plot_df)==0){
+        stop("No rows in merged metadata + embeddings data.")
+    } else {
+        messager("Constructed plot_df:",
+                 formatC(nrow(plot_df),big.mark = ","),"rows x",
+                 formatC(ncol(plot_df),big.mark = ","),"columns"
+                 )
+    }
 
-    gp <- ggplot(umap_df, aes_string(
-        x = colnames(embeddings)[1],
-        y = colnames(embeddings)[2],
+    gp <- ggplot(plot_df, aes_string(
+        x = colnames(embeddings)[x_dim],
+        y = colnames(embeddings)[y_dim],
         color = color_var, label = label_var
     )) +
         geom_point(aes_string(size = size_var), alpha = point_alpha) +

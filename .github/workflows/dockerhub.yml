@@ -18,7 +18,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.PAT_GITHUB }}
       RGL_USE_NULL: TRUE
       GITHUB_REPO: ${{ github.repository }}
-      DOCKER_USERNAME: "nathanskene"
+      DOCKER_USERNAME: "bschilder"
       DOCKER_ORG: "neurogenomicslab"
     steps:
       - uses: actions/checkout@v2

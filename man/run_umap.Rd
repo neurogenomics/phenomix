@@ -10,7 +10,7 @@
 run_umap(
   mat,
   transpose = TRUE,
-  pca = ncol(mat),
+  pca = if (transpose) ncol(mat) else nrow(mat),
   add_names = TRUE,
   n_components = 2,
   n_neighbors = 15,

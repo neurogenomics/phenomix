@@ -19,7 +19,7 @@
 #' @export
 run_umap <- function(mat,
                      transpose = TRUE,
-                     pca = ncol(mat),
+                     pca = if(transpose) ncol(mat) else nrow(mat),
                      add_names = TRUE,
                      n_components = 2,
                      n_neighbors = 15,
@@ -59,12 +59,14 @@ run_umap <- function(mat,
         umap$embedding <- umap$embedding %>%
             `colnames<-`(paste0("UMAP.", seq(1, ncol(umap$embedding)))) %>%
             `row.names<-`(rownames(mat))
-        for (i in length(umap$pca_models)) {
-            pc_embed <- umap$pca_models[[i]]$rotation
-            umap$pca_models[[i]]$rotation <- pc_embed %>%
-                `colnames<-`(paste0("PC", seq(1, ncol(pc_embed)))) %>%
-                `row.names<-`(colnames(mat))
-        }
+        tryCatch({
+            for (i in length(umap$pca_models)) {
+                pc_embed <- umap$pca_models[[i]]$rotation
+                umap$pca_models[[i]]$rotation <- pc_embed %>%
+                    `colnames<-`(paste0("PC", seq(1, ncol(pc_embed)))) %>%
+                    `row.names<-`(colnames(mat))
+            }
+        }, error= function(e)message(e))
     }
     return(umap)
 }

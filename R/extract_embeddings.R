@@ -47,6 +47,10 @@ extract_embeddings <- function(obj,
         } else {
             stop("No embeddings could be identified.")
         }
+    } else if (is_matrix(obj) ){
+        messager("Interpretting obj as matrix with trait embeddings.",
+                 v=verbose)
+        embeddings <- obj
     } else {
         stop("No embeddings could be identified.")
     }

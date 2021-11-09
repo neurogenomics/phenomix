@@ -79,7 +79,7 @@ Polygenic Risk Scores (PRS) applied to
 Decomposition of Genetic Associations (DeGAs) components. 
 The dPRS methodology was first described in 
 \href{https://www.nature.com/articles/s41431-021-00813-0?proof=t}{
-Aguirre et al. (2019, European Journal of Human Genetics)}, where they used 
+Aguirre et al. (2021, European Journal of Human Genetics)}, where they used 
 DeGAs to reduce ### GWAS traits to 500 components.
 }
 \details{

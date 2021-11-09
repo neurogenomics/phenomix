@@ -52,6 +52,10 @@ extract_loadings <- function(obj,
         } else {
             stop("No loadings could be identified.")
         }
+    } else if (is_matrix(obj) ){
+        messager("Interpretting obj as matrix with feature loadings.",
+                 v=verbose)
+        loadings <- obj
     } else {
         stop("No loadings could be identified.")
     }
