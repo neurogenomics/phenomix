@@ -11,6 +11,7 @@ autoencoder documentation}
 run_autoencoder(
   obj,
   transpose = TRUE,
+  normalize = TRUE,
   assay = NULL,
   slot = NULL,
   metadata = NULL,

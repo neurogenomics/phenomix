@@ -75,6 +75,8 @@ Suggests:
     WGCNA,
     reticulate,
     scNLP,
-    MOFA2
+    MOFA2,
+    h2o,
+    recipes
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr 

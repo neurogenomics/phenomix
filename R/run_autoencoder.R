@@ -32,7 +32,11 @@
 #'
 #' @source \href{https://bradleyboehmke.github.io/HOML/autoencoders.html}{
 #' autoencoder documentation}
+#' 
 #' @export
+#' @importFrom Matrix t
+#' @importFrom dplyr %>%
+#' 
 #' @examples 
 #' #### Import data ####
 #' obj <- phenomix::get_HPO()
@@ -43,6 +47,7 @@
 #'                                     color_var = "group_depth3")
 run_autoencoder <- function(obj,
                             transpose = TRUE,
+                            normalize = TRUE,
                             assay = NULL,
                             slot = NULL,
                             metadata = NULL,
@@ -57,21 +62,27 @@ run_autoencoder <- function(obj,
                             ...){ 
     # obj <- phenomix::get_HPO() 
     # library(dplyr); library(ggplot2); transpose <- TRUE; metadata <- NULL; 
-    # color_var = "group_depth3"; label_var = "HPO_label"; 
-    # assay = NULL; slot = NULL;
+    # color_var = "group_depth3"; label_var = "HPO_label"; epochs = 10;
+    # assay = NULL; slot = NULL; activation = 'Tanh'; hidden=2; sparse =TRUE;
+    # variable_importances <- TRUE
     # gwas <- Seurat::FindVariableFeatures(gwas, nfeatures = 5000)
     # select_features <- Seurat::VariableFeatures(gwas)
     # #### Subset data ####
-    # obj <- gwas# [select_features,]
+    # obj <- gwas# [select_features,] 
     requireNamespace("h2o")
     mat <- extract_matrix(obj = obj,
                           assay = assay,
                           slot = slot)
+    # mat[mat==0] <- NA
     if(is.null(metadata)) metadata <- extract_metadata(obj = obj)
     # nrow(metadata[is.na(metadata[[label_var]]),])
     if (transpose) {
         mat <- Matrix::t(mat)
     }  
+    if(!is.null(normalize_method)){
+        mat <- normalise(mat = mat,
+                         method = normalize_method)
+    }
     #### initialize H2O instance ####
     if (!is.null(seed)) set.seed(seed)
     h2o::h2o.init(max_mem_size = "15g")  
@@ -91,8 +102,8 @@ run_autoencoder <- function(obj,
         # distribution = "quantile",
         sparse = sparse,
         variable_importances = variable_importances, 
-        epochs = epochs,
-        ...
+        epochs = epochs
+        # ...
     )
     
     #### Explore variable importance ####
