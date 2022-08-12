@@ -1,7 +1,7 @@
 Package: phenomix
 Type: Package
 Title: Explore the phenome 
-Version: 0.99.3
+Version: 0.99.4
 Authors@R: c(person(given = "Brian",
                     family = "Schilder",
                     role = c("cre"),
@@ -78,5 +78,5 @@ Suggests:
     MOFA2,
     h2o,
     recipes
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 VignetteBuilder: knitr 

@@ -1,6 +1,6 @@
 get_gene_length <- function(gene_hits,
                             ref_genome = "GRCh37",
-                            gene_var = "GENEID",
+                            gene_col = "GENEID",
                             use_symbols = TRUE,
                             drop_na = TRUE,
                             verbose = TRUE) {
@@ -25,10 +25,10 @@ get_gene_length <- function(gene_hits,
     length_key <- data.table::data.table(data.frame(length_key),
                                          key = "GENEID")
     #### Translate gene IDs back to gene symbols ####
-    if (gene_var != "GENEID" & use_symbols) {
+    if (gene_col != "GENEID" & use_symbols) {
         length_key <- translate_geneids_txdb(
             gene_hits = length_key,
-            gene_var = "GENEID",
+            gene_col = "GENEID",
             verbose = verbose
         )
         data.table::setkeyv(length_key, "SYMBOL")
@@ -36,7 +36,7 @@ get_gene_length <- function(gene_hits,
         data.table::setkeyv(length_key, "GENEID")
     }
     #### Query length_key for GENELEN ####
-    gene_hits[, GENELEN := length_key[gene_hits[[gene_var]], "GENELEN"]]
+    gene_hits[, GENELEN := length_key[gene_hits[[gene_col]], "GENELEN"]]
     #### Drop NAs ####
     na_count <- sum(is.na(gene_hits$GENELEN))
     if (drop_na & na_count > 0) {

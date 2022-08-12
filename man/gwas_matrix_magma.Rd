@@ -11,6 +11,7 @@ gwas_matrix_magma(
   save_path = NULL,
   nCores = 1,
   fillna = TRUE,
+  trans_FUN = NULL,
   agg_FUN = "mean",
   verbose = TRUE
 )
@@ -35,6 +36,8 @@ produced by \link[MAGMA.Celltyping]{map.snps.to.genes}.}
 \item{nCores}{Number of cores to parallelise across.}
 
 \item{fillna}{Value to fill \code{NA}s with.}
+
+\item{trans_FUN}{Transformation function.}
 
 \item{agg_FUN}{Aggregation function.}
 

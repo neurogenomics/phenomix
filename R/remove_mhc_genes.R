@@ -1,17 +1,20 @@
 remove_mhc_genes <- function(dat,
+                             gene_col = "SYMBOL",
                              verbose = TRUE,
-                             ...) {
-    GENE <- NULL;
+                             ...) { 
     MHC_genes <- get_mhc_genes(
         verbose = verbose,
         ...
-    )
-    MHC_hits <- data.table::uniqueN(
-        dat$GENE[!dat$GENE %in% unique(MHC_genes$SYMBOL)]
-    )
-    messager("Removing", length(MHC_hits), "MHC gene(s) from data.",
-        v = verbose
-    )
-    dat <- dat[!GENE %in% MHC_hits, ]
+    ) 
+    #### Check which MHC data column to filter by  #### 
+    ## Entrez gene ID or HGNC gene symbol
+    MHC_col <-if(methods::is(dat[[gene_col]],"numeric")){"GENEID"}else{"SYMBOL"}  
+    #### Filter
+    MHC_hits <- unique(
+        dat[get(gene_col) %in% unique(MHC_genes[[MHC_col]]),][[gene_col]]
+    )  
+    messager("Removing",formatC(length(MHC_hits), big.mark = ","), 
+             "MHC gene(s) from data.",v = verbose)
+    dat <- dat[!get(gene_col) %in% MHC_hits, ]
     return(dat)
 }

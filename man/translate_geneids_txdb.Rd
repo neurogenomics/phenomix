@@ -6,7 +6,7 @@
 \usage{
 translate_geneids_txdb(
   gene_hits,
-  gene_var = "GENEID",
+  gene_col = "GENEID",
   drop_na = TRUE,
   verbose = TRUE
 )
@@ -14,7 +14,7 @@ translate_geneids_txdb(
 \arguments{
 \item{gene_hits}{Output from \code{aggregate_sumstats}.}
 
-\item{gene_var}{Column name with gene IDs.}
+\item{gene_col}{Column name with gene IDs.}
 
 \item{drop_na}{Drop genes without a corresponding \code{SYMBOL}}
 

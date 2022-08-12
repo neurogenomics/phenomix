@@ -60,11 +60,16 @@ run_autoencoder <- function(obj,
                             epochs = 10,
                             seed = 2020,
                             ...){ 
-    # obj <- phenomix::get_HPO() 
-    # library(dplyr); library(ggplot2); transpose <- TRUE; metadata <- NULL; 
-    # color_var = "group_depth3"; label_var = "HPO_label"; epochs = 10;
-    # assay = NULL; slot = NULL; activation = 'Tanh'; hidden=2; sparse =TRUE;
-    # variable_importances <- TRUE
+    obj <- phenomix::get_HPO()
+    # obj <- phenomix::get_GWAS_Atlas()
+    # obj <- phenomix::get_DEGAS()
+    # obj <- phenomix::get_dPRS()
+    # obj <- readRDS("../phenome_decomposition/raw_data/GWAS_Atlas/GWAS_Atlas_all.seurat.rds")
+    # library(dplyr); library(ggplot2); transpose <- TRUE; metadata <- NULL; epochs = 10; normalize_method = "log1p";
+    # color_var = "group_depth3"; label_var = "HPO_label"; 
+    # color_var = "Domain"; label_var = "Trait";
+    # assay = NULL; slot = NULL; activation = 'Tanh'; hidden=2; sparse =TRUE;variable_importances <- TRUE;
+    
     # gwas <- Seurat::FindVariableFeatures(gwas, nfeatures = 5000)
     # select_features <- Seurat::VariableFeatures(gwas)
     # #### Subset data ####
@@ -76,6 +81,7 @@ run_autoencoder <- function(obj,
     # mat[mat==0] <- NA
     if(is.null(metadata)) metadata <- extract_metadata(obj = obj)
     # nrow(metadata[is.na(metadata[[label_var]]),])
+    #### Inpute needs to be in sample (trait) x feature (gene) format ####
     if (transpose) {
         mat <- Matrix::t(mat)
     }  
@@ -142,16 +148,18 @@ run_autoencoder <- function(obj,
                                   label_var = label_var,
                                   labels = FALSE)
     ### Reduce further with UMAP ####
-    # umap_res <- run_umap(mat = latent_mat,
-    #                      transpose = FALSE)
-    # gg_umap <- plot_reduction(obj = umap_res,
-    #                           metadata = metadata,
-    #                           fix_rownames = TRUE,
-    #                           color_var = color_var,
-    #                           label_var = label_var,
-    #                           labels = FALSE)
-    # plotly::ggplotly(gg_umap)
-    
+    # {
+    #     umap_res <- run_umap(mat = latent_mat,
+    #                          transpose = FALSE)
+    #     gg_umap <- plot_reduction(obj = umap_res,
+    #                               metadata = metadata,
+    #                               fix_rownames = TRUE,
+    #                               color_var = color_var,
+    #                               label_var = label_var,
+    #                               labels = FALSE)
+    #     plotly::ggplotly(gg_umap)
+    # }
+    # 
     #### Compare to UMAP run on original matrix ####
     # gg_umap <- plot_reduction(obj,
     #                           reduction = "umap",

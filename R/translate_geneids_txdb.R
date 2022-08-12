@@ -7,38 +7,44 @@
 #' to gene \code{SYMBOL}.
 #'
 #' @param gene_hits Output from \code{aggregate_sumstats}.
-#' @param gene_var Column name with gene IDs.
+#' @param gene_col Column name with gene IDs.
 #' @param drop_na Drop genes without a corresponding \code{SYMBOL}
 #' @param verbose Print messages.
 #'
 #' @keywords internal
 #' @importFrom AnnotationDbi select
-#' @importFrom data.table data.table setkey
-#' @importFrom dplyr %>%
+#' @importFrom data.table data.table setkey 
 #' @importFrom stats na.omit
 translate_geneids_txdb <- function(gene_hits,
-                                   gene_var = "GENEID",
+                                   gene_col = "GENEID",
                                    drop_na = TRUE,
                                    verbose = TRUE) {
     SYMBOL <- NULL;
-    messager("Translating", gene_var, "to SYMBOL.", v = verbose)
+    messager("Translating", gene_col, "to SYMBOL.", v = verbose)
     symbol_key <- AnnotationDbi::select(org.Hs.eg.db::org.Hs.eg.db,
-        keys = gene_hits[[gene_var]],
+        keys = as.character(gene_hits[[gene_col]]),
         columns = c("SYMBOL", "ENTREZID"),
         keytype = "ENTREZID"
     ) %>%
         data.table::data.table(key = "ENTREZID") %>%
-        na.omit() %>%
+        na.omit() |>
         unique()
-    data.table::setkeyv(gene_hits, gene_var)
-    gene_hits[, SYMBOL := symbol_key[get(gene_var), "SYMBOL"]]
+    data.table::setkeyv(gene_hits, gene_col)
+    #### Make sure input/output cols are unique ####
+    if(gene_col=="SYMBOL"){
+        messager("Renaming gene_col as SYMBOL.1",v=verbose)
+        data.table::setnames(gene_hits,gene_col,"SYMBOL.1")
+    }
+    gene_hits[, SYMBOL := symbol_key[get(gene_col), "SYMBOL"]]
     #### Drop NAs ####
     na_count <- sum(is.na(gene_hits$SYMBOL))
     if (drop_na & na_count > 0) {
-        messager("Dropping", na_count, "genes without SYMBOL.",
+        messager("Dropping",
+                 formatC(na_count,big.mark = ","),
+                 "genes without SYMBOL.",
             v = verbose
         )
         gene_hits <- stats::na.omit(gene_hits, "SYMBOL")
-    }
+    } 
     return(gene_hits)
 }

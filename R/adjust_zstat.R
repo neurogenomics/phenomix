@@ -52,14 +52,15 @@ adjust_zstat <- function(dat,
     if (drop_MHC) {
         dat <- remove_mhc_genes(
             dat = dat,
+            gene_col = "GENE",
             verbose = verbose
         )
-    }
-
+    } 
     dat_og <- dat
     dat <- stats::na.omit(dat, "ZSTAT")
     if (nrow(dat) < 10) {
-        messager("WARNING: <10 rows remainings in gene-level data. Unable to compute ADJ_ZSTAT.")
+        messager("WARNING: <10 rows remainings in gene-level data.",
+                 "Unable to compute ADJ_ZSTAT.",v=verbose)
         return(dat_og)
     }
 

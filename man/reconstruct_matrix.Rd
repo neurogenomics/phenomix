@@ -9,7 +9,11 @@ reconstruct_matrix(
   v_name = "contribution_var",
   d_name = NULL,
   u_labels = "label_phe_code",
-  v_labels = if (gene_level) {     "label_gene" } else {     "label_var" },
+  v_labels = if (gene_level) {
+     "label_gene"
+ } else {
+     "label_var"
+ },
   npz_obj = NULL,
   annot = NULL,
   gene_level = FALSE,

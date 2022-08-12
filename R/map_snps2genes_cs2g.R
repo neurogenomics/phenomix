@@ -52,7 +52,7 @@ map_snps2genes_cs2g <- function(sumstats,
     gene_hits <- get_gene_length(
         gene_hits = gene_hits,
         ref_genome = ref_genome,
-        gene_var = "TargetGene",
+        gene_col = "TargetGene",
         use_symbols = TRUE,
         verbose = verbose
     )
