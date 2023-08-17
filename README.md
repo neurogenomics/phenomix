@@ -17,8 +17,6 @@ Most recent update: <i>Aug-17-2023</i>
 
 ## R package for the exploration and analysis of many genotype-phenotype datasets at once.
 
-## R package for the exploration and analysis of many genotype-phenotype datasets at once.
-
 ## Installation
 
 ``` r
@@ -28,7 +26,7 @@ remotes::install_github("neurogenomics/phenomix")
 
 ## Documentation
 
-### [Documentation site](https://neurogenomics.github.io/phenomix).
+### [Documentation site](https://neurogenomics.github.io/phenomix)
 
 ### [Vignette: Celltype enrichment](https://neurogenomics.github.io/phenomix/articles/celltype_enrichment.html)
 
