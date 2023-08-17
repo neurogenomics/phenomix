@@ -34,7 +34,7 @@ run_gprofiler <- function(obj,
 
     gene_lists <- lapply(factors, function(f) {
         as.character(subset(top_genes, factor %in% f)$feature)
-    }) %>% `names<-`(factors)
+    }) |> `names<-`(factors)
 
     gres <- gprofiler2::gost(query = gene_lists, ...)
     if (show_plot) {

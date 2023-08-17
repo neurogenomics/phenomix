@@ -25,8 +25,8 @@ translate_geneids_txdb <- function(gene_hits,
         keys = as.character(gene_hits[[gene_col]]),
         columns = c("SYMBOL", "ENTREZID"),
         keytype = "ENTREZID"
-    ) %>%
-        data.table::data.table(key = "ENTREZID") %>%
+    ) |>
+        data.table::data.table(key = "ENTREZID") |>
         na.omit() |>
         unique()
     data.table::setkeyv(gene_hits, gene_col)
@@ -38,10 +38,11 @@ translate_geneids_txdb <- function(gene_hits,
     gene_hits[, SYMBOL := symbol_key[get(gene_col), "SYMBOL"]]
     #### Drop NAs ####
     na_count <- sum(is.na(gene_hits$SYMBOL))
-    if (drop_na & na_count > 0) {
+    if (isTRUE(drop_na) && 
+        na_count > 0) {
         messager("Dropping",
                  formatC(na_count,big.mark = ","),
-                 "genes without SYMBOL.",
+                 "rows without SYMBOL.",
             v = verbose
         )
         gene_hits <- stats::na.omit(gene_hits, "SYMBOL")

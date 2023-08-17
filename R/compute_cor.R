@@ -8,16 +8,14 @@
 #' @param assay If \code{obj} is a \pkg{Seurat} object, which assay to extract
 #'  for correlations.
 #' @param slot If \code{obj} is a \pkg{Seurat} object, which slot to extract
-#'  for correlations.
-#' @param reduction If not \code{NULL}, extracts the embedding from the
-#' specified reduction (e.g. "pca") and uses that to
-#' compute trait-trait similarities instead.
+#'  for correlations. 
 #' @param transpose Whether to transpose the matrix first.
 #' @param return_obj Whether to return the \pkg{Seurat} object with a new
 #' \code{obj@graphs} slot, or to simply return the sparse correlation matrix.
 #' @param verbose Print messages.
 #' @inheritParams stats::cor
 #' @inheritParams WGCNA::cor
+#' @inheritParams scKirby::get_obsm
 #'
 #' @returns A \pkg{Seurat} object with a new \code{obj@graphs} slot,
 #' or the sparse correlation matrix.
@@ -26,10 +24,10 @@
 #' @importFrom Matrix t
 #' @importFrom methods as slot
 compute_cor <- function(obj,
+                        keys = NULL,
                         graph_name = NULL,
                         assay = NULL,
                         slot = NULL,
-                        reduction = NULL,
                         transpose = FALSE,
                         method = "pearson",
                         fill_na = NULL,
@@ -37,24 +35,32 @@ compute_cor <- function(obj,
                         return_obj = TRUE,
                         nThreads = 1,
                         verbose = TRUE) {
+    # devoptera::args2vars(compute_cor)
+    
     #### Extract relevant matrix ####
-    if (!is.null(reduction)) {
-        mat <- extract_embeddings(
+    if (!is.null(keys)) {
+        mat <- scKirby::get_obsm(
             obj = obj,
-            reduction = reduction,
+            keys = keys,
             verbose = verbose
-        )
+        )[[1]]
         #### Important! must transpose ####
         transpose <- TRUE
     } else {
-        mat <- extract_matrix(
+        mat <- scKirby::get_x(
             obj = obj,
             assay = assay,
             slot = slot,
             verbose = verbose
         )
+        if(is.list(mat)){
+            messager(length(mat),"matrices extracted.",
+                     "Selecting only the first one:",
+                     shQuote(names(mat)[[1]]), v=verbose)
+            mat <- mat[[1]]
+        }
     }
-    if (transpose) mat <- Matrix::t(mat)
+    if (isTRUE(transpose)) mat <- Matrix::t(mat)
     if (!is.null(fill_na)) mat[is.na(mat)] <- fill_na
     #### Compute corr ####
     if (is_installed(pkg = "WGCNA")) {
@@ -71,12 +77,13 @@ compute_cor <- function(obj,
                            method = method)
     }
     #### Convert to sparse graph ####
-    cmat <- methods::as(methods::as(cmat, "sparseMatrix"), "Graph")
-    if (return_obj && is_seurat(obj)) {
+    cmat <- scKirby::to_graph(cmat)
+    if (isTRUE(return_obj) && 
+        scKirby::is_class(obj,"seurat")) {
         graph_name <- infer_graph_name(obj = obj, 
                                        graph_name = graph_name,
                                        assay = assay, 
-                                       reduction = reduction, 
+                                       keys = keys, 
                                        ignore_has_graph = TRUE, 
                                        verbose = FALSE)
         messager("Adding new graph to obj:", graph_name, v = verbose)

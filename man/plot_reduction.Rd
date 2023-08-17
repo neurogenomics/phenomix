@@ -6,7 +6,7 @@
 \usage{
 plot_reduction(
   obj,
-  reduction = NULL,
+  keys = NULL,
   metadata = NULL,
   x_dim = 1,
   y_dim = 2,
@@ -25,11 +25,14 @@ plot_reduction(
 \itemize{
 \item{\code{DimReduc}}
 \item{\code{Seurat}}
-\item{\code{Seurat}}
+\item{\code{AnnData}}
+\item{\code{prcomp}}
+\item{\code{CellDataSet}}
+\item{\code{list}}
+\item{\code{matrix/data.frame}}
 }}
 
-\item{reduction}{Which reduction to extract from.
-Only used if \code{obj} is of class \code{Seurat}.}
+\item{keys}{The keys of reductions to extract from.}
 
 \item{metadata}{Metadata associated with \code{obj}. 
 Will be automatically extracted from \code{obj} if it is a

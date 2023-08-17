@@ -14,7 +14,7 @@
 #' @param show_plot Whether to print the plot.
 #' @param point_alpha Opacity of data points.
 #' 
-#' @inheritParams extract_embeddings
+#' @inheritParams scKirby::get_obsm
 #' @inheritParams ggrepel::geom_text_repel
 #'
 #' @return ggplot object
@@ -22,9 +22,8 @@
 #' @export
 #' @import ggplot2
 #' @importFrom ggrepel geom_text_repel
-#' @importFrom dplyr %>%
 plot_reduction <- function(obj,
-                           reduction = NULL,
+                           keys = NULL,
                            metadata = NULL,
                            x_dim = 1,
                            y_dim = 2,
@@ -36,28 +35,31 @@ plot_reduction <- function(obj,
                            max.overlaps = 30,
                            show_plot = TRUE,
                            point_alpha = .6) { 
+    
+    requireNamespace("ggplot2")
+    
     if (is.null(metadata)) {
-        metadata <- extract_metadata(obj = obj)
+        metadata <- scKirby::get_obs(obj = obj)
     }
     if (is.null(rownames(metadata))) {
-        stop("metadata must have rownames to merge with obj.")
+        stopper("metadata must have rownames to merge with obj.")
     } 
     #### Prepare data ####
-    embeddings <- extract_embeddings(
+    embeddings <- scKirby::get_obsm(
         obj = obj,
-        reduction = reduction
+        keys = keys
     ) 
     if(x_dim>ncol(embeddings) || x_dim<1) {
-        stop("x_dim must be an integer >= the number of embeddings dimensions.") 
+        stopper("x_dim must be an integer >= the number of embeddings dimensions.") 
     }
     if(y_dim>ncol(embeddings) || y_dim<1) {
-        stop("y_dim must be an integer >= the number of embeddings dimensions.") 
+        stopper("y_dim must be an integer >= the number of embeddings dimensions.") 
     }
     #### Fix rownames to match metadata rownames ####
     if (fix_rownames) {
-        metadata <- metadata %>%
+        metadata <- metadata |>
             `rownames<-`(gsub("-|[:]|[.]", "_", rownames(metadata)))
-        embeddings <- embeddings %>%
+        embeddings <- embeddings |>
             `rownames<-`(gsub("-|[:]|[.]", "_", rownames(embeddings)))
     }
     plot_df <- merge(
@@ -66,7 +68,7 @@ plot_reduction <- function(obj,
         by = 0
     )
     if(nrow(plot_df)==0){
-        stop("No rows in merged metadata + embeddings data.")
+        stopper("No rows in merged metadata + embeddings data.")
     } else {
         messager("Constructed plot_df:",
                  formatC(nrow(plot_df),big.mark = ","),"rows x",
@@ -81,9 +83,9 @@ plot_reduction <- function(obj,
     )) +
         geom_point(aes_string(size = size_var), alpha = point_alpha) +
         theme_bw()
-    if (labels) {
+    if (isTRUE(labels)) {
         gp <- gp + ggrepel::geom_text_repel(max.overlaps = max.overlaps)
     }
-    if (show_plot) print(gp)
+    if (isTRUE(show_plot)) print(gp)
     return(gp)
 }

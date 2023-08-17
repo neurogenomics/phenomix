@@ -7,7 +7,7 @@
 get_top_factors(
   obj,
   metadata = NULL,
-  reduction = NULL,
+  keys = NULL,
   term,
   search_col = "label_phe",
   n_quantiles = 10,
@@ -22,16 +22,17 @@ get_top_factors(
 \item{metadata}{Phenotype metadata.
 Not needed if \code{obj} is a \pkg{Seurat} object.}
 
-\item{reduction}{Which reduction to extract from.
-Only used if \code{obj} is of class \code{Seurat}.}
+\item{keys}{The keys of reductions to extract from.}
 
 \item{term}{Term with which to perform substring search of observations.}
 
-\item{search_col}{Which column in the observation metadata to perform substring search.}
+\item{search_col}{Which column in the observation metadata to perform 
+substring search.}
 
 \item{n_quantiles}{How many quantiles to bin factor loadings into.}
 
-\item{select_quantiles}{Which quantiles to return. Defaults to the top quantile only.}
+\item{select_quantiles}{Which quantiles to return. Defaults to the
+top quantile only.}
 
 \item{plot_hist}{Whether to plot the distribution of loadings.}
 
@@ -41,7 +42,8 @@ Only used if \code{obj} is of class \code{Seurat}.}
 data.table
 }
 \description{
-Search a reduction for observations (e.g. traits) that match a given \code{term} (case-insensitive substring search).
+Search a reduction for observations (e.g. traits) that match a given 
+\code{term} (case-insensitive substring search).
 Then get the factors with the highest mean loading for the matching features.
 }
 \examples{

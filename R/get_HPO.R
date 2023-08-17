@@ -15,8 +15,9 @@
 #' }
 #' @return \pkg{Seurat} object
 #' @export
+#' @examples
+#' obj <- get_HPO() 
 get_HPO <- function() {
     tmp <- get_data(fname = "HPO_seurat.rds")
-    obj <- readRDS(tmp)
-    return(obj)
+    readRDS(tmp)
 }

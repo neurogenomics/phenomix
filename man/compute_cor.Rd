@@ -6,10 +6,10 @@
 \usage{
 compute_cor(
   obj,
+  keys = NULL,
   graph_name = NULL,
   assay = NULL,
   slot = NULL,
-  reduction = NULL,
   transpose = FALSE,
   method = "pearson",
   fill_na = NULL,
@@ -22,15 +22,13 @@ compute_cor(
 \arguments{
 \item{obj}{Either a \pkg{Seurat} object or a feature*trait matrix.}
 
+\item{keys}{The keys of reductions to extract from.}
+
 \item{assay}{If \code{obj} is a \pkg{Seurat} object, which assay to extract
 for correlations.}
 
 \item{slot}{If \code{obj} is a \pkg{Seurat} object, which slot to extract
 for correlations.}
-
-\item{reduction}{If not \code{NULL}, extracts the embedding from the
-specified reduction (e.g. "pca") and uses that to
-compute trait-trait similarities instead.}
 
 \item{transpose}{Whether to transpose the matrix first.}
 

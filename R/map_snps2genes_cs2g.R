@@ -11,7 +11,7 @@
 #' \href{https://alkesgroup.broadinstitute.org/cS2G}{
 #' Broad Institute server}
 #'
-#' @param sumstats_file GWAS summary statistics munged by
+#' @param dat GWAS summary statistics munged by
 #' \link[MungeSumstats]{format_sumstats}.
 #' Can be a path to the saved file or \link[data.table]{data.table}.
 #' @param nCores Number of cores to parallelise across.
@@ -22,7 +22,7 @@
 #'
 #' @keywords internal
 #' @importFrom data.table setkey fread
-map_snps2genes_cs2g <- function(sumstats,
+map_snps2genes_cs2g <- function(dat,
                                 ref_genome = "GRCh37",
                                 dataset = "Nasser2020",
                                 abc = NULL,
@@ -31,12 +31,12 @@ map_snps2genes_cs2g <- function(sumstats,
 
     #### Check build ####
     # if(!toupper(ref_genome) %in% c("HG19","GRCH37")){
-    #     stop("sumstats must first be aligned to GRCh37, ",
+    #     stopper("dat must first be aligned to GRCh37, ",
     #          "as the ABC model results are aligned to GRCh37.")
     # }
-    #### Import ABC predictions and merge with overlapping sumstats ####
+    #### Import ABC predictions and merge with overlapping dat ####
     merged_hits <- merge_abc(
-        sumstats = sumstats,
+        dat = dat,
         dataset = dataset,
         abc = abc,
         nCores = nCores,

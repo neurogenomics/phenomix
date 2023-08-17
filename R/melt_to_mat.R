@@ -9,8 +9,8 @@ melt_to_mat <- function(dat,
                                          fun.aggregate = fun.aggregate, 
                                          fill = fill,
                                          drop = FALSE,
-                                         value.var = value.var) %>%
-        tibble::column_to_rownames(var1) %>% 
+                                         value.var = value.var) |>
+        tibble::column_to_rownames(var1) |> 
         as.matrix()
     return(cmat)
 }

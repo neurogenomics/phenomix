@@ -6,7 +6,7 @@
 \usage{
 adjust_zstat_txdb(
   dat,
-  drop_MHC = TRUE,
+  drop_mhc = TRUE,
   method = "bonferroni",
   model = NULL,
   formula = ZSTAT ~ NSNPS + logNSNPS + GENELEN + logGENELEN,
@@ -18,7 +18,7 @@ adjust_zstat_txdb(
 \item{dat}{\code{data.table}
 produced by \link[phenomix]{map_snps2genes_txdb}.}
 
-\item{drop_MHC}{Drop genes from the MHC
+\item{drop_mhc}{Drop genes from the MHC
 (Major Histocompatibility Complex) region.}
 
 \item{method}{correction method, a \code{\link{character}} string.

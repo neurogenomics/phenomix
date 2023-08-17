@@ -6,7 +6,7 @@
 \usage{
 adjust_zstat_magma(
   magma,
-  drop_MHC = TRUE,
+  drop_mhc = TRUE,
   method = "bonferroni",
   model = NULL,
   formula = ZSTAT ~ NSNPS + logNSNPS + NPARAM + logNPARAM + GENELEN + logGENELEN,
@@ -18,7 +18,7 @@ adjust_zstat_magma(
 \item{magma}{MAGMA \emph{.genes.out} data.table
 produced by \link[MAGMA.Celltyping]{map.snps.to.genes}.}
 
-\item{drop_MHC}{Drop genes from the MHC
+\item{drop_mhc}{Drop genes from the MHC
 (Major Histocompatibility Complex) region.}
 
 \item{method}{correction method, a \code{\link{character}} string.

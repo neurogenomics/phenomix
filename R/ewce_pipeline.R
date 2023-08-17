@@ -20,14 +20,14 @@
 #             sctSpecies = sctSpecies,
 #             genelistSpecies = genelistSpecies
 #         )
-#         res_df <- res$results %>%
+#         res_df <- res$results |>
 #             dplyr::mutate(
 #                 FDR = p.adjust(p = p, method = "fdr"),
 #                 CellType = gsub(gsub_celltype, "", CellType)
 #             )
 #         return(res_df)
-#     }) %>%
-#         `names<-`(names(marker_list)) %>%
+#     }) |>
+#         `names<-`(names(marker_list)) |>
 #         data.table::rbindlist(idcol = idcol)
 #     return(boot_res)
 # }

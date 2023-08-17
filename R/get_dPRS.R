@@ -47,7 +47,7 @@
 #' 
 #' meta <- data.table::fread(meta_file, data.table = FALSE)
 #' colnames(meta) <- gsub("#","",colnames(meta))
-#' meta <- meta %>% dplyr::mutate(GBE_ID=gsub("_","-",GBE_ID))  
+#' meta <- meta |> dplyr::mutate(GBE_ID=gsub("_","-",GBE_ID))  
 #' rownames(meta) <- meta$GBE_ID
 #' 
 #' ## Reconstruct matrix

@@ -13,8 +13,7 @@
 #'
 #' @return \code{data.table} with group assignments at each depth.
 #'
-#' @keywords internal
-#' @importFrom dplyr %>%
+#' @keywords internal 
 #' @importFrom data.table data.table
 #' @importFrom ontologyIndex get_descendants
 get_ontology_groups <- function(ontology,
@@ -40,20 +39,20 @@ get_ontology_groups <- function(ontology,
                 ontology = ontology,
                 roots = root
             )
-        }) %>% `names<-`(names(top_names))
+        }) |> `names<-`(names(top_names))
 
         group_assigns <- lapply(term_ids, function(id) {
             group_identity <- lapply(names(all_desc), function(x) {
                 id %in% all_desc[[x]]
-            }) %>%
-                `names<-`(names(all_desc)) %>%
+            }) |>
+                `names<-`(names(all_desc)) |>
                 unlist()
             group <- top_names[names(group_identity[group_identity][1])]
             return(group)
-        }) %>% `names<-`(term_ids)
+        }) |> `names<-`(term_ids)
         # counts <- table(unname(unlist(group_assigns)))
         return(group_assigns)
-    }) %>% `names<-`(paste0("group_depth", depth_levels))
+    }) |> `names<-`(paste0("group_depth", depth_levels))
 
     df <- data.frame(do.call("cbind", depth_assigns))
     df <- cbind(id = rownames(df), df)

@@ -6,8 +6,8 @@ get_ontology_levels <- function(ontology,
             ontology = ontology,
             term_ids = id
         )
-    }) %>%
-        `names<-`(term_ids) %>%
+    }) |>
+        `names<-`(term_ids) |>
         unlist()
     return(lvls)
 }

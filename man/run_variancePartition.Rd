@@ -25,7 +25,7 @@ will be extracted automatically.}
 
 \item{nCores}{Number of cores to use in parallel.}
 
-\item{formula}{specifies variables for the linear (mixed) model.  Must only specify covariates, since the rows of exprObj are automatically used a a response. e.g.: \code{~ a + b + (1|c)}}
+\item{formula}{specifies variables for the linear (mixed) model.  Must only specify covariates, since the rows of exprObj are automatically used as a response. e.g.: \code{~ a + b + (1|c)}}
 
 \item{is_opengwas}{Whether the data comes from
  \href{https://gwas.mrcieu.ac.uk/}{OpenGWAS}.

@@ -24,3 +24,6 @@ Import the Human Phenotype Ontology (HPO) as a Seurat object
 with precalculated variable genes, specificity stored as an assay,
 and PCA/UMAP reductions.
 }
+\examples{
+obj <- get_HPO() 
+}

@@ -22,13 +22,13 @@
 #' @importFrom GeneOverlap newGeneOverlap testGeneOverlap
 #' @importFrom broom tidy
 #' @importFrom data.table rbindlist
-#' @importFrom dplyr mutate %>%
+#' @importFrom dplyr mutate
 #' @importFrom stats p.adjust
 #' @importFrom methods slot
 #' @examples
 #' ### DeGAs loadings
 #' degas <- get_DEGAS()
-#' xmat <- extract_loadings(obj = degas)
+#' xmat <- get_varm(obj = degas)
 #' xmat <- xmat[, 1:10] # Let's use just 10 components as an example
 #'
 #' ### Celltype Dataset
@@ -50,7 +50,7 @@ iterate_gsea <- function(xmat,
     message(length(gene_intersect), 
             " intersecting genes between GWAS and CTD matrices.")
     ### Run lm  for all celltypes against this trait
-    message(
+    messager(
         "Running ", formatC(ncol(xmat) * ncol(ymat), big.mark = ","),
         " tests: ", formatC(ncol(xmat), big.mark = ","), " traits x ",
         formatC(ncol(ymat), big.mark = ","), " celltypes."
@@ -72,7 +72,7 @@ iterate_gsea <- function(xmat,
             res <- GeneOverlap::newGeneOverlap(
                 listA = rownames(subset(dat, trait %in% use_quantiles)),
                 listB = rownames(subset(dat, celltype %in% use_quantiles))
-            ) %>%
+            ) |>
                 GeneOverlap::testGeneOverlap()
             res_df <- data.frame(
                 term = ct,
@@ -86,20 +86,20 @@ iterate_gsea <- function(xmat,
                 p.value = res@pval
             )
             return(res_df)
-        }) %>% data.table::rbindlist()
-    }, mc.cores = nCores) %>%
-        `names<-`(colnames(xmat)) %>%
+        }) |> data.table::rbindlist()
+    }, mc.cores = nCores) |>
+        `names<-`(colnames(xmat)) |>
         data.table::rbindlist(idcol = "trait")
 
     ### Multiple-testing correction
-    gsea_res <- gsea_res %>%
+    gsea_res <- gsea_res |>
         dplyr::mutate(qvalue = stats::p.adjust(p = p.value,
-                                               method = correction_method)) %>%
+                                               method = correction_method)) |>
         dplyr::rename(pvalue = p.value)
     ### Filter only sig results
-    sig_res <- gsea_res %>%
+    sig_res <- gsea_res |>
         subset(qvalue < qvalue_thresh)
-    message("\n", formatC(nrow(sig_res), big.mark = ","),
+    messager("\n", formatC(nrow(sig_res), big.mark = ","),
             " significant results @ ", 
             correction_method, "<", qvalue_thresh)
     ### Return FULL results (not just sig)

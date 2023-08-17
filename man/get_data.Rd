@@ -2,11 +2,34 @@
 % Please edit documentation in R/get_data.R
 \name{get_data}
 \alias{get_data}
-\title{get data via \pkg{piggyback}}
+\title{Get data}
 \usage{
-get_data(fname, repo = "neurogenomics/phenomix", overwrite = FALSE)
+get_data(
+  fname,
+  repo = "neurogenomics/phenomix",
+  tag = "latest",
+  save_dir = tools::R_user_dir("phenomix", which = "cache"),
+  .token = gh::gh_token(),
+  piggyback_cache_duration = 10,
+  overwrite = FALSE
+)
+}
+\arguments{
+\item{repo}{Repository name in format "owner/repo". Defaults to \code{guess_repo()}.}
+
+\item{tag}{tag for the GitHub release to which this data should be attached.}
+
+\item{.token}{GitHub authentication token, see \verb{[gh::gh_token()]}}
+
+\item{piggyback_cache_duration}{piggyback cache duration.}
+
+\item{overwrite}{Should any local files of the same name be overwritten?
+default \code{TRUE}.}
+}
+\value{
+R object.
 }
 \description{
-get data via \pkg{piggyback}
+Get data stored on GitHub Releases via \pkg{piggyback}.
 }
 \keyword{internal}

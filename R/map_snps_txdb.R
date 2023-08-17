@@ -9,7 +9,7 @@
 #' Permits selection of different region types with
 #' \code{queries} argument.
 #'
-#' @param sumstats GWAS summary statistics munged by
+#' @param dat GWAS summary statistics munged by
 #' \link[MungeSumstats]{format_sumstats}.
 #' @param promoter_upstream How many basepairs upstream of known promoters
 #'  to search for genes.
@@ -32,7 +32,7 @@
 #' @importFrom GenomicRanges GRangesList makeGRangesFromDataFrame
 #' @importFrom parallel mclapply
 #' @importFrom methods is
-map_snps_txdb <- function(sumstats,
+map_snps_txdb <- function(dat,
                           promoter_upstream = 35000,
                           promoter_downstream = 10000,
                           queries = c(
@@ -44,11 +44,15 @@ map_snps_txdb <- function(sumstats,
                           return_merged = TRUE,
                           nCores = 1,
                           verbose = TRUE) {
+    # devoptera::args2vars(map_snps_txdb)
 
+    if(!"SNP" %in% names(dat)){
+        stopper("SNP column missing from dat.")
+    }
     #### Convert to GRanges ####
-    if (!methods::is(sumstats, "GRanges")) {
+    if (!methods::is(dat, "GRanges")) {
         gr <- GenomicRanges::makeGRangesFromDataFrame(
-            sumstats, 
+            dat, 
             keep.extra.columns = TRUE, 
             seqnames.field = "CHR", 
             start.field = "BP", 
@@ -58,14 +62,13 @@ map_snps_txdb <- function(sumstats,
     #### Get txdb ####
     txdb <- select_txdb_build(ref_genome = ref_genome)
     ##### Gather region queries #####
-    promoter_region <- VariantAnnotation::PromoterVariants(
-        upstream = promoter_upstream,
-        downstream = promoter_downstream
-    )
-    if (all_variants) {
-        # regions <- VariantAnnotation::AllVariants(promoter = promoter_region)
+    if (isTRUE(all_variants)) { 
         regions <- list(allvariants = VariantAnnotation::AllVariants())
-    } else {
+    } else { 
+        promoter_region <- VariantAnnotation::PromoterVariants(
+            upstream = promoter_upstream,
+            downstream = promoter_downstream
+        )
         regions <- list(
             promoter = promoter_region,
             coding = VariantAnnotation::CodingVariants(),
@@ -89,21 +92,24 @@ map_snps_txdb <- function(sumstats,
             subject = txdb,
             region = regions[[x]]
         )
+        if(length(res)==0) return(res)
         res$region <- x
         return(res)
-    }, mc.cores = nCores) %>%
-        `names<-`(names(regions)) %>%
-        GenomicRanges::GRangesList() %>%
+    }, mc.cores = nCores) |>
+        `names<-`(names(regions)) |>
+        GenomicRanges::GRangesList() |>
         unlist()
     #### Add RSID back in so we can merge later ####
-    hits$SNP <- gr$SNP[hits$QUERYID]
-
+    hits$SNP <- gr$SNP[hits$QUERYID] 
     #### Merge ####
-    if (return_merged) {
+    if (isTRUE(return_merged)) {
+        messager("Merging dat with hits.",v=verbose)
         merged_hits <- merge(
-            x = sumstats,
-            y = data.table::data.table(data.frame(hits)),
-            by = "SNP", all = TRUE
+            x = dat,
+            y = data.table::as.data.table(hits),
+            by = "SNP",
+            sort = FALSE,
+            all = TRUE
         )
         return(merged_hits)
     } else {

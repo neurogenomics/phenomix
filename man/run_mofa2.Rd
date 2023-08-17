@@ -72,7 +72,7 @@ If NULL, default options are used.}
 \item{reductions}{In addition to returning  MOFA factors,
 further reduce the data with "umap" and/or "tsne".}
 
-\item{seed}{Seed passed to \[base]{set.seed}
+\item{seed}{Seed passed to \link[base]{set.seed}
 for reproducibility between runs.}
 
 \item{verbose}{Print messages.}

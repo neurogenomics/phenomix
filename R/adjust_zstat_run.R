@@ -22,7 +22,7 @@ adjust_zstat_run <- function(dat,
     predictors <- names(mod$coefficients)[-1]
     adjusted_predictors <- lapply(seq(1, length(predictors)), function(i) {
         dat[[predictors[i]]] * mod$coefficients[i + 1]
-    }) %>% `names<-`(predictors)
+    }) |> `names<-`(predictors)
     #### Compute Adjust Z-stat ####
-    dat[, ADJ_ZSTAT := dat$ZSTAT - Reduce(`+`, adjusted_predictors)]
+    dat[, ADJ_ZSTAT := ZSTAT - Reduce(`+`, adjusted_predictors)]
 }

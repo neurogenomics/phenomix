@@ -5,23 +5,25 @@
 \title{Map SNPs to genes}
 \usage{
 map_snps2genes(
-  sumstats_file,
-  method = c("abc", "txdb"),
+  dat,
+  method = c("txdb", "abc"),
   dataset = "Nasser2020",
   abc = NULL,
+  agg_var = "SYMBOL",
+  drop_na = TRUE,
   adjust_z = TRUE,
-  drop_MHC = TRUE,
+  drop_mhc = TRUE,
   model = NULL,
   log_vars = c("NSNPS", "NPARAM", "GENELEN"),
   formula = ZSTAT ~ NSNPS + logNSNPS + NPARAM + logNPARAM + GENELEN + logGENELEN,
   nCores = 1,
-  save_dir = tempdir(),
+  save_path = tempfile(),
   return_path = FALSE,
   verbose = TRUE
 )
 }
 \arguments{
-\item{sumstats_file}{GWAS summary statistics munged by
+\item{dat}{GWAS summary statistics munged by
 \link[MungeSumstats]{format_sumstats}.
 Can be a path to the saved file or \link[data.table]{data.table}.}
 
@@ -31,10 +33,14 @@ Can be a path to the saved file or \link[data.table]{data.table}.}
 
 \item{abc}{Use a previously downloaded ABC \link[data.table]{data.table}.}
 
+\item{agg_var}{Variable to aggregate \code{merged_hits} by.}
+
+\item{drop_na}{Drop rows with \code{NA} in any column.}
+
 \item{adjust_z}{Whether to adjust Z-statistic using
 the \code{model} and \code{formula}.}
 
-\item{drop_MHC}{Drop genes from the MHC
+\item{drop_mhc}{Drop genes from the MHC
 (Major Histocompatibility Complex) region.}
 
 \item{model}{Statistical model to use.
@@ -47,11 +53,14 @@ Only run on variables available in \code{dat}.}
 
 \item{nCores}{Number of cores to parallelise across.}
 
-\item{save_dir}{Where to save results.}
+\item{save_path}{Path to save results to.}
 
 \item{return_path}{Whether to return the path to the saved results.}
 
 \item{verbose}{Print messages.}
+
+\item{agg_by_genes}{Aggregate results by genes (\code{TRUE}) or SNPs
+(\code{FALSE}).}
 }
 \value{
 gene_hits \link[data.table]{data.table}.
@@ -79,3 +88,7 @@ Could compute mean coloc score per gene for each SNP and use that.
 Other position-based functional data might still be useful.
 }
 
+\examples{
+dat <- MungeSumstats::formatted_example()
+dat2 <- map_snps2genes(dat)
+}

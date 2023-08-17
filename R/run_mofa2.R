@@ -20,7 +20,7 @@
 #' @param maxiter Maximum number of training iterations (\emph{DEFAULT} = 1000).
 #' @param reductions In addition to returning  MOFA factors,
 #' further reduce the data with "umap" and/or "tsne".
-#' @param seed Seed passed to \[base]{set.seed}
+#' @param seed Seed passed to \link[base]{set.seed}
 #' for reproducibility between runs.
 #' @param verbose Print messages.
 #' @param ... Additional parameters passed to \link[MOFA2]{run_mofa}.
@@ -56,8 +56,8 @@ run_mofa2 <- function(obj,
     if (!is.null(seed)) set.seed(seed)
     #### Transpose matrices ####
     if (transpose & methods::is(obj, "list")) {
-        for (i in seq(1, length(mat_list))) {
-            mat_list[[i]] <- Matrix::t(mat_list[[i]])
+        for (i in seq(1, length(obj))) {
+            obj[[i]] <- Matrix::t(obj[[i]])
         }
     }
     #### Fix colnames ####
@@ -69,7 +69,7 @@ run_mofa2 <- function(obj,
         make_unique = TRUE
     )
     #### Prepare groups ####
-    metadata <- if (is.null(metadata)) extract_metadata(obj)
+    metadata <- if (is.null(metadata))  scKirby::get_obs()
     groups <- if ((!is.null(groups)) & length(groups) == 1) metadata[[groups]]
     # #### Use all features ####
     # if(features[1]=="all") {

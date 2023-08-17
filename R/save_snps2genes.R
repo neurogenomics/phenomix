@@ -1,25 +1,13 @@
 save_snps2genes <- function(gene_hits,
-                            save_dir,
-                            sumstats_file,
-                            method = NULL,
+                            save_path,
                             nCores = 1,
                             verbose = TRUE) {
-    if (!is.null(save_dir)) {
-        #### Construct path ####
-        if (methods::is(sumstats_file, "character")) {
-            id <- gsub(
-                paste(supported_suffixes(), collapse = "|"),
-                "", basename(sumstats_file)
-            )
-            out_path <- file.path(save_dir,
-                                  paste0(id, "_", method, ".tsv.gz"))
-        } else {
-            out_path <- paste0(tempfile(), method, ".tsv.gz")
-        }
+    if (!is.null(save_path)) { 
         #### Save ####
-        messager("Saving gene_hits ==>", out_path, v = verbose)
-        data.table::fwrite(gene_hits, out_path, nThread = nCores)
-        return(out_path)
+        messager("Saving gene_hits ==>", save_path, v = verbose)
+        dir.create(dirname(save_path), showWarnings = FALSE, recursive = TRUE)
+        data.table::fwrite(gene_hits, save_path, nThread = nCores)
+        return(save_path)
     } else {
         return(NULL)
     }

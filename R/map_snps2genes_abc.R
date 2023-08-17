@@ -11,7 +11,7 @@
 #'
 #' \href{https://www.engreitzlab.org/resources/}{ABC models from multiple Engreitz Lab publications}
 #'
-#' @param sumstats_file GWAS summary statistics munged by
+#' @param dat GWAS summary statistics munged by
 #' \link[MungeSumstats]{format_sumstats}.
 #' Can be a path to the saved file or \link[data.table]{data.table}.
 #' @param nCores Number of cores to parallelise across.
@@ -19,28 +19,31 @@
 #' @param verbose Print messages.
 #' @inheritParams map_snps_txdb
 #' @inheritParams import_abc
+#' @inheritParams aggregate_sumstats
 #'
 #' @return \code{gene_hits} \link[data.table]{data.table}
 #'
 #' @keywords internal
 #' @importFrom data.table setkey fread
-map_snps2genes_abc <- function(sumstats,
+map_snps2genes_abc <- function(dat,
                                ref_genome = "GRCh37",
                                dataset = "Nasser2020",
                                abc = NULL,
+                               agg_var = "SYMBOL",
                                nCores = 1,
                                verbose = TRUE) {
+    # devoptera::args2vars(map_snps2genes_abc)
 
     #### Check build ####
     if (!toupper(ref_genome) %in% c("HG19", "GRCH37")) {
-        stop(
-            "sumstats must first be aligned to GRCh37, ",
+        stopper(
+            "dat must first be aligned to GRCh37, ",
             "as the ABC model results are aligned to GRCh37."
         )
     }
-    #### Import ABC predictions and merge with overlapping sumstats ####
+    #### Import ABC predictions and merge with overlapping dat ####
     merged_hits <- merge_abc(
-        sumstats = sumstats,
+        dat = dat,
         dataset = dataset,
         abc = abc,
         nCores = nCores,
@@ -49,14 +52,14 @@ map_snps2genes_abc <- function(sumstats,
     #### Aggregate ABC ####
     gene_hits <- aggregate_sumstats(
         merged_hits = merged_hits,
-        agg_var = "TargetGene",
+        agg_var = agg_var,
         verbose = verbose
     )
     #### Get gene length ####
     gene_hits <- get_gene_length(
         gene_hits = gene_hits,
         ref_genome = ref_genome,
-        gene_col = "TargetGene",
+        gene_col = agg_var,
         use_symbols = TRUE,
         verbose = verbose
     )
@@ -67,7 +70,7 @@ map_snps2genes_abc <- function(sumstats,
         verbose = verbose
     )
     #### Rename TargetGene ####
-    data.table::setnames(gene_hits, "TargetGene", "GENE")
+    data.table::setnames(gene_hits, agg_var, "GENE")
     #### Return ####
     return(gene_hits)
 }

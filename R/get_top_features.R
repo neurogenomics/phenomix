@@ -13,7 +13,7 @@
 #' @export
 #' @importFrom Seurat Reductions
 #' @importFrom reshape2 melt
-#' @importFrom dplyr %>% rename group_by slice_max
+#' @importFrom dplyr rename group_by slice_max
 #' @importFrom data.table data.table
 #' @examples
 #' degas <- get_DEGAS()
@@ -29,15 +29,15 @@ get_top_features <- function(obj,
                              title = NULL,
                              verbose = TRUE) {
     Var1 <- Var2 <- value <- loading <- NULL;
-    loadings <- extract_loadings(
+    loadings <- get_varm(
         obj = obj,
         reduction = reduction,
         verbose = verbose
     )
-    top_features <- reshape2::melt(loadings) %>%
-        dplyr::rename(feature = Var1, factor = Var2, loading = value) %>%
-        dplyr::group_by(factor) %>%
-        dplyr::slice_max(order_by = abs(loading), n = n_features) %>%
+    top_features <- reshape2::melt(loadings) |>
+        dplyr::rename(feature = Var1, factor = Var2, loading = value) |>
+        dplyr::group_by(factor) |>
+        dplyr::slice_max(order_by = abs(loading), n = n_features) |>
         data.table::data.table()
 
     if (show_plot) {

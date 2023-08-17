@@ -7,7 +7,7 @@ select_txdb_build <- function(ref_genome,
         messager("Selecting TxDb.Hsapiens.UCSC.hg38.knownGene", v = verbose)
         txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
     } else {
-        stop("ref_genome must be 'GRCh37' or 'GRCh38'")
+        stopper("ref_genome must be 'GRCh37' or 'GRCh38'")
     }
     return(txdb)
 }

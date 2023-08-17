@@ -4,7 +4,13 @@
 \alias{import_abc}
 \title{Import ABC model predictions}
 \usage{
-import_abc(dataset = "Nasser2020", abc = NULL, nCores = 1, verbose = TRUE)
+import_abc(
+  dataset = "Nasser2020",
+  abc = NULL,
+  nCores = 1,
+  save_dir = tools::R_user_dir(package = "phenomix", which = "cache"),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{dataset}{Which ABC model to import.}
@@ -12,6 +18,8 @@ import_abc(dataset = "Nasser2020", abc = NULL, nCores = 1, verbose = TRUE)
 \item{abc}{Use a previously downloaded ABC \link[data.table]{data.table}.}
 
 \item{nCores}{Number of cores to parallelise across.}
+
+\item{save_dir}{Directory to cache files to.}
 
 \item{verbose}{Print messages.}
 }

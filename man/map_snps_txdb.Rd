@@ -5,7 +5,7 @@
 \title{Map SNPs to genes: txdb}
 \usage{
 map_snps_txdb(
-  sumstats,
+  dat,
   promoter_upstream = 35000,
   promoter_downstream = 10000,
   queries = c("promoter", "coding", "intron", "threeUTR", "splicesite"),
@@ -17,7 +17,7 @@ map_snps_txdb(
 )
 }
 \arguments{
-\item{sumstats}{GWAS summary statistics munged by
+\item{dat}{GWAS summary statistics munged by
 \link[MungeSumstats]{format_sumstats}.}
 
 \item{promoter_upstream}{How many basepairs upstream of known promoters

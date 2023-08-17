@@ -1,7 +1,7 @@
 Package: phenomix
 Type: Package
 Title: Explore the phenome 
-Version: 0.99.4
+Version: 0.99.5
 Authors@R: c(person(given = "Brian",
                     family = "Schilder",
                     role = c("cre"),
@@ -17,7 +17,7 @@ Depends: R (>= 4.1.0)
 SystemRequirements: Python (>= 3.7.0)
 biocViews:
 Imports: 
-    stats,
+    scKirby,
     utils,
     methods,
     Matrix,
@@ -42,7 +42,6 @@ Imports:
     BiocParallel,
     AnnotationDbi,
     DelayedArray,
-    DT,
     reshape2,
     scales,
     stringr,
@@ -53,9 +52,12 @@ Imports:
     ontologyIndex,
     VariantAnnotation,
     GenomeInfoDb,
-    piggyback
+    piggyback,
+    gh,
+    tools
 Remotes:
-    github::neurogenomics/scNLP
+    github::neurogenomics/scNLP,
+    github::neurogenomics/scKirby
 Suggests:
     markdown,
     rmarkdown,
@@ -78,5 +80,6 @@ Suggests:
     MOFA2,
     h2o,
     recipes
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr 
+Config/testthat/edition: 3

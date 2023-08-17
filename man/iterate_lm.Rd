@@ -35,7 +35,7 @@ Iterate linear regression across all traits and celltypes
 \examples{
 ### DeGAs loadings
 degas <- get_DEGAS()
-xmat <- extract_loadings(degas)
+xmat <- get_varm(degas)
 xmat <- xmat[, 1:10] # Let's use just 10 components as an example
 
 ### Celltype Dataset

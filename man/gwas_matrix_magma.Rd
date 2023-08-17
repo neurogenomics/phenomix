@@ -7,7 +7,7 @@
 gwas_matrix_magma(
   magma_files,
   metric = c("ADJ_ZSTAT", "ZSTAT", "P"),
-  drop_MHC = TRUE,
+  drop_mhc = TRUE,
   save_path = NULL,
   nCores = 1,
   fillna = TRUE,
@@ -28,7 +28,7 @@ produced by \link[MAGMA.Celltyping]{map.snps.to.genes}.}
  \item{\code{"P"} : }{MAGMA P-value.}
 }}
 
-\item{drop_MHC}{Drop genes from the MHC
+\item{drop_mhc}{Drop genes from the MHC
 (Major Histocompatibility Complex) region.}
 
 \item{save_path}{Path to save results as RDS object.}

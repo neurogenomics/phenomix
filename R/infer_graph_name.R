@@ -1,12 +1,12 @@
 infer_graph_name <- function(obj, 
                              graph_name = NULL,
                              assay = NULL,
-                             reduction = NULL,
+                             keys = NULL,
                              ignore_has_graph = TRUE,
                              verbose = TRUE){
     if(is.null(graph_name)){
-        if(!is.null(reduction)) {
-            graph_name <- paste(reduction,"cor",sep="_") 
+        if(!is.null(keys)) {
+            graph_name <- paste(keys,"cor",sep="_") 
         } else if (!is.null(assay)){
             graph_name <- paste(assay,"cor",sep="_") 
         } else {

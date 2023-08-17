@@ -17,6 +17,7 @@
 #' @param dataset Which ABC model to import.
 #' @param nCores Number of cores to parallelise across. 
 #' @param abc Use a previously downloaded ABC \link[data.table]{data.table}.
+#' @param save_dir Directory to cache files to.
 #' @param verbose Print messages.
 #'
 #' @return \code{gene_hits} \link[data.table]{data.table}
@@ -26,26 +27,36 @@
 import_abc <- function(dataset = "Nasser2020",
                        abc = NULL,
                        nCores = 1,
+                       save_dir = tools::R_user_dir(
+                           package = "phenomix",
+                           which = "cache"),
                        verbose = TRUE) {
     dataset <- tolower(dataset[1])
+    
     #### Return provided data ####
     if (!is.null(abc)) {
-        messager("Using previously downloaded ABC data.table", v = verbose)
+        messager("Using supplied ABC data.table", v = verbose)
         return(abc)
     }
     #### NOTE: aligned to HG19 ####
     if (dataset == "nasser2020") {
-        abc_url <- file.path(
-            "ftp://ftp.broadinstitute.org/outgoing",
-            "lincRNA/ABC",
+        abc_url <- paste0(
+            "ftp://ftp.broadinstitute.org/outgoing/",
+            "lincRNA/ABC/",
             "AllPredictions.AvgHiC.ABC0.015.minus150.ForABCPaperV3.txt.gz"
         )
     }
     #### Read ABC ####
-    messager("Importing", dataset, "ABC model predictions from remote server.",
+    path <- file.path(save_dir,basename(abc_url))
+    if(!file.exists(path)){
+        dir.create(dirname(path), showWarnings = FALSE, recursive = TRUE)
+        utils::download.file(url = abc_url,
+                             destfile = path)
+    }
+    messager("Importing",dataset,"ABC model predictions.",
         v = verbose
     )
-    abc <- data.table::fread(abc_url, nThread = nCores)
+    abc <- data.table::fread(path, nThread = nCores)
     data.table::setnames(abc, c("chr", "start"), c("CHR", "BP"))
     data.table::setkeyv(abc, c("CHR", "BP"))
     return(abc)

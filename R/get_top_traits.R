@@ -9,14 +9,14 @@
 #' @param n_traits Number of top traits per reduction factor to select.
 #' @param verbose Print messages.
 #' @inheritParams plot_top
-#' @inheritParams extract_embeddings
+#' @inheritParams scKirby::get_obsm
 #'
 #' @return \code{data.table} of top traits.
 #' 
 #' @export
 #' @importFrom Seurat Reductions
 #' @importFrom reshape2 melt
-#' @importFrom dplyr %>% rename group_by slice_max
+#' @importFrom dplyr rename group_by slice_max
 #' @importFrom data.table data.table
 #' @examples
 #' degas <- get_DEGAS()
@@ -33,22 +33,22 @@ get_top_traits <- function(obj,
                            y = "loading",
                            verbose = TRUE) {
     Var1 <- Var2 <- value <- loading <- NULL;
-    embeddings <- extract_embeddings(
+    embeddings <- scKirby::get_obsm(
         obj = obj,
         reduction = reduction,
         verbose = verbose
     )
-    if (is.null(metadata)) metadata <- extract_metadata(obj = obj)
-    top_traits <- reshape2::melt(embeddings) %>%
+    if (is.null(metadata)) metadata <-  scKirby::get_obs(obj = obj)
+    top_traits <- reshape2::melt(embeddings) |>
         merge(metadata,
             by.x = "Var1", by.y = 0, all.x = TRUE
-        ) %>%
+        ) |>
         dplyr::rename(phenotype = Var1,
                       factor = Var2, 
-                      loading = value) %>%
-        dplyr::group_by(factor) %>%
+                      loading = value) |>
+        dplyr::group_by(factor) |>
         dplyr::slice_max(order_by = abs(loading),
-                         n = n_traits) %>%
+                         n = n_traits) |>
         data.table::data.table()
 
     if (show_plot) {

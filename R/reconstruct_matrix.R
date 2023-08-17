@@ -2,8 +2,7 @@
 #'
 #' @keywords internal
 #' @importFrom stats quantile
-#' @importFrom scales rescale
-#' @importFrom dplyr %>%
+#' @importFrom scales rescale 
 reconstruct_matrix <- function(u_name = "contribution_phe",
                                v_name = "contribution_var",
                                d_name = NULL,
@@ -40,7 +39,7 @@ reconstruct_matrix <- function(u_name = "contribution_phe",
             label_var_gene <- annotate_vector(
                 vec = npz_obj[v_labels],
                 annot = annot
-            ) %>% unname()
+            ) |> unname()
         } else {
             label_var_gene <- npz_obj[v_labels]
         }
@@ -53,7 +52,7 @@ reconstruct_matrix <- function(u_name = "contribution_phe",
         label_var_gene <- label_phe_code_tmp
     }
     if (any(replace_underscores)) {
-        message("Replacing _ with -.")
+        messager("Replacing _ with -.")
         ## Seurat requires this, and tries 
         ## to enforce it but doesn't do it very well
         ## https://github.com/satijalab/seurat/issues/1296
@@ -69,11 +68,11 @@ reconstruct_matrix <- function(u_name = "contribution_phe",
     messager("Preparing input matrices.", v=verbose) 
     u <- npz_obj[u_name]
     label_dim <- paste0("dim", seq(1,ncol(u)))
-    u <- u %>%
-        `rownames<-`(label_phe_code) %>%
+    u <- u |>
+        `rownames<-`(label_phe_code) |>
         `colnames<-`(label_dim)
-    v <- npz_obj[v_name] %>%
-        `rownames<-`(label_var_gene) %>%
+    v <- npz_obj[v_name] |>
+        `rownames<-`(label_var_gene) |>
         `colnames<-`(label_dim)
     if (gene_level & remove_nongenes) {
         ## NOTE: Most of the "genes" do not have any gene symbols. Remove them.

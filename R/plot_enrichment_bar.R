@@ -1,7 +1,7 @@
 #' Plot enrichment results: barplot
 #'
 #' @keywords internal
-#' @importFrom dplyr %>% desc arrange
+#' @importFrom dplyr desc arrange
 plot_enrichment_bar <- function(res,
                                 qvalue_thresh = .05,
                                 show_plot = TRUE,
@@ -11,7 +11,7 @@ plot_enrichment_bar <- function(res,
                                 dpi = 300,
                                 verbose = TRUE) {
     qvalue <- pvalue <- term <- NULL;
-    plot_dat <- subset(res, qvalue < .05) %>%
+    plot_dat <- subset(res, qvalue < .05) |>
         dplyr::arrange(dplyr::desc(pvalue))
     plot_dat$term <- factor(plot_dat$term,
         levels = unique(plot_dat$term),

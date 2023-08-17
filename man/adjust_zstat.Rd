@@ -6,7 +6,8 @@
 \usage{
 adjust_zstat(
   dat,
-  drop_MHC = TRUE,
+  gene_col = "SYMBOL",
+  drop_mhc = TRUE,
   method = "bonferroni",
   model = NULL,
   log_vars = c("NSNPS", "NPARAM", "GENELEN"),
@@ -19,7 +20,7 @@ adjust_zstat(
 \item{dat}{\code{data.table}
 produced by \link[phenomix]{map_snps2genes_txdb}.}
 
-\item{drop_MHC}{Drop genes from the MHC
+\item{drop_mhc}{Drop genes from the MHC
 (Major Histocompatibility Complex) region.}
 
 \item{method}{correction method, a \code{\link{character}} string.
@@ -46,4 +47,8 @@ Adjust the GWAS Z-statistic.
 \details{
 Used when you want to directly analyse the gene-level
 Z-scores corrected for gene length,  etc.
+}
+\examples{
+dat <- MungeSumstats::formatted_example()
+dat2 <- map_snps2genes(dat, adjust_z=FALSE) 
 }

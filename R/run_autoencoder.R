@@ -12,10 +12,7 @@
 #' @param seed Seed passed to \[base]{set.seed} 
 #' for reproducibility between runs.
 #' @param ... Additional parameters passed to \link[h2o]{h2o.deeplearning}.
-#' @inheritParams h2o::h2o.deeplearning
-#'
-#' @importFrom Matrix t
-#' @importFrom dplyr %>%
+#' @inheritParams h2o::h2o.deeplearning 
 #' 
 #' @returns List containing:
 #' \itemize{
@@ -34,8 +31,7 @@
 #' autoencoder documentation}
 #' 
 #' @export
-#' @importFrom Matrix t
-#' @importFrom dplyr %>%
+#' @importFrom Matrix t 
 #' 
 #' @examples 
 #' #### Import data ####
@@ -75,11 +71,11 @@ run_autoencoder <- function(obj,
     # #### Subset data ####
     # obj <- gwas# [select_features,] 
     requireNamespace("h2o")
-    mat <- extract_matrix(obj = obj,
+    mat <- scKirby::get_x(obj = obj,
                           assay = assay,
                           slot = slot)
     # mat[mat==0] <- NA
-    if(is.null(metadata)) metadata <- extract_metadata(obj = obj)
+    if(is.null(metadata)) metadata <-  scKirby::get_obs(obj = obj)
     # nrow(metadata[is.na(metadata[[label_var]]),])
     #### Inpute needs to be in sample (trait) x feature (gene) format ####
     if (transpose) {
@@ -135,7 +131,7 @@ run_autoencoder <- function(obj,
     #### Extract predictions (decoded data) ####
     # ae1_codings <- h2o::h2o.predict(object = ae1, 
     #                                 newdata = features)
-    latent_mat <- as.matrix(ae1_codings) %>%
+    latent_mat <- as.matrix(ae1_codings) |>
         `row.names<-`(colnames(obj)) 
     
     #### Plot traits in latent space ####

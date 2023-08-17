@@ -11,8 +11,8 @@ get_n_ancestors <- function(ontology,
             terms = x
         )
         return(length(all_terms))
-    }) %>%
-        `names<-`(term_ids) %>%
+    }) |>
+        `names<-`(term_ids) |>
         unlist()
     return(n_ancestors)
 }

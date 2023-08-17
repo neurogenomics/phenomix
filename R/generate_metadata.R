@@ -19,7 +19,7 @@
 #' @export
 #' @importFrom MungeSumstats find_sumstats get_genome_builds
 #' @importFrom utils read.csv write.csv
-#' @importFrom  dplyr mutate %>%
+#' @importFrom  dplyr mutate
 generate_metadata <- function(munged_files,
                               infer_builds = TRUE,
                               drop_na_N = TRUE,
@@ -43,7 +43,7 @@ generate_metadata <- function(munged_files,
     #### Add munged GWAS path into metadata ####
     metagwas_all$path <- munged_files[metagwas_all$id]
     #### Infer N ####
-    metagwas_all <- metagwas_all %>%
+    metagwas_all <- metagwas_all |>
         dplyr::mutate(N = ifelse(is.na(sample_size),
             sum(ncase, ncontrol, na.rm = TRUE), sample_size
         ))
@@ -59,7 +59,7 @@ generate_metadata <- function(munged_files,
         metagwas_all[is.na(metagwas_all$trait_group), "trait_group"] <- "other"
     }
     #### Set rownames ####
-    metagwas_all <- data.frame(metagwas_all) %>%
+    metagwas_all <- data.frame(metagwas_all) |>
         `rownames<-`(gsub("-|[:]|[.]", "_", metagwas_all$id))
     #### Infer genome ####
     if (infer_builds & (!"build_inferred" %in% colnames(metagwas_all))) {

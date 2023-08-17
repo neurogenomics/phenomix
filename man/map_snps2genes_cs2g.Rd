@@ -5,7 +5,7 @@
 \title{Map SNPs to genes: cS2G}
 \usage{
 map_snps2genes_cs2g(
-  sumstats,
+  dat,
   ref_genome = "GRCh37",
   dataset = "Nasser2020",
   abc = NULL,
@@ -14,13 +14,13 @@ map_snps2genes_cs2g(
 )
 }
 \arguments{
+\item{dat}{GWAS summary statistics munged by
+\link[MungeSumstats]{format_sumstats}.
+Can be a path to the saved file or \link[data.table]{data.table}.}
+
 \item{nCores}{Number of cores to parallelise across.}
 
 \item{verbose}{Print messages.}
-
-\item{sumstats_file}{GWAS summary statistics munged by
-\link[MungeSumstats]{format_sumstats}.
-Can be a path to the saved file or \link[data.table]{data.table}.}
 
 \item{method}{Method to use for mapping SNPs to genes.}
 }

@@ -8,7 +8,11 @@ remove_mhc_genes <- function(dat,
     ) 
     #### Check which MHC data column to filter by  #### 
     ## Entrez gene ID or HGNC gene symbol
-    MHC_col <-if(methods::is(dat[[gene_col]],"numeric")){"GENEID"}else{"SYMBOL"}  
+    MHC_col <-if(methods::is(dat[[gene_col]],"numeric")){
+        "GENEID"
+    } else {
+        "SYMBOL"
+    }  
     #### Filter
     MHC_hits <- unique(
         dat[get(gene_col) %in% unique(MHC_genes[[MHC_col]]),][[gene_col]]

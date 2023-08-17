@@ -33,9 +33,11 @@ Subplot image from [Geneshot_ontologies](https://github.com/bschilder/Geneshot_o
 img1 <- here::here("inst/hex/geneshot.UMAP.layer2.pdf")
 # img2 <- "../images/phoenix_pixel.png"
 
-sticker(subplot = img1, package="phenomix", p_size=20, s_x=1, s_y=.7,  s_width = .8,
-        h_fill = "black", h_color = "#f504f9",spotlight = FALSE, white_around_sticker=TRUE,
-        filename=here::here("inst/hex/phenomix.png"))
+sticker(subplot = img1, package="phenomix",
+        p_size=20, s_x=1, s_y=.7,  s_width = .8,
+        h_fill = "black", h_color = "#72efe9",
+        spotlight = FALSE, white_around_sticker=FALSE,
+        filename=here::here("inst/hex/hex.png"))
 
 ```
 

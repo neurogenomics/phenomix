@@ -45,7 +45,7 @@ Iterate gene set enrichment analysis across all traits and celltypes.
 \examples{
 ### DeGAs loadings
 degas <- get_DEGAS()
-xmat <- extract_loadings(obj = degas)
+xmat <- get_varm(obj = degas)
 xmat <- xmat[, 1:10] # Let's use just 10 components as an example
 
 ### Celltype Dataset

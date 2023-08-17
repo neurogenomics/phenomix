@@ -7,7 +7,7 @@
 #'
 #' @param magma MAGMA \emph{.genes.out} data.table
 #' produced by \link[MAGMA.Celltyping]{map.snps.to.genes}.
-#' @param drop_MHC Drop genes from the MHC
+#' @param drop_mhc Drop genes from the MHC
 #' (Major Histocompatibility Complex) region.
 #' @param model Statistical model to use.
 #' Defaults to \link[stats]{lm}.
@@ -19,7 +19,7 @@
 #' @importFrom stats lm p.adjust
 #' @importFrom data.table setkey :=
 adjust_zstat_magma <- function(magma,
-                               drop_MHC = TRUE,
+                               drop_mhc = TRUE,
                                method = "bonferroni",
                                model = NULL,
                                formula = ZSTAT ~ NSNPS + logNSNPS + NPARAM +
@@ -40,8 +40,8 @@ adjust_zstat_magma <- function(magma,
     magma[, logNSNPS := log(NSNPS)]
     magma[, logNPARAM := log(NPARAM)]
     #### Drop MHC genes ####
-    if (drop_MHC) {
-        message("Dropping genes from the MHC region.")
+    if (isTRUE(drop_mhc)) {
+        messager("Dropping genes from the MHC region.")
         # DROP MHC: chr6, 25-34 MB
         # Which genome build?
         magma <- magma[!(magma$CHR == 6 & magma$START >= 25000000 & magma$STOP <= 34000000), ]
@@ -53,7 +53,7 @@ adjust_zstat_magma <- function(magma,
     #### Regress out effects of NSNPS and NPARAM ####
     # (see 'boxplots_by_decile.r' and the section on downsampling for info)
     #--- NSNPS only really has mjaor effects (i.e. zscore+2) when a gene has ~10000 SNPS
-    message("Adjusting MAGMA ZSTAT.")
+    messager("Adjusting MAGMA ZSTAT.")
     mod <- model(
         formula = formula,
         data = magma,

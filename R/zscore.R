@@ -2,6 +2,11 @@ zscore <- function(dat,
                    column = "BETA",
                    verbose = TRUE) {
     ZSTAT <- NULL;
-    messager("Computing ZSTAT from", paste0(column, "."), v = verbose)
-    data.table::setDT(dat)[, ZSTAT := scale(get(column))]
+    column <- column[1]
+    
+    if(column %in% names(dat)){
+        messager("Computing ZSTAT from", paste0(shQuote(column), "."), 
+                 v = verbose)
+        dat[, ZSTAT:=scale(get(column))]
+    } 
 }

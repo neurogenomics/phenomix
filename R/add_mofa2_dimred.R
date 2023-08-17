@@ -10,7 +10,7 @@ add_mofa2_dimred <- function(obj,
         embeddings <- data.frame(
             UMAP1 = model@dim_red$UMAP$UMAP1,
             UMAP2 = model@dim_red$UMAP$UMAP2,
-            row.names = extract_colnames(obj)
+            row.names = scKirby::get_obs_names(obj)
         )
         DR <- Seurat::CreateDimReducObject(
             embeddings = as.matrix(embeddings),

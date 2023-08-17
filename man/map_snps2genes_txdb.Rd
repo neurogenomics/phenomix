@@ -5,17 +5,21 @@
 \title{Map SNPs to genes: txdb}
 \usage{
 map_snps2genes_txdb(
-  sumstats,
+  dat,
   promoter_upstream = 35000,
   promoter_downstream = 10000,
   queries = c("promoter", "coding", "intron", "threeUTR", "splicesite"),
+  drop_na = TRUE,
+  agg_var = "SYMBOL",
+  zscore_col = "BETA_mean",
   nCores = 1,
   verbose = TRUE
 )
 }
 \arguments{
-\item{sumstats}{GWAS summary statistics munged by
-\link[MungeSumstats]{format_sumstats}.}
+\item{dat}{GWAS summary statistics munged by
+\link[MungeSumstats]{format_sumstats}.
+Can be a path to the saved file or \link[data.table]{data.table}.}
 
 \item{promoter_upstream}{How many basepairs upstream of known promoters
 to search for genes.}
@@ -26,13 +30,13 @@ to search for genes.}
 \item{queries}{Genomic region types to search for overlap with \code{gr}.
 See \link[VariantAnnotation]{AllVariants} for details.}
 
+\item{drop_na}{Drop rows with \code{NA} in any column.}
+
+\item{agg_var}{Variable to aggregate \code{merged_hits} by.}
+
 \item{nCores}{Number of cores to parellelise across.}
 
 \item{verbose}{Print messages.}
-
-\item{sumstats_file}{GWAS summary statistics munged by
-\link[MungeSumstats]{format_sumstats}.
-Can be a path to the saved file or \link[data.table]{data.table}.}
 
 \item{method}{Method to use for mapping SNPs to genes.}
 }

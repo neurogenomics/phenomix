@@ -5,8 +5,7 @@
 #'
 #' @param obj \pkg{Seurat} object.
 #' @param assay Assay to use.
-#' @param slot Slot to use.
-#' @param reduction Reduction to use.
+#' @param slot Slot to use. 
 #' @param graph_name Name of the graph to use.
 #' If none provided, will use the last graph available.
 #' If no graphs are available, new ones will be computed using
@@ -22,28 +21,24 @@
 #' @param max_neighbors The max number of neighbors (var2) per term (var1).
 #' @param add_original_names Add original names into the results.
 #' This can be useful when var1 names are forced to be unique internally.
-#' @param verbose Whether to print messages.
+#' @inheritParams scKirby::get_obsm
 #'
-#' @examples 
-#' degas <- get_DEGAS()
-#'
-#' ### No group filter
-#' top_neighbors <- find_neighbors(
-#'     obj = degas,
-#'     var1_search = "parkinson", 
-#'     label_col = "label_phe"
-#' )
 #' @export
-#' @importFrom dplyr %>% mutate_at arrange group_by slice_max desc rename
+#' @importFrom dplyr mutate_at arrange group_by slice_max desc rename
 #' @importFrom stats setNames
 #' @importFrom Matrix as.matrix
 #' @importFrom reshape2 melt
 #' @importFrom data.table data.table
+#' @examples 
+#' obj <- get_HPO()
+#' top_neighbors <- find_neighbors(obj = obj,
+#'                                 var1_search = "parkinson",
+#'                                 label_col = "HPO_label")
 find_neighbors <- function(obj,
                            graph_name = NULL,
                            assay = NULL,
                            slot = NULL,
-                           reduction=NULL,
+                           keys = NULL,
                            var1_search = NULL,
                            label_col = NULL,
                            var2_group = NULL,
@@ -51,30 +46,39 @@ find_neighbors <- function(obj,
                            max_neighbors = Inf,
                            add_original_names = TRUE,
                            verbose = TRUE) {
+    
+    # devoptera::args2vars(find_neighbors)
     Var1 <- Var2 <- trait1 <- trait2 <- similarity <- NULL;
+    #### Get obs ####
+    obs <- scKirby::get_obs(obj = obj,
+                            verbose = verbose)
+    if(!is.null(label_col)){
+        if(!label_col %in% names(obs)){
+            stopper(paste0("label_col=",shQuote(label_col)),
+                    "not found in obs metadata.")
+        }
+    }
     #### Extract/compute correlation matrix ####
-    cmat <- extract_cor(
+    cmat <- get_cor(
         obj = obj,
-        graph_name = graph_name,
+        graph_name = graph_name, 
+        keys = keys,
         assay = assay,
         slot = slot,
-        reduction = reduction,
         return_obj = FALSE,
         verbose = verbose
     )
-    metadata <- extract_metadata(obj = obj)
+    #### Align naming of obs metadata and matrix ####
     if (is.null(label_col)) {
         sample_names <- rownames(cmat)
     } else {
-        sample_names <- make.unique(metadata[[label_col]])
+        sample_names <- make.unique(obs[[label_col]])
     }
-    metadata$sample_names <- sample_names
-    names_dict <- stats::setNames(rownames(cmat), sample_names)
-
-    fgraph <- cmat %>%
-        `row.names<-`(sample_names) %>%
+    obs$sample_names <- sample_names
+    names_dict <- stats::setNames(rownames(cmat), sample_names) 
+    fgraph <- cmat |>
+        `row.names<-`(sample_names) |>
         `colnames<-`(sample_names)
-
     if (!is.null(var1_search)) {
         messager("Filtering results by var1_search:",
             paste(var1_search,collapse = " | "),
@@ -96,7 +100,7 @@ find_neighbors <- function(obj,
                 fgraph <- fgraph[targets1,,drop=FALSE]
             } 
         } else {
-            stop(
+            stopper(
                 "0 entries in label_col match the ",
                 "substring search for `var1_search`"
             )
@@ -104,13 +108,13 @@ find_neighbors <- function(obj,
     }
 
     if (!is.null(group_col) &&
-        (group_col %in% colnames(metadata)) &&
+        (group_col %in% colnames(obs)) &&
         (!is.null(var2_group))) {
         messager("+ Filtering results by var2_group:", var2_group,
                  v = verbose)
-        targets2 <- metadata[
+        targets2 <- obs[
             grepl(pattern = paste(var2_group, collapse = "|"), 
-                  x = metadata[[group_col]],
+                  x = obs[[group_col]],
                 ignore.case = TRUE
             ),
             "sample_names"
@@ -122,36 +126,36 @@ find_neighbors <- function(obj,
             )
             fgraph <- fgraph[, targets2]
         } else {
-            stop(
+            stopper(
                 "0 entries in group_col match the ",
                 "substring search for var2_group."
             )
         }
     } 
 
-    top_candidates <- fgraph %>%
-        Matrix::as.matrix(drop=FALSE) %>%
-        reshape2::melt(value.name = "similarity", drop=FALSE) %>%
-        dplyr::rename(trait1 = Var1, trait2 = Var2) %>%
-        data.table::data.table() %>%
-        dplyr::mutate_at(c("trait1", "trait2"), as.character) %>%
-        subset(trait1 %in% targets1) %>%
-        subset(trait1 != trait2) %>%
-        subset(similarity > 0) %>%
-        dplyr::group_by(trait1) %>%
+    top_candidates <- fgraph |>
+        Matrix::as.matrix(drop=FALSE) |>
+        reshape2::melt(value.name = "similarity", drop=FALSE) |>
+        dplyr::rename(trait1 = Var1, trait2 = Var2) |>
+        data.table::data.table() |>
+        dplyr::mutate_at(c("trait1", "trait2"), as.character) |>
+        subset(trait1 %in% targets1) |>
+        subset(trait1 != trait2) |>
+        subset(similarity > 0) |>
+        dplyr::group_by(trait1) |>
         dplyr::slice_max(
             order_by = similarity,
             n = max_neighbors
-        ) %>%
-        dplyr::arrange(dplyr::desc(similarity)) %>%
+        ) |>
+        dplyr::arrange(dplyr::desc(similarity)) |>
         data.table::data.table()
 
     if (!is.null(group_col)) {
         messager("+ Adding group_col to results.", v = verbose)
-        keys <- stats::setNames(metadata[[group_col]], metadata$sample_names)
+        keys <- stats::setNames(obs[[group_col]], obs$sample_names)
         top_candidates$trait2_group <- keys[top_candidates$trait2]
     }
-    if (add_original_names) {
+    if (isTRUE(add_original_names)) {
         messager("+ Adding original names to results.", v = verbose)
         top_candidates$trait1_id <- names_dict[top_candidates$trait1]
         top_candidates$trait2_id <- names_dict[top_candidates$trait2]

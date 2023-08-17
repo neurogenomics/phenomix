@@ -28,7 +28,7 @@ plot_variancePartition <- function(varPart,
     vp <- variancePartition::sortCols(varPart)
     #### Select genes ####
     if (is.null(genes)) {
-        message(
+        messager(
             "Selecting ", n_genes,
             " with the greatest total variance explained by metadata variables."
         )

@@ -25,7 +25,6 @@
 #' @export
 #' @importFrom data.table fread dcast
 #' @importFrom tibble column_to_rownames
-#' @importFrom dplyr %>%
 get_cs2g_ukb <- function(URL = file.path(
                              "https://storage.googleapis.com",
                              "broad-alkesgroup-public/cS2G",
@@ -75,9 +74,9 @@ get_cs2g_ukb <- function(URL = file.path(
             value.var = value_var,
             fill = 0,
             fun.aggregate = "mean"
-        ) %>%
-            tibble::column_to_rownames("gene") %>%
-            as.matrix() %>%
+        ) |>
+            tibble::column_to_rownames("gene") |>
+            as.matrix() |>
             methods::as("sparseMatrix")
         #### Ensure rownames match ####
         metadata <- metadata[colnames(mat), ]

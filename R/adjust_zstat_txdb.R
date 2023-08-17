@@ -7,7 +7,7 @@
 #'
 #' @param dat \code{data.table}
 #' produced by \link[phenomix]{map_snps2genes_txdb}.
-#' @param drop_MHC Drop genes from the MHC
+#' @param drop_mhc Drop genes from the MHC
 #' (Major Histocompatibility Complex) region.
 #' @param model Statistical model to use.
 #' Defaults to \link[stats]{lm}.
@@ -21,7 +21,7 @@
 #' @importFrom stats lm p.adjust
 #' @importFrom data.table setkey
 adjust_zstat_txdb <- function(dat,
-                              drop_MHC = TRUE,
+                              drop_mhc = TRUE,
                               method = "bonferroni",
                               model = NULL,
                               formula = ZSTAT ~ NSNPS + logNSNPS +
@@ -42,8 +42,8 @@ adjust_zstat_txdb <- function(dat,
     dat[, logNSNPS := log(NSNPS)]
     # dat[,logNPARAM:=log(NPARAM)]
     #### Drop MHC genes ####
-    if (drop_MHC) {
-        message("Dropping genes from the MHC region.")
+    if (isTRUE(drop_mhc)) {
+        messager("Dropping genes from the MHC region.")
         # DROP MHC: chr6, 25-34 MB
         MHC_genes <- get_mhc_genes()
         dat <- dat[!SYMBOL %in% unique(MHC_genes$SYMBOL), ]

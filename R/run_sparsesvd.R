@@ -31,11 +31,11 @@ run_sparsesvd <- function(mat,
     )
     if (add_names) {
         ssvd_names <- paste0("SSVD.", seq(1, ncol(ssvd$u)))
-        ssvd$u <- ssvd$u %>%
-            `colnames<-`(ssvd_names) %>%
+        ssvd$u <- ssvd$u |>
+            `colnames<-`(ssvd_names) |>
             `row.names<-`(rownames(mat))
-        ssvd$v <- ssvd$v %>%
-            `colnames<-`(ssvd_names) %>%
+        ssvd$v <- ssvd$v |>
+            `colnames<-`(ssvd_names) |>
             `row.names<-`(colnames(mat))
         ssvd$d <- setNames(ssvd$d, ssvd_names)
     }

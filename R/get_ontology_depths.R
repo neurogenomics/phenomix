@@ -11,8 +11,8 @@ get_ontology_depths <- function(ontology,
     #                                 term_ids = ancests)
     #     lvl <- min(lvls,na.rm = TRUE)+1
     #     return(lvl)
-    # }, mc.cores = cores$worker_cores) %>%
-    #     `names<-`(term_ids) %>% unlist()
+    # }, mc.cores = cores$worker_cores) |>
+    #     `names<-`(term_ids) |> unlist()
     lvls <- get_ontology_levels(
         ontology = ontology,
         term_ids = term_ids

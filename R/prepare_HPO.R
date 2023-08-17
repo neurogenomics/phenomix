@@ -22,14 +22,14 @@ prepare_HPO <- function(save_path = tempfile(
             "<tab>"
         )[[1]]
     )
-    HPO <- HPO %>% dplyr::mutate(
+    HPO <- HPO |> dplyr::mutate(
         HPOid = HPO_id,
         HPO_id = gsub("[:]", ".", HPO_id)
     )
     #### Prepare metadata ####
-    meta <- HPO %>%
-        dplyr::group_by(HPO_id, HPOid, HPO_label) %>%
-        dplyr::summarise(n_genes = dplyr::n_distinct(entrez_gene_symbol)) %>%
+    meta <- HPO |>
+        dplyr::group_by(HPO_id, HPOid, HPO_label) |>
+        dplyr::summarise(n_genes = dplyr::n_distinct(entrez_gene_symbol)) |>
         data.frame()
     #### Get ontology depths ####
     depths <- get_ontology_depths(ontology = hpo)
@@ -58,9 +58,9 @@ prepare_HPO <- function(save_path = tempfile(
         value.var = "val",
         fill = 0,
         fun.aggregate = max
-    ) %>%
-        data.frame() %>%
-        tibble::column_to_rownames(var = "entrez_gene_symbol") %>%
+    ) |>
+        data.frame() |>
+        tibble::column_to_rownames(var = "entrez_gene_symbol") |>
         data.frame()
     mat <- as(as.matrix(mat), "sparseMatrix")
 
@@ -77,7 +77,7 @@ prepare_HPO <- function(save_path = tempfile(
         )
     }
     if (!is.null(save_path)) {
-        message("Saving HPO Seurat object to ==>", save_path)
+        messager("Saving HPO Seurat object to ==>", save_path)
         dir.create(dirname(save_path),
             showWarnings = FALSE,
             recursive = TRUE

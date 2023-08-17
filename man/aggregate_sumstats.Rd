@@ -9,8 +9,8 @@
 \usage{
 aggregate_sumstats(
   merged_hits,
-  drop_na = TRUE,
-  agg_var = "GENEID",
+  drop_na = FALSE,
+  agg_var = "SYMBOL",
   extra_cols = c("ABC.Score", "CellType"),
   sort_rows = TRUE,
   verbose = TRUE
@@ -42,3 +42,4 @@ according to some grouping column (e.g."GENEID").
 \details{
 Requires the columns
 }
+\keyword{internal}

@@ -20,8 +20,7 @@
 #'
 #' @export
 #' @importFrom data.table fread dcast .GRP
-#' @importFrom tibble column_to_rownames
-#' @importFrom dplyr %>% 
+#' @importFrom tibble column_to_rownames 
 get_cs2g_gwascatalog <- function(URL = file.path(
                                      "https://storage.googleapis.com",
                                      "broad-alkesgroup-public/cS2G",
@@ -73,9 +72,9 @@ get_cs2g_gwascatalog <- function(URL = file.path(
             value.var = "cS2G",
             fill = 0,
             fun.aggregate = "mean"
-        ) %>%
-            tibble::column_to_rownames("gene") %>%
-            as.matrix() %>%
+        ) |>
+            tibble::column_to_rownames("gene") |>
+            as.matrix() |>
             methods::as("sparseMatrix")
         #### Ensure rownames match ####
         metadata <- metadata[colnames(mat), ]

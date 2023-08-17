@@ -27,7 +27,7 @@
 #' @importFrom data.table fread setkey setnames 
 gwas_matrix_magma <- function(magma_files,
                               metric = c("ADJ_ZSTAT", "ZSTAT", "P"),
-                              drop_MHC = TRUE,
+                              drop_mhc = TRUE,
                               save_path = NULL,
                               nCores = 1,
                               fillna = TRUE,
@@ -37,7 +37,7 @@ gwas_matrix_magma <- function(magma_files,
     # templateR:::args2vars(gwas_matrix_magma)
     # scKirby::source_all(gwas_matrix_magma)
     
-    ..x <- NULL;
+    ..x <- GENE <- NULL;
     metric <- toupper(metric[1])
     fill_value <- if (metric == "P") 1 else 0
     #### Merge all results ####
@@ -45,14 +45,14 @@ gwas_matrix_magma <- function(magma_files,
         X = names(magma_files),
         FUN = function(x,
                  .metric = metric,
-                 .drop_MHC = drop_MHC) {
+                 .drop_mhc = drop_mhc) {
             message_parallel(x)
             dat <- data.table::fread(magma_files[[x]], nThread = 1)
             #### Adjust ZSTAT ####
             if (.metric == "ADJ_ZSTAT") {
                 dat <- adjust_zstat(
                     dat = dat,
-                    drop_MHC = .drop_MHC,
+                    drop_mhc = .drop_mhc,
                     log_vars = c("NSNPS", "NPARAM", "GENELEN"),
                     formula = ZSTAT ~ NSNPS + logNSNPS + NPARAM +
                         logNPARAM + GENELEN + logGENELEN,

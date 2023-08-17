@@ -5,17 +5,19 @@
 \title{Map SNPs to genes: ABC}
 \usage{
 map_snps2genes_abc(
-  sumstats,
+  dat,
   ref_genome = "GRCh37",
   dataset = "Nasser2020",
   abc = NULL,
+  agg_var = "SYMBOL",
   nCores = 1,
   verbose = TRUE
 )
 }
 \arguments{
-\item{sumstats}{GWAS summary statistics munged by
-\link[MungeSumstats]{format_sumstats}.}
+\item{dat}{GWAS summary statistics munged by
+\link[MungeSumstats]{format_sumstats}.
+Can be a path to the saved file or \link[data.table]{data.table}.}
 
 \item{ref_genome}{name of the reference genome used for the GWAS ("GRCh37" or
 "GRCh38"). Argument is case-insensitive. Default is NULL which infers the
@@ -25,13 +27,11 @@ reference genome from the data.}
 
 \item{abc}{Use a previously downloaded ABC \link[data.table]{data.table}.}
 
+\item{agg_var}{Variable to aggregate \code{merged_hits} by.}
+
 \item{nCores}{Number of cores to parallelise across.}
 
 \item{verbose}{Print messages.}
-
-\item{sumstats_file}{GWAS summary statistics munged by
-\link[MungeSumstats]{format_sumstats}.
-Can be a path to the saved file or \link[data.table]{data.table}.}
 
 \item{method}{Method to use for mapping SNPs to genes.}
 }

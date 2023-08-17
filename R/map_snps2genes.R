@@ -20,101 +20,98 @@
 #' Could compute mean coloc score per gene for each SNP and use that.
 #' Other position-based functional data might still be useful.
 #'
-#' @param sumstats_file GWAS summary statistics munged by
+#' @param dat GWAS summary statistics munged by
 #' \link[MungeSumstats]{format_sumstats}.
 #' Can be a path to the saved file or \link[data.table]{data.table}.
+#' @param agg_by_genes Aggregate results by genes (\code{TRUE}) or SNPs
+#' (\code{FALSE}).
 #' @param adjust_z Whether to adjust Z-statistic using
 #'  the \code{model} and \code{formula}.
 #' @param nCores Number of cores to parallelise across.
 #' @param method Method to use for mapping SNPs to genes.
-#' @param save_dir Where to save results.
+#' @param save_path Path to save results to.
 #' @param verbose Print messages.
 #' @param return_path Whether to return the path to the saved results.
 #' @inheritParams import_abc
 #' @inheritParams adjust_zstat
+#' @inheritParams aggregate_sumstats
+#' @inheritParams translate_geneids_txdb
 #'
 #' @return gene_hits \link[data.table]{data.table}.
 #'
 #' @export
-#' @importFrom data.table setkey fread
-map_snps2genes <- function(sumstats_file,
+#' @import data.table
+#' @examples
+#' dat <- MungeSumstats::formatted_example()
+#' dat2 <- map_snps2genes(dat)
+map_snps2genes <- function(dat,
                            #### Methods args ####
-                           method = c("abc", "txdb"),
+                           method = c("txdb","abc"),
                            dataset = "Nasser2020",
                            abc = NULL,
+                           agg_var = "SYMBOL",
+                           drop_na = TRUE,
                            #### Adjust Z-stat args ####
                            adjust_z = TRUE,
-                           drop_MHC = TRUE,
+                           drop_mhc = TRUE,
                            model = NULL,
                            log_vars = c("NSNPS", "NPARAM", "GENELEN"),
                            formula = ZSTAT ~ NSNPS + logNSNPS + NPARAM +
                                logNPARAM + GENELEN + logGENELEN,
                            #### Util args ####
                            nCores = 1,
-                           save_dir = tempdir(),
+                           save_path = tempfile(),
                            return_path = FALSE,
                            verbose = TRUE) {
-
-    # save_dir <- "/Volumes/bms20/projects/neurogenomics-lab/live/GWAS_sumstats/OpenGWAS"
-    # metagwas_all <- read.csv(file.path(save_dir,"OpenGWAS_metadata.csv"), row.names = 1)
-    # sumstats_file <- metagwas_all$path[1]
-    # method="abc"; nCores <- 10; verbose=TRUE; dataset="Nasser2020";  ref_genome="GRCh37"; #abc=NULL;
-    # model=NULL; drop_MHC=TRUE; log_vars=c("NSNPS","NPARAM","GENELEN");   formula=ZSTAT ~ NSNPS + logNSNPS + NPARAM + logNPARAM + GENELEN + logGENELEN
-
+    # devoptera::args2vars(map_snps2genes)
+    
+    check_required_cols(dat = dat)
     start <- Sys.time()
     #### Check method ####
     method <- tolower(method[1])
-    #### Prepare sumstats ####
+    #### Prepare dat ####
     # Replace with MungeSumstats:::format_sumstats() once it's fixed.
-    if (methods::is(sumstats_file, "character")) {
-        messager("Importing sumstats_file.", v = verbose)
-        sumstats <- data.table::fread(sumstats_file,
-            nThread = nCores
-        )
+    if (methods::is(dat, "character")) {
+        messager("Importing dat.", v = verbose)
+        dat <- data.table::fread(dat,
+                                 nThread = nCores)
     } else {
-        sumstats <- sumstats_file
+        dat <- data.table::as.data.table(dat)
     }
     #### Select method and map SNPs ####
     #### txdb ####
     if (method == "txdb") {
-        #### Map ####
+        #### Map #### 
         gene_hits <- map_snps2genes_txdb(
-            sumstats = sumstats,
+            dat = dat,
+            agg_var = agg_var,
+            drop_na = drop_na,
+            nCores = nCores,
             verbose = verbose
-        )
-        #### Adjust ZSTAT ####
-        if (adjust_z) {
-            gene_hits <- adjust_zstat(
-                dat = gene_hits,
-                model = model,
-                log_vars = log_vars,
-                drop_MHC = drop_MHC,
-                formula = formula,
-                verbose = verbose
-            )
-        }
+        ) 
     }
     #### ABC ####
     if (method == "abc") {
-        #### Map ####
+        #### Map #### 
         gene_hits <- map_snps2genes_abc(
-            sumstats = sumstats,
+            dat = dat,
             abc = abc,
+            agg_var = agg_var,
             dataset = dataset,
             nCores = nCores,
             verbose = verbose
-        )
-        #### Adjust ZSTAT ####
-        if (adjust_z) {
-            gene_hits <- adjust_zstat(
-                dat = gene_hits,
-                model = model,
-                log_vars = log_vars,
-                drop_MHC = drop_MHC,
-                formula = formula,
-                verbose = verbose
-            )
-        }
+        ) 
+    }
+    #### Adjust ZSTAT ####
+    if (isTRUE(adjust_z)) {
+        gene_hits <- adjust_zstat(
+            dat = gene_hits,
+            model = model,
+            log_vars = log_vars,
+            drop_mhc = drop_mhc,
+            formula = formula,
+            verbose = verbose
+        ) 
     }
     #### OpenTargets ####
     # if(method=="opentargets"){
@@ -127,16 +124,14 @@ map_snps2genes <- function(sumstats_file,
     #### Save ####
     out_path <- save_snps2genes(
         gene_hits = gene_hits,
-        save_dir = save_dir,
-        sumstats_file = sumstats_file,
-        method = method,
+        save_path = save_path, 
         nCores = nCores,
         verbose = verbose
     )
     #### Report time ####
     report_time(start)
     #### Return ####
-    if (return_path) {
+    if (isTRUE(return_path)) {
         return(out_path)
     } else {
         return(gene_hits)

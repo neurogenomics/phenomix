@@ -40,7 +40,7 @@
 #' rownames(DEGAS_metadata) <- DEGAS_metadata$label_phe_code
 #' 
 #' #### Use matrix multiplication to reconstruct trait x gene matrix ####
-#' M <- (u %*% t(v)) %>% Matrix::t() %>% as("sparseMatrix")
+#' M <- (u %*% t(v)) |> Matrix::t() |> as("sparseMatrix")
 #' degas <- Seurat::CreateSeuratObject(counts = M,
 #'                                     assay = "genes", 
 #'                                     meta.data = DEGAS_metadata)

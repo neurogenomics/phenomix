@@ -4,28 +4,30 @@ p_adjust <- function(dat,
                      Q_var = "Q",
                      verbose = TRUE) {
     Q <- NULL;
-    #### Figure out which column to use for P ####
-    if (all(!is.null(P_var), P_var %in% colnames(dat))) {
-        P_use <- P_var
-    } else if ("P" %in% colnames(dat)) {
-        P_use <- "P"
-    } else if ("p" %in% colnames(dat)) {
-        P_use <- "P"
-    } else if ("P_mean" %in% colnames(dat)) {
-        P_use <- "P_mean"
+    
+    if("Q" %in% names(dat)){
+        messager("Using existing Q column.",v=verbose) 
     } else {
-        messager("WARNING:",
-            "No usable P_var detected. Returnig dat without Q_var.",
-            v = verbose
+        #### Figure out which column to use for P ####
+        if (all(!is.null(P_var), P_var %in% colnames(dat))) {
+            P_use <- P_var
+        } else if ("P" %in% colnames(dat)) {
+            P_use <- "P"
+        } else if ("p" %in% colnames(dat)) {
+            P_use <- "P"
+        } else if ("P_mean" %in% colnames(dat)) {
+            P_use <- "P_mean"
+        } else {
+            stopper("No usable P_var detected.") 
+        }
+        #### Report ####
+        messager("Computing", Q_var, "by correcting", P_use, "with",
+                 paste0(method, "."),
+                 v = verbose
         )
-        return(dat)
-    }
-    #### Report ####
-    messager("Computing", Q_var, "by correcting", P_use, "with", paste0(method, "."),
-        v = verbose
-    )
-    #### Compute Q ####
-    data.table::setkeyv(dat, P_use)
-    dat[, Q := stats::p.adjust(get(P_use), method = method)]
-    data.table::setnames(dat, Q_var, "Q")
+        #### Compute Q ####
+        data.table::setkeyv(dat, P_use)
+        dat[, Q := stats::p.adjust(get(P_use), method = method)]
+        data.table::setnames(dat, Q_var, "Q")
+    } 
 }

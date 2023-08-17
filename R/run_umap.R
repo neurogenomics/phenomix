@@ -12,8 +12,7 @@
 #' @inheritParams uwot::umap
 #'
 #' @importFrom Matrix t
-#' @importFrom uwot umap
-#' @importFrom dplyr %>%
+#' @importFrom uwot umap 
 #'
 #' @source \href{https://umap-learn.readthedocs.io/en/latest/}{UMAP documentation}
 #' @export
@@ -56,14 +55,14 @@ run_umap <- function(mat,
         ...
     )
     if (add_names) {
-        umap$embedding <- umap$embedding %>%
-            `colnames<-`(paste0("UMAP.", seq(1, ncol(umap$embedding)))) %>%
+        umap$embedding <- umap$embedding |>
+            `colnames<-`(paste0("UMAP.", seq(1, ncol(umap$embedding)))) |>
             `row.names<-`(rownames(mat))
         tryCatch({
             for (i in length(umap$pca_models)) {
                 pc_embed <- umap$pca_models[[i]]$rotation
-                umap$pca_models[[i]]$rotation <- pc_embed %>%
-                    `colnames<-`(paste0("PC", seq(1, ncol(pc_embed)))) %>%
+                umap$pca_models[[i]]$rotation <- pc_embed |>
+                    `colnames<-`(paste0("PC", seq(1, ncol(pc_embed)))) |>
                     `row.names<-`(colnames(mat))
             }
         }, error= function(e)message(e))

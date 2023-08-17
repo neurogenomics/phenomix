@@ -37,7 +37,7 @@ get_mhc_genes <- function(seqnames = "chr6:25000000-34000000",
         )
         gr_mhc <- GenomicRanges::GRanges(seqnames = seqnames)
         MHC_genes <- map_snps_txdb(
-            sumstats = gr_mhc,
+            dat = gr_mhc,
             ref_genome = ref_genome,
             all_variants = TRUE
         )

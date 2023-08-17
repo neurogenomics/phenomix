@@ -16,8 +16,8 @@ get_n_descendants <- function(ontology,
         )
         n <- length(unique(all_descend))
         return(n)
-    }) %>%
-        `names<-`(term_ids) %>%
+    }) |>
+        `names<-`(term_ids) |>
         unlist()
     return(n_descends)
 }

@@ -3,7 +3,7 @@ annotate_vector <- function(vec,
                             annot = NULL,
                             gene_level = F) {
     if (is.null(annot)) {
-        message("+ Missing `annot` argument. Returning input `vec`")
+        messager("+ Missing `annot` argument. Returning input `vec`")
         return(vec)
     }
     if (gene_level) {

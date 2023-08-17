@@ -9,7 +9,7 @@ find_neighbors(
   graph_name = NULL,
   assay = NULL,
   slot = NULL,
-  reduction = NULL,
+  keys = NULL,
   var1_search = NULL,
   label_col = NULL,
   var2_group = NULL,
@@ -31,7 +31,7 @@ If no graphs are available, new ones will be computed using
 
 \item{slot}{Slot to use.}
 
-\item{reduction}{Reduction to use.}
+\item{keys}{The keys of reductions to extract from.}
 
 \item{var1_search}{Substring search term to filter var1 by.
 If a vector is supplied instead, this will be interpreted as an "or" query.}
@@ -50,18 +50,18 @@ when \code{var2_group} is used.}
 \item{add_original_names}{Add original names into the results.
 This can be useful when var1 names are forced to be unique internally.}
 
-\item{verbose}{Whether to print messages.}
+\item{verbose}{Print messages.}
 }
 \description{
 Search [shared] K-nearest neighbor graph to find the
  samples that are most similar to those matching a substring search.
 }
 \examples{
-degas <- get_DEGAS()
+obj <- get_DEGAS()
 
 ### No group filter
 top_neighbors <- find_neighbors(
-    obj = degas,
+    obj = obj,
     var1_search = "parkinson", 
     label_col = "label_phe"
 )

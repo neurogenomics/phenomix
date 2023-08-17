@@ -24,9 +24,6 @@ get_top_traits(
 \item{metadata}{Phenotype metadata.
 Not needed if \code{obj} is a \pkg{Seurat} object.}
 
-\item{reduction}{Which reduction to extract from.
-Only used if \code{obj} is of class \code{Seurat}.}
-
 \item{n_traits}{Number of top traits per reduction factor to select.}
 
 \item{factors}{Which factors to plot.}

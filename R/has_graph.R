@@ -1,6 +1,6 @@
 has_graph <- function(obj,
                       graph_names = NULL){
-    if(is_seurat(obj)){
+    if(scKirby::is_class(obj,"seurat")){
         #### Check if "graphs" slot even exists ####
         if(!"graphs" %in% methods::slotNames(obj)){
             return(FALSE)
@@ -15,5 +15,5 @@ has_graph <- function(obj,
             # If graph_name given, tell us whether it exists in the obj
             return(any(graph_names %in% all_graphs))
         }
-    }else{ return(FALSE) }
+    } else{ return(FALSE) }
 }

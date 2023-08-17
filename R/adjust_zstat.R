@@ -7,7 +7,7 @@
 #'
 #' @param dat \code{data.table}
 #' produced by \link[phenomix]{map_snps2genes_txdb}.
-#' @param drop_MHC Drop genes from the MHC
+#' @param drop_mhc Drop genes from the MHC
 #' (Major Histocompatibility Complex) region.
 #' @param model Statistical model to use.
 #' Defaults to \link[stats]{lm}.
@@ -17,14 +17,17 @@
 #' @param verbose Print messages.
 #' @param ... Additional arguments passed to \code{model}.
 #' @inheritParams stats::p.adjust
-#'
-#' @return \code{dat} with the new column "ADJ_ZSTAT".
+#' @returns \code{dat} with the new column "ADJ_ZSTAT".
 #'
 #' @export
 #' @importFrom stats lm p.adjust na.omit
 #' @importFrom data.table setkey
+#' @examples
+#' dat <- MungeSumstats::formatted_example()
+#' dat2 <- map_snps2genes(dat, adjust_z=FALSE) 
 adjust_zstat <- function(dat,
-                         drop_MHC = TRUE,
+                         gene_col = "SYMBOL",
+                         drop_mhc = TRUE,
                          method = "bonferroni",
                          model = NULL,
                          log_vars = c("NSNPS", "NPARAM", "GENELEN"),
@@ -33,7 +36,7 @@ adjust_zstat <- function(dat,
                          verbose = TRUE,
                          ...) {
 
-    # dat <- gene_hits;drop_MHC=TRUE; method="bonferroni";   model=NULL; log_vars=c("NSNPS","NPARAM","GENELEN");    formula=ZSTAT ~ NSNPS + logNSNPS + GENELEN + logGENELEN
+    # devoptera::args2vars(adjust_zstat)
 
     #### Adjust p-value ####
     p_adjust(
@@ -49,28 +52,26 @@ adjust_zstat <- function(dat,
         verbose = verbose
     )
     #### Drop MHC genes ####
-    if (drop_MHC) {
+    if (isTRUE(drop_mhc)) {
         dat <- remove_mhc_genes(
             dat = dat,
-            gene_col = "GENE",
+            gene_col = gene_col,
             verbose = verbose
         )
     } 
-    dat_og <- dat
+    dat_og <- data.table::copy(dat)
     dat <- stats::na.omit(dat, "ZSTAT")
     if (nrow(dat) < 10) {
         messager("WARNING: <10 rows remainings in gene-level data.",
                  "Unable to compute ADJ_ZSTAT.",v=verbose)
         return(dat_og)
     }
-
     #### Adjust formula ####
     # Make sure all variables are available in dat #
     formula1 <- fix_formula1(
         formula = formula,
         dat = dat
     )
-
     #### Regress out effects of NSNPS and NPARAM ####
     # (see 'boxplots_by_decile.r' and the section on downsampling for info)
     #--- NSNPS only really has mjaor effects (i.e. zscore+2) when a gene has ~10000 SNPS

@@ -33,7 +33,7 @@ run_variancePartition <- function(obj,
                                   show_plot = TRUE,
                                   ...) {
     if (is.null(formula) & (!is_opengwas)) {
-        stop("Must provide formula or set is_opengwas=TRUE (when applicable).")
+        stopper("Must provide formula or set is_opengwas=TRUE (when applicable).")
     }
     #### Register cores ####
     if (is.null(nCores)) {
@@ -41,10 +41,10 @@ run_variancePartition <- function(obj,
     }
     BiocParallel::register(BiocParallel::SnowParam(nCores))
     #### Extract matrix ####
-    mat <- extract_matrix(obj = obj)
+    mat <- scKirby::get_x(obj = obj)
     #### Extract metadata ####
     if (methods::is(obj, "Seurat")) {
-        metadata <- extract_metadata(obj = obj)
+        metadata <-  scKirby::get_obs(obj = obj)
     }
     #### Prepare formula #####
     if (is_opengwas) {
@@ -67,7 +67,7 @@ run_variancePartition <- function(obj,
         metadata[is.na(metadata)] <- "NA" # Make NA its own category
     }
     if (is.null(formula)) {
-        stop("Must provide formula argument.")
+        stopper("Must provide formula argument.")
     }
     #### Run VP ####
     varPart <- variancePartition::fitExtractVarPartModel(

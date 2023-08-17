@@ -10,15 +10,15 @@
 #     )
 #     diag(cor_integrated) <- NA
 # 
-#     cor_integrated_melt <- reshape2::melt(cor_integrated) %>% `colnames<-`(c("trait1", "trait2", "r"))
-#     top_celltypes <- subset(cor_integrated_melt, (trait1 %in% phenotypes) & (trait2 %in% celltypes)) %>%
-#         dplyr::group_by(trait1) %>%
-#         dplyr::slice_max(order_by = r, n = 5) %>%
+#     cor_integrated_melt <- reshape2::melt(cor_integrated) |> `colnames<-`(c("trait1", "trait2", "r"))
+#     top_celltypes <- subset(cor_integrated_melt, (trait1 %in% phenotypes) & (trait2 %in% celltypes)) |>
+#         dplyr::group_by(trait1) |>
+#         dplyr::slice_max(order_by = r, n = 5) |>
 #         data.frame()
 #     ### Get mean r for ordering
-#     mean_r <- top_celltypes %>%
-#         dplyr::group_by(trait2) %>%
-#         dplyr::summarise(r = median(r, na.rm = T)) %>%
+#     mean_r <- top_celltypes |>
+#         dplyr::group_by(trait2) |>
+#         dplyr::summarise(r = median(r, na.rm = T)) |>
 #         dplyr::arrange(desc(r))
 # 
 #     top_celltypes$trait2 <- factor(top_celltypes$trait2, levels = mean_r$trait2, ordered = T)
