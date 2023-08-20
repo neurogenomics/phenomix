@@ -20,6 +20,8 @@ adjust_zstat(
 \item{dat}{\code{data.table}
 produced by \link[phenomix]{map_snps2genes_txdb}.}
 
+\item{gene_col}{Name of the gene column.}
+
 \item{drop_mhc}{Drop genes from the MHC
 (Major Histocompatibility Complex) region.}
 

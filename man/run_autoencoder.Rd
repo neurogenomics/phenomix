@@ -11,10 +11,10 @@ autoencoder documentation}
 run_autoencoder(
   obj,
   transpose = TRUE,
-  normalize = TRUE,
+  normalise_method = "log10p",
   assay = NULL,
   slot = NULL,
-  metadata = NULL,
+  obs = NULL,
   color_var = NULL,
   label_var = NULL,
   hidden = c(2),
@@ -31,9 +31,18 @@ run_autoencoder(
 
 \item{transpose}{Whether to transpose the matrix first.}
 
+\item{normalise_method}{Normalisation method to apply to the data matrix
+before training the autoencoder.}
+
 \item{assay}{Assay to use.}
 
 \item{slot}{Data slot to use.}
+
+\item{obs}{Phenotype metadata.}
+
+\item{color_var}{Variable in \code{obs} to color points by.}
+
+\item{label_var}{Variable \code{obs} to label points by.}
 
 \item{hidden}{Hidden layer sizes (e.g. [100, 100]). Defaults to c(200, 200).}
 
@@ -50,9 +59,138 @@ networks. Defaults to TRUE.}
 \item{seed}{Seed passed to \[base]{set.seed} 
 for reproducibility between runs.}
 
-\item{...}{Additional parameters passed to \link[h2o]{h2o.deeplearning}.}
+\item{...}{
+  Arguments passed on to \code{\link[h2o:h2o.deeplearning]{h2o::h2o.deeplearning}}
+  \describe{
+    \item{\code{x}}{(Optional) A vector containing the names or indices of the predictor variables to use in building the model.
+If x is missing, then all columns except y are used.}
+    \item{\code{y}}{The name or column index of the response variable in the data. 
+The response must be either a numeric or a categorical/factor variable. 
+If the response is numeric, then a regression model will be trained, otherwise it will train a classification model.}
+    \item{\code{training_frame}}{Id of the training data frame.}
+    \item{\code{model_id}}{Destination id for this model; auto-generated if not specified.}
+    \item{\code{validation_frame}}{Id of the validation data frame.}
+    \item{\code{nfolds}}{Number of folds for K-fold cross-validation (0 to disable or >= 2). Defaults to 0.}
+    \item{\code{keep_cross_validation_models}}{\code{Logical}. Whether to keep the cross-validation models. Defaults to TRUE.}
+    \item{\code{keep_cross_validation_predictions}}{\code{Logical}. Whether to keep the predictions of the cross-validation models. Defaults to FALSE.}
+    \item{\code{keep_cross_validation_fold_assignment}}{\code{Logical}. Whether to keep the cross-validation fold assignment. Defaults to FALSE.}
+    \item{\code{fold_assignment}}{Cross-validation fold assignment scheme, if fold_column is not specified. The 'Stratified' option will
+stratify the folds based on the response variable, for classification problems. Must be one of: "AUTO",
+"Random", "Modulo", "Stratified". Defaults to AUTO.}
+    \item{\code{fold_column}}{Column with cross-validation fold index assignment per observation.}
+    \item{\code{ignore_const_cols}}{\code{Logical}. Ignore constant columns. Defaults to TRUE.}
+    \item{\code{score_each_iteration}}{\code{Logical}. Whether to score during each iteration of model training. Defaults to FALSE.}
+    \item{\code{weights_column}}{Column with observation weights. Giving some observation a weight of zero is equivalent to excluding it from
+the dataset; giving an observation a relative weight of 2 is equivalent to repeating that row twice. Negative
+weights are not allowed. Note: Weights are per-row observation weights and do not increase the size of the
+data frame. This is typically the number of times a row is repeated, but non-integer values are supported as
+well. During training, rows with higher weights matter more, due to the larger loss function pre-factor. If
+you set weight = 0 for a row, the returned prediction frame at that row is zero and this is incorrect. To get
+an accurate prediction, remove all rows with weight == 0.}
+    \item{\code{offset_column}}{Offset column. This will be added to the combination of columns before applying the link function.}
+    \item{\code{balance_classes}}{\code{Logical}. Balance training data class counts via over/under-sampling (for imbalanced data). Defaults to
+FALSE.}
+    \item{\code{class_sampling_factors}}{Desired over/under-sampling ratios per class (in lexicographic order). If not specified, sampling factors will
+be automatically computed to obtain class balance during training. Requires balance_classes.}
+    \item{\code{max_after_balance_size}}{Maximum relative size of the training data after balancing class counts (can be less than 1.0). Requires
+balance_classes. Defaults to 5.0.}
+    \item{\code{checkpoint}}{Model checkpoint to resume training with.}
+    \item{\code{pretrained_autoencoder}}{Pretrained autoencoder model to initialize this model with.}
+    \item{\code{overwrite_with_best_model}}{\code{Logical}. If enabled, override the final model with the best model found during training. Defaults to
+TRUE.}
+    \item{\code{use_all_factor_levels}}{\code{Logical}. Use all factor levels of categorical variables. Otherwise, the first factor level is omitted
+(without loss of accuracy). Useful for variable importances and auto-enabled for autoencoder. Defaults to
+TRUE.}
+    \item{\code{standardize}}{\code{Logical}. If enabled, automatically standardize the data. If disabled, the user must provide properly
+scaled input data. Defaults to TRUE.}
+    \item{\code{train_samples_per_iteration}}{Number of training samples (globally) per MapReduce iteration. Special values are 0: one epoch, -1: all
+available data (e.g., replicated training data), -2: automatic. Defaults to -2.}
+    \item{\code{target_ratio_comm_to_comp}}{Target ratio of communication overhead to computation. Only for multi-node operation and
+train_samples_per_iteration = -2 (auto-tuning). Defaults to 0.05.}
+    \item{\code{adaptive_rate}}{\code{Logical}. Adaptive learning rate. Defaults to TRUE.}
+    \item{\code{rho}}{Adaptive learning rate time decay factor (similarity to prior updates). Defaults to 0.99.}
+    \item{\code{epsilon}}{Adaptive learning rate smoothing factor (to avoid divisions by zero and allow progress). Defaults to 1e-08.}
+    \item{\code{rate}}{Learning rate (higher => less stable, lower => slower convergence). Defaults to 0.005.}
+    \item{\code{rate_annealing}}{Learning rate annealing: rate / (1 + rate_annealing * samples). Defaults to 1e-06.}
+    \item{\code{rate_decay}}{Learning rate decay factor between layers (N-th layer: rate * rate_decay ^ (n - 1). Defaults to 1.}
+    \item{\code{momentum_start}}{Initial momentum at the beginning of training (try 0.5). Defaults to 0.}
+    \item{\code{momentum_ramp}}{Number of training samples for which momentum increases. Defaults to 1000000.}
+    \item{\code{momentum_stable}}{Final momentum after the ramp is over (try 0.99). Defaults to 0.}
+    \item{\code{nesterov_accelerated_gradient}}{\code{Logical}. Use Nesterov accelerated gradient (recommended). Defaults to TRUE.}
+    \item{\code{input_dropout_ratio}}{Input layer dropout ratio (can improve generalization, try 0.1 or 0.2). Defaults to 0.}
+    \item{\code{hidden_dropout_ratios}}{Hidden layer dropout ratios (can improve generalization), specify one value per hidden layer, defaults to 0.5.}
+    \item{\code{l1}}{L1 regularization (can add stability and improve generalization, causes many weights to become 0). Defaults to
+0.}
+    \item{\code{l2}}{L2 regularization (can add stability and improve generalization, causes many weights to be small. Defaults to
+0.}
+    \item{\code{max_w2}}{Constraint for squared sum of incoming weights per unit (e.g. for Rectifier). Defaults to 3.4028235e+38.}
+    \item{\code{initial_weight_distribution}}{Initial weight distribution. Must be one of: "UniformAdaptive", "Uniform", "Normal". Defaults to
+UniformAdaptive.}
+    \item{\code{initial_weight_scale}}{Uniform: -value...value, Normal: stddev. Defaults to 1.}
+    \item{\code{initial_weights}}{A list of H2OFrame ids to initialize the weight matrices of this model with.}
+    \item{\code{initial_biases}}{A list of H2OFrame ids to initialize the bias vectors of this model with.}
+    \item{\code{loss}}{Loss function. Must be one of: "Automatic", "CrossEntropy", "Quadratic", "Huber", "Absolute", "Quantile".
+Defaults to Automatic.}
+    \item{\code{distribution}}{Distribution function Must be one of: "AUTO", "bernoulli", "multinomial", "gaussian", "poisson", "gamma",
+"tweedie", "laplace", "quantile", "huber". Defaults to AUTO.}
+    \item{\code{quantile_alpha}}{Desired quantile for Quantile regression, must be between 0 and 1. Defaults to 0.5.}
+    \item{\code{tweedie_power}}{Tweedie power for Tweedie regression, must be between 1 and 2. Defaults to 1.5.}
+    \item{\code{huber_alpha}}{Desired quantile for Huber/M-regression (threshold between quadratic and linear loss, must be between 0 and
+1). Defaults to 0.9.}
+    \item{\code{score_interval}}{Shortest time interval (in seconds) between model scoring. Defaults to 5.}
+    \item{\code{score_training_samples}}{Number of training set samples for scoring (0 for all). Defaults to 10000.}
+    \item{\code{score_validation_samples}}{Number of validation set samples for scoring (0 for all). Defaults to 0.}
+    \item{\code{score_duty_cycle}}{Maximum duty cycle fraction for scoring (lower: more training, higher: more scoring). Defaults to 0.1.}
+    \item{\code{classification_stop}}{Stopping criterion for classification error fraction on training data (-1 to disable). Defaults to 0.}
+    \item{\code{regression_stop}}{Stopping criterion for regression error (MSE) on training data (-1 to disable). Defaults to 1e-06.}
+    \item{\code{stopping_rounds}}{Early stopping based on convergence of stopping_metric. Stop if simple moving average of length k of the
+stopping_metric does not improve for k:=stopping_rounds scoring events (0 to disable) Defaults to 5.}
+    \item{\code{stopping_metric}}{Metric to use for early stopping (AUTO: logloss for classification, deviance for regression and anomaly_score
+for Isolation Forest). Note that custom and custom_increasing can only be used in GBM and DRF with the Python
+client. Must be one of: "AUTO", "deviance", "logloss", "MSE", "RMSE", "MAE", "RMSLE", "AUC", "AUCPR",
+"lift_top_group", "misclassification", "mean_per_class_error", "custom", "custom_increasing". Defaults to
+AUTO.}
+    \item{\code{stopping_tolerance}}{Relative tolerance for metric-based stopping criterion (stop if relative improvement is not at least this
+much) Defaults to 0.}
+    \item{\code{max_runtime_secs}}{Maximum allowed runtime in seconds for model training. Use 0 to disable. Defaults to 0.}
+    \item{\code{score_validation_sampling}}{Method used to sample validation dataset for scoring. Must be one of: "Uniform", "Stratified". Defaults to
+Uniform.}
+    \item{\code{diagnostics}}{\code{Logical}. Enable diagnostics for hidden layers. Defaults to TRUE.}
+    \item{\code{fast_mode}}{\code{Logical}. Enable fast mode (minor approximation in back-propagation). Defaults to TRUE.}
+    \item{\code{force_load_balance}}{\code{Logical}. Force extra load balancing to increase training speed for small datasets (to keep all cores
+busy). Defaults to TRUE.}
+    \item{\code{replicate_training_data}}{\code{Logical}. Replicate the entire training dataset onto every node for faster training on small datasets.
+Defaults to TRUE.}
+    \item{\code{single_node_mode}}{\code{Logical}. Run on a single node for fine-tuning of model parameters. Defaults to FALSE.}
+    \item{\code{shuffle_training_data}}{\code{Logical}. Enable shuffling of training data (recommended if training data is replicated and
+train_samples_per_iteration is close to #nodes x #rows, of if using balance_classes). Defaults to FALSE.}
+    \item{\code{missing_values_handling}}{Handling of missing values. Either MeanImputation or Skip. Must be one of: "MeanImputation", "Skip". Defaults
+to MeanImputation.}
+    \item{\code{quiet_mode}}{\code{Logical}. Enable quiet mode for less output to standard output. Defaults to FALSE.}
+    \item{\code{autoencoder}}{\code{Logical}. Auto-Encoder. Defaults to FALSE.}
+    \item{\code{col_major}}{\code{Logical}. #DEPRECATED Use a column major weight matrix for input layer. Can speed up forward
+propagation, but might slow down backpropagation. Defaults to FALSE.}
+    \item{\code{average_activation}}{Average activation for sparse auto-encoder. #Experimental Defaults to 0.}
+    \item{\code{sparsity_beta}}{Sparsity regularization. #Experimental Defaults to 0.}
+    \item{\code{max_categorical_features}}{Max. number of categorical features, enforced via hashing. #Experimental Defaults to 2147483647.}
+    \item{\code{reproducible}}{\code{Logical}. Force reproducibility on small data (will be slow - only uses 1 thread). Defaults to FALSE.}
+    \item{\code{export_weights_and_biases}}{\code{Logical}. Whether to export Neural Network weights and biases to H2O Frames. Defaults to FALSE.}
+    \item{\code{mini_batch_size}}{Mini-batch size (smaller leads to better fit, larger can speed up and generalize better). Defaults to 1.}
+    \item{\code{categorical_encoding}}{Encoding scheme for categorical features Must be one of: "AUTO", "Enum", "OneHotInternal", "OneHotExplicit",
+"Binary", "Eigen", "LabelEncoder", "SortByResponse", "EnumLimited". Defaults to AUTO.}
+    \item{\code{elastic_averaging}}{\code{Logical}. Elastic averaging between compute nodes can improve distributed model convergence.
+#Experimental Defaults to FALSE.}
+    \item{\code{elastic_averaging_moving_rate}}{Elastic averaging moving rate (only if elastic averaging is enabled). Defaults to 0.9.}
+    \item{\code{elastic_averaging_regularization}}{Elastic averaging regularization strength (only if elastic averaging is enabled). Defaults to 0.001.}
+    \item{\code{export_checkpoints_dir}}{Automatically export generated models to this directory.}
+    \item{\code{auc_type}}{Set default multinomial AUC type. Must be one of: "AUTO", "NONE", "MACRO_OVR", "WEIGHTED_OVR", "MACRO_OVO",
+"WEIGHTED_OVO". Defaults to AUTO.}
+    \item{\code{verbose}}{\code{Logical}. Print scoring history to the console (Metrics per epoch). Defaults to FALSE.}
+  }}
 }
 \value{
+Trained autoencoder.
+
 List containing:
 \itemize{
 \item{embedding : }{Latent space embedding from the smallest hidden layer.}
@@ -69,16 +207,12 @@ even when the embedding has more dimensions.}
 \description{
 Run a customisable deep autoencoder to reduce your data to N dimensions,
 and extract feature importance scores.
-}
-\details{
 Uses \link[h2o]{h2o.deeplearning}.
 }
 \examples{
-#### Import data ####
-obj <- phenomix::get_HPO()
+obj <- get_HPO()[seq(100)]
 #### Subset the data to speed up example ####
-obj <- obj[obj@assays$RNA@var.features[1:300], ]
+obj <- obj[obj@assays$RNA@var.features[seq(300)], ]
 #### Train autoencoder ####
-ae_res <- phenomix::run_autoencoder(obj = obj, 
-                                    color_var = "group_depth3")
+ae_res <- run_autoencoder(obj = obj, color_var = "group_depth3")
 }

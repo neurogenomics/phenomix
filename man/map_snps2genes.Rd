@@ -58,9 +58,6 @@ Only run on variables available in \code{dat}.}
 \item{return_path}{Whether to return the path to the saved results.}
 
 \item{verbose}{Print messages.}
-
-\item{agg_by_genes}{Aggregate results by genes (\code{TRUE}) or SNPs
-(\code{FALSE}).}
 }
 \value{
 gene_hits \link[data.table]{data.table}.

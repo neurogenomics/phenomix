@@ -6,7 +6,7 @@
 #' Z-scores corrected for gene length,  etc.
 #'
 #' @param magma MAGMA \emph{.genes.out} data.table
-#' produced by \link[MAGMA.Celltyping]{map.snps.to.genes}.
+#' produced by \link[MAGMA.Celltyping]{map_snps_to_genes}.
 #' @param drop_mhc Drop genes from the MHC
 #' (Major Histocompatibility Complex) region.
 #' @param model Statistical model to use.

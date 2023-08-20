@@ -7,7 +7,8 @@ Authors@R: c(person(given = "Brian",
                     role = c("cre"),
                     email = "brian_schilder@alumni.brown.edu",
                     comment = c(ORCID = "0000-0001-5949-2191")) )
-Description: R package for the exploration and analysis of many genotype-phenotype datasets at once.
+Description: R package for the exploration and analysis of many
+    genotype-phenotype datasets at once.
 License: GPL (>=3) 
 URL: https://github.com/neurogenomics/phenomix
 BugReports: https://github.com/neurogenomics/phenomix/issues
@@ -16,6 +17,7 @@ LazyData: true
 Depends: R (>= 4.1.0)
 SystemRequirements: Python (>= 3.7.0)
 biocViews:
+    Software
 Imports: 
     scKirby,
     utils,
@@ -27,37 +29,31 @@ Imports:
     dplyr,
     tibble,
     broom,
-    here,
     data.table, 
     ggplot2, 
     ggrepel,
     heatmaply,
     patchwork,
-    Seurat,
-    SeuratObject,
-    future,   
-    pals,
+    Seurat, 
     gprofiler2,
     GeneOverlap,
     BiocParallel,
     AnnotationDbi,
-    DelayedArray,
-    reshape2,
+    DelayedArray, 
     scales,
     stringr,
     MASS,
     sparsesvd,
     uwot,
     GenomicRanges,
+    GenomicFiles,
     ontologyIndex,
     VariantAnnotation,
     GenomeInfoDb,
     piggyback,
     gh,
-    tools
-Remotes:
-    github::neurogenomics/scNLP,
-    github::neurogenomics/scKirby
+    tools,
+    echotabix
 Suggests:
     markdown,
     rmarkdown,
@@ -68,8 +64,7 @@ Suggests:
     remotes, 
     plotly, 
     sparklyr,
-    ggpubr,
-    BiocManager,
+    ggpubr, 
     GenomicFeatures,
     TxDb.Hsapiens.UCSC.hg19.knownGene,
     TxDb.Hsapiens.UCSC.hg38.knownGene,
@@ -79,7 +74,15 @@ Suggests:
     scNLP,
     MOFA2,
     h2o,
-    recipes
+    recipes,
+    downloadR,
+    HPOExplorer
+Remotes:
+    github::neurogenomics/scNLP,
+    github::neurogenomics/scKirby,
+    github::neurogenomics/HPOExplorer,
+    github::RajLabMSSM/echotabix,
+    github::RajLabMSSM/downloadR
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr 
 Config/testthat/edition: 3

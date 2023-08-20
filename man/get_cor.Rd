@@ -42,7 +42,7 @@ Trait-trait correlation matrix.
 Extract correlation matrix stored as a graph.
 }
 \examples{
-obj <- phenomix::get_HPO()
-cmat <- get_cor(obj = obj,
+obj <- get_HPO()[seq(100),]
+obj2 <- get_cor(obj = obj,
                 keys = "pca")
 }

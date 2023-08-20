@@ -3,7 +3,7 @@ title: "phenomix"
 author: "<h4>Author: <i>Brian M. Schilder</i></h4>" 
 date: "<h4>Most recent update: <i>`r format( Sys.Date(), '%b-%d-%Y')`</i></h4>"
 output:
-  BiocStyle::html_document:
+  rmarkdown::html_vignette
 vignette: >
     %\VignetteIndexEntry{phenomix} 
     %\usepackage[utf8]{inputenc}
@@ -11,28 +11,24 @@ vignette: >
 ---
 
 ```{r setup, include=TRUE, message=FALSE} 
-library(phenomix)
-
-library(dplyr)
-library(ggplot2)
+library(phenomix) 
 ```
-
 
 # Import data
 
-
-## DeGAs loadings 
+## HPO loadings 
 
 ```{r}
-degas <- phenomix::get_DEGAS()
-xmat <- phenomix::extract_loadings(obj = degas)
-xmat <- xmat[,1:10] # Let's use just 10 components as an example
+obj <- phenomix::get_HPO()
+xmat <- scKirby::get_varm(obj = obj, 
+                          keys = "pca")[[1]]
+xmat <- xmat[,seq(10)] # Let's use just 10 components as an example
 ```
 
 ## Celltype Dataset
 
 ```{r}
-ctd <- phenomix::get_BlueLake2018_FrontalCortexOnly()
+ctd <- phenomix::get_ctd()
 ymat <- ctd[[1]]$specificity
 ```
 
@@ -42,14 +38,13 @@ ymat <- ctd[[1]]$specificity
 
 ```{r}  
 res_lm <- phenomix::iterate_lm(xmat = xmat, 
-                               ymat = ymat, 
-                               nCores = 1) 
+                               ymat = ymat) 
 ```
 
 ### Results 
 
 ```{r}
-knitr::kable(subset(res_lm, qvalue<.05))
+knitr::kable(res_lm[qvalue<.05,])
 ```
 
 ### Plot 
@@ -64,17 +59,16 @@ gg_bar <- phenomix::plot_enrichment(res = res_lm,
 
 ```{r}
 res_gsea <- phenomix::iterate_gsea(xmat = xmat, 
-                                   ymat = ymat, 
-                                   nCores = 1) 
+                                   ymat = ymat) 
 ```
 
 
 ### Results 
 
-There are not significant results.
+There are 1 significant result: PC_10 is enriched for Pericytes.
 
 ```{r}
-knitr::kable(subset(res_gsea, qvalue<.05))
+knitr::kable(res_gsea[qvalue<.05,])
 ```
 
  

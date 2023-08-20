@@ -3,11 +3,10 @@
 #' Search a reduction for observations (e.g. traits) that match a given 
 #' \code{term} (case-insensitive substring search).
 #' Then get the factors with the highest mean loading for the matching features.
-#'
 #' @param obj \pkg{Seurat} object or dimensionality reduction object.
-#' @param metadata Phenotype metadata.
+#' @param obs Phenotype metadata.
 #' Not needed if \code{obj} is a \pkg{Seurat} object.
-#' @param term Term with which to perform substring search of observations.
+#' @param terms Terms with which to perform substring search of observations.
 #' @param search_col Which column in the observation metadata to perform 
 #' substring search.
 #' @param n_quantiles How many quantiles to bin factor loadings into.
@@ -16,64 +15,80 @@
 #' @param plot_hist Whether to plot the distribution of loadings.
 #' @param verbose Print messages.
 #' @inheritParams scKirby::get_obsm
-#'
-#' @return data.table
+#' @returns data.table
+#' 
 #' @export
-#' @importFrom Seurat Reductions
-#' @importFrom reshape2 melt
-#' @importFrom dplyr rename group_by slice_max
-#' @importFrom data.table data.table
+#' @import scKirby
+#' @import data.table
 #' @importFrom graphics hist
 #' @examples
-#' degas <- get_DEGAS()
-#' top_factors <- get_top_factors(
-#'     obj = degas,
-#'     term = "parkinson",
-#'     select_quantiles = 8:10
-#' )
+#' obj <- get_HPO()
+#' top_factors <- get_top_factors(obj = obj,
+#'                                terms = c("parkinson","cardio"),
+#'                                search_col = "HPO_label")
 get_top_factors <- function(obj,
-                            metadata = NULL,
+                            terms,
+                            obs = NULL,
                             keys = NULL,
-                            term,
-                            search_col = "label_phe",
+                            search_col = NULL,
                             n_quantiles = 10,
                             select_quantiles = n_quantiles,
                             plot_hist = FALSE,
-                            verbose = TRUE) {
-    embeddings <- scKirby::get_obsm(
-        obj = obj,
-        keys = keys,
-        verbose = verbose
-    )
-    if (is.null(metadata)) metadata <- scKirby::get_obs(obj = obj)
-    if (!search_col %in% colnames(metadata) | is.null(search_col)) {
-        message(search_col, " not in metadata. Using ", colnames(metadata)[1],
-                " instead.")
-        search_col <- colnames(metadata)[1]
+                            verbose = TRUE) { 
+    # devoptera::args2vars(get_top_factors) 
+    
+    #### Get obsm (embedding) ####
+    obsm <- scKirby::get_obsm(obj = obj,
+                              keys = keys,
+                              verbose = verbose)
+    keys <- names(obsm)
+    if(length(obsm)>1){
+        messager(">1 obsm embedding identified.",
+                 "Using first one only:",shQuote(keys[1]),v=verbose)
+    }
+    obsm <- obsm[[1]]
+    #### Get obs (observation metadata) ####
+    if (is.null(obs)) obs <- scKirby::get_obs(obj = obj)
+    #### Check search_col is present ####
+    if (is.null(search_col) | 
+        !search_col %in% colnames(obs) | is.null(search_col)) {
+        messager("search_col not in obs. Using obs names instead.",v=verbose)
+        obs_vec <- scKirby::get_obs_names(obj)
+    } else {
+        obs_vec <- obs[[search_col]]
     } 
-    select_cols <- rownames(metadata[grepl(term,
-                                           unname(metadata[[search_col]]),
-                                           ignore.case = TRUE), ])
+    #### Search obs for matches ####
+    select_cols <- rownames(
+        obs[grepl(paste(terms,collapse = "|"),obs_vec,ignore.case = TRUE), ]
+    )
+    #### Report matches ####
     if (length(select_cols) > 0) {
-        messager(
-            "+ ", length(select_cols), " matching phenotypes identified:\n",
-            paste("  -", select_cols, collapse = "\n")
-        )
+        messager("+", formatC(length(select_cols),big.mark = ","),
+                 "matching phenotypes identified:",
+                 paste("\n -", select_cols, collapse = ""),v=verbose)
     } else {
         stopper("0 matching phenotypes identified.")
-    }
-
+    } 
     #### Handle multiple phenotypes per term
-    if (!is(embeddings, "numeric")) embeddings <- colMeans(embeddings, 
-                                                           na.rm = TRUE)
-    if (plot_hist) {
-        print(graphics::hist(embeddings, 50, 
-                             main = paste("Top", keys, "factors:", term)))
+    obsm_means <- if (scKirby::is_class(obsm,"matrix")){
+        colMeans(obsm[select_cols,], na.rm = TRUE)
+    } else {
+        obsm
     }
-
-    quantiles <- cut(abs(embeddings),
+    if (isTRUE(plot_hist)) {
+        graphics::hist(obsm_means, 50, 
+                       main = paste("Top", keys[1], "factors:", 
+                                    paste(terms,collapse = "; "))) |>
+            methods::show()
+    }
+    #### Filter by quantiles ####
+    messager("Filtering by quantiles computed from absolute",
+             shQuote(keys[1]),"loadings.",v=verbose)
+    quantiles <- cut(obsm_means,
                      breaks = n_quantiles,
-                     labels = seq(1,n_quantiles))
-    top_factors <- embeddings[quantiles %in% select_quantiles]
+                     labels = seq(n_quantiles)) 
+    top_factors <- obsm_means[quantiles %in% select_quantiles]
+    messager("Returning",formatC(length(top_factors),big.mark = ","),
+             "top factor(s).",v=verbose)
     return(top_factors)
 }

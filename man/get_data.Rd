@@ -8,7 +8,7 @@ get_data(
   fname,
   repo = "neurogenomics/phenomix",
   tag = "latest",
-  save_dir = tools::R_user_dir("phenomix", which = "cache"),
+  save_dir = tools::R_user_dir(package = "phenomix", which = "cache"),
   .token = gh::gh_token(),
   piggyback_cache_duration = 10,
   overwrite = FALSE

@@ -86,7 +86,7 @@ map_snps_txdb <- function(dat,
     regions <- regions[queries[queries %in% names(regions)]]
     #### Iterate over each region class ####
     hits <- parallel::mclapply(names(regions), function(x) {
-        message_parallel("Querying regions: ", x)
+        messager("Querying regions: ", x, parallel=TRUE)
         res <- VariantAnnotation::locateVariants(
             query = gr,
             subject = txdb,

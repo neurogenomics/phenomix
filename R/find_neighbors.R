@@ -23,14 +23,11 @@
 #' This can be useful when var1 names are forced to be unique internally.
 #' @inheritParams scKirby::get_obsm
 #'
-#' @export
-#' @importFrom dplyr mutate_at arrange group_by slice_max desc rename
-#' @importFrom stats setNames
-#' @importFrom Matrix as.matrix
-#' @importFrom reshape2 melt
-#' @importFrom data.table data.table
+#' @export 
+#' @importFrom stats setNames  
+#' @import data.table 
 #' @examples 
-#' obj <- get_HPO()
+#' obj <- get_HPO()[seq(100),]
 #' top_neighbors <- find_neighbors(obj = obj,
 #'                                 var1_search = "parkinson",
 #'                                 label_col = "HPO_label")
@@ -47,8 +44,9 @@ find_neighbors <- function(obj,
                            add_original_names = TRUE,
                            verbose = TRUE) {
     
-    # devoptera::args2vars(find_neighbors)
-    Var1 <- Var2 <- trait1 <- trait2 <- similarity <- NULL;
+    # devoptera::args2vars(find_neighbors, reassign = TRUE)
+    
+    trait1 <- trait2 <- similarity <- NULL;
     #### Get obs ####
     obs <- scKirby::get_obs(obj = obj,
                             verbose = verbose)
@@ -133,23 +131,23 @@ find_neighbors <- function(obj,
         }
     } 
 
-    top_candidates <- fgraph |>
-        Matrix::as.matrix(drop=FALSE) |>
-        reshape2::melt(value.name = "similarity", drop=FALSE) |>
-        dplyr::rename(trait1 = Var1, trait2 = Var2) |>
-        data.table::data.table() |>
-        dplyr::mutate_at(c("trait1", "trait2"), as.character) |>
-        subset(trait1 %in% targets1) |>
-        subset(trait1 != trait2) |>
-        subset(similarity > 0) |>
-        dplyr::group_by(trait1) |>
-        dplyr::slice_max(
-            order_by = similarity,
-            n = max_neighbors
-        ) |>
-        dplyr::arrange(dplyr::desc(similarity)) |>
-        data.table::data.table()
-
+    
+    messager("Converting graph to data.table",v=verbose) 
+    top_candidates <- fgraph[targets1,] |>
+        data.table::as.data.table(keep.rownames="trait1") |>
+        data.table::melt.data.table(id.vars="trait1",
+                                    variable.name="trait2",
+                                    value.name = "similarity", 
+                                    drop=FALSE)
+    top_candidates[,trait1:=as.character(trait1)][,trait2:=as.character(trait2)]
+    top_candidates <- top_candidates[trait1 != trait2][similarity>0] 
+    top_candidates <- 
+        top_candidates[,.SD[similarity %in% head(sort(similarity),
+                                                 max_neighbors)],
+                       by="trait1"] |>
+        data.table::setorderv("similarity",-1)
+         
+    
     if (!is.null(group_col)) {
         messager("+ Adding group_col to results.", v = verbose)
         keys <- stats::setNames(obs[[group_col]], obs$sample_names)

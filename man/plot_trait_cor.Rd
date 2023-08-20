@@ -6,7 +6,7 @@
 \usage{
 plot_trait_cor(
   knn,
-  top_n = 10,
+  top_n = 3,
   non_self = TRUE,
   group_var = "trait1",
   show_plot = TRUE,
@@ -20,11 +20,23 @@ plot_trait_cor(
 
 \item{non_self}{Remove trait2 that are present in trait1.}
 
-\item{show_plot}{Whethe to print the plot.}
+\item{group_var}{Column in \code{knn} data to group by 
+when computing \code{top_n} traits.}
+
+\item{show_plot}{Whether to print the plot.}
+
+\item{type}{Plot type ("heat" or "bar").}
 }
 \value{
 \code{ggplot} object.
 }
 \description{
 Takes the output of \link[phenomix]{find_neighbors} as input to \code{knn}.
+}
+\examples{
+obj <- get_HPO()[seq(100),]
+knn <- find_neighbors(obj = obj,
+                      var1_search = "cardio",
+                      label_col = "HPO_label")
+gg_cor <- plot_trait_cor(knn=knn,  top_n = 3)
 }

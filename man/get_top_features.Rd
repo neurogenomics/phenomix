@@ -6,10 +6,10 @@
 \usage{
 get_top_features(
   obj,
-  reduction = NULL,
+  keys = NULL,
   n_features = 3,
   n_features_plot = 20,
-  factors = seq(1, 10),
+  factors = seq(10),
   invert_vars = FALSE,
   fill = "factor",
   show_plot = TRUE,
@@ -20,7 +20,7 @@ get_top_features(
 \arguments{
 \item{obj}{\pkg{Seurat} object.}
 
-\item{reduction}{Reduction to use. If \code{NULL}, defaults to first available reduction.}
+\item{keys}{The keys of reductions to extract from.}
 
 \item{n_features}{Number of top features per factor to select.}
 
@@ -45,6 +45,6 @@ top_features \code{data.table}
 Plot the top feature loadings for from a given reduction.
 }
 \examples{
-degas <- get_DEGAS()
-top_features <- get_top_features(obj = degas)
+obj <- get_HPO()
+top_features <- get_top_features(obj = obj)
 }

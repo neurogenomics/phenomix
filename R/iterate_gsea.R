@@ -27,8 +27,8 @@
 #' @importFrom methods slot
 #' @examples
 #' ### DeGAs loadings
-#' degas <- get_DEGAS()
-#' xmat <- get_varm(obj = degas)
+#' obj <- get_DEGAS()
+#' xmat <- get_varm(obj = obj)
 #' xmat <- xmat[, 1:10] # Let's use just 10 components as an example
 #'
 #' ### Celltype Dataset
@@ -58,7 +58,7 @@ iterate_gsea <- function(xmat,
 
     gsea_res <- parallel::mclapply(1:ncol(xmat), function(i) {
         tt <- colnames(xmat)[i]
-        message_parallel(" - ", tt, ": (", i, "/", ncol(xmat), ")")
+        messager(" - ", tt, ": (", i, "/", ncol(xmat), ")", parallel=TRUE)
         lapply(colnames(ymat), function(ct) { 
             dat <- data.frame(
                 trait = cut(xmat[gene_intersect, tt], 

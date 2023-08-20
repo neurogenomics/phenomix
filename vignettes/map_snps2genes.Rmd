@@ -3,101 +3,33 @@ title: "map_snps2genes"
 author: "Brian M. Schilder"
 date: "`r Sys.Date()`"
 output:
-  BiocStyle::html_document:
+  rmarkdown::html_vignette
 vignette: >
     %\VignetteIndexEntry{map_snps2genes} 
     %\usepackage[utf8]{inputenc}
     %\VignetteEngine{knitr::rmarkdown}
 ---
 
-```{r setup, include=TRUE}
-#### To install the dev branch of MAGMA.Celltyping, use:
-# remotes::install_github("NathanSkene/MAGMA_Celltyping@bschilder_dev")
-
-# devtools::install_github("neurogenomics/MungeSumstats")
-library(phenomix)
-# library(MAGMA.Celltyping)
-# library(MungeSumstats)
-library(ggplot2)
-library(dplyr)
-
-save_dir <- "/Volumes/bms20/projects/neurogenomics-lab/live/GWAS_sumstats/OpenGWAS"
-storage_dir <- "/Desktop/model_celltype_conservation/raw_data/MAGMA" 
+```{r setup, include=TRUE} 
+library(phenomix)    
 ```
 
-# Munge sum stats
+# Download data
 
-## Import sum stats
+## MAGMA files
 
-Run previously to save time.
+```{r}
 
-```{r, eval=FALSE}
-metagwas <- MungeSumstats::find_sumstats(traits = c("Alzheimer","Parkinson",
-                                                    "amyotrophic","dementia"))
-munged_files <- MungeSumstats::import_sumstats(ids = metagwas$id, 
-                                               save_dir = save_dir, 
-                                               nThread = 10, 
-                                               parallel_across_ids = FALSE,
-                                               force_new = FALSE) 
 ```
-
-## Create metadata file
-
-`MungeSumstats` automatically keeps log files in the `tempdir()`. But if you restart your R session mid-way, they'll be erased.
-
-Instead, infer the genome build here with the `infer_builds=TRUE` argument.
-
-
-```{r, eval=FALSE}  
-munged_files = list.files(save_dir,".tsv.gz", full.names = TRUE)
-metagwas_all <- phenomix::generate_metadata(munged_files = munged_files, 
-                                  infer_builds = TRUE,
-                                  trait_groups = c("alzheimer","parkinson","amyotrophic",
-                                                   "frontotemporal dementia","dementia"),
-                                  save_dir = save_dir) 
-```
-
-
-
-# Map SNPs to genes
-
-## MAGMA
-
-### Genome reference
-
-```{r Prepare genome reference, eval=FALSE}
-genome_ref_path <- MAGMA.Celltyping::get_genome_ref(storage_dir = storage_dir)
-```
- 
-### Map SNPs 
-
-```{r, eval=FALSE}
-magma_files <- parallel::mclapply(seq(1,nrow(metagwas_all)),
-                                  function(i){
-  MAGMA.Celltyping:::message_parallel("----- ", metagwas_all$id[i]," -----")
-  MAGMA.Celltyping::map.snps.to.genes(path_formatted = metagwas_all$path[i],
-                                      genome_build = metagwas_all$build_inferred[i],
-                                      upstream_kb = 35,  
-                                      downstream_kb = 10,
-                                      N = metagwas_all$N[i],
-                                      genome_ref_path = genome_ref_path,
-                                      force_new = FALSE)
-}, mc.cores = 10) %>% `names<-`(metagwas_all$id)
-```
-
 
 ### Construct gene x trait matrix
 
-Can construct gene x trait matrix from gene-level MAGMA results across multiple GWAS traits.
+Construct gene x trait matrix from gene-level MAGMA results across multiple GWAS traits.
 
 ```{r, eval=FALSE}
-magma_matrix <- phenomix::gwas_matrix_magma(magma_files = magma_files,
-                                            metric = "ADJ_ZSTAT", 
-                                            save_path = file.path(save_dir,"OpenGWAS_neurodegenGWAS_ADJZSTAT.rds"),
-                                            mc.cores = 10)
-# magma_matrix <- readRDS(file.path(save_dir,"OpenGWAS_neurodegenGWAS_ADJZSTAT.rds"))
+X <- phenomix::magma_matrix(magma_files = magma_files,
+                            metric = "ADJ_ZSTAT") 
 ```
-
 
 ## ABC
 
@@ -122,7 +54,7 @@ abc <- phenomix::import_abc(dataset = "Nasser2020")
                              method = "abc",
                              abc = abc) 
     }, error = function(x){x})
-  }, mc.cores = 1) %>% `names<-`(metagwas$id)
+  }, mc.cores = 1) |> `names<-`(metagwas$id)
   phenomix:::report_time(start)
 }
 
@@ -143,8 +75,8 @@ abc_matrix <- parallel::mclapply(names(abc_hits),
   #   return( dat[,c("GENE",..x)])
   # } else {return(NULL)}
   # return( dat[,c("GENE","ZSTAT")])
-},  mc.cores = 1) %>%
-  # plyr::compact() %>%
+},  mc.cores = 1) |>
+  # plyr::compact() |>
   base::Reduce(f = function(x,y){merge(x,y,all.x=TRUE,all.y=TRUE)})
 
 

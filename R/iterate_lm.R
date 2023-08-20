@@ -18,8 +18,8 @@
 #' @importFrom stats p.adjust
 #' @examples
 #' ### DeGAs loadings
-#' degas <- get_DEGAS()
-#' xmat <- get_varm(degas)
+#' obj <- get_DEGAS()
+#' xmat <- get_varm(obj)
 #' xmat <- xmat[, 1:10] # Let's use just 10 components as an example
 #'
 #' ### Celltype Dataset
@@ -50,9 +50,8 @@ iterate_lm <- function(xmat,
 
     lm_res <- parallel::mclapply(1:ncol(xmat), function(i) {
         tt <- colnames(xmat)[i]
-        message_parallel(" - ", tt, ": (", i, "/", ncol(xmat), ")")
-        lapply(colnames(ymat), function(ct) {
-            # message_parallel(" - ",ct)
+        messager(" - ", tt, ": (", i, "/", ncol(xmat), ")", parallel=TRUE)
+        lapply(colnames(ymat), function(ct) { 
             if (!is.null(y_quantiles)) {
                 lm_dat <- data.frame(
                     trait = xmat[gene_intersect, tt],
@@ -88,7 +87,7 @@ iterate_lm <- function(xmat,
     sig_res <- lm_res |>
         subset(qvalue < qvalue_thresh)
     messager("\n", formatC(nrow(sig_res), big.mark = ","),
-            " significant results @ ",
+            "significant results @ ",
             correction_method, "<", qvalue_thresh)
     ### Return FULL results (not just sig)
     return(lm_res)

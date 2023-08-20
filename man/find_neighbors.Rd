@@ -57,12 +57,8 @@ Search [shared] K-nearest neighbor graph to find the
  samples that are most similar to those matching a substring search.
 }
 \examples{
-obj <- get_DEGAS()
-
-### No group filter
-top_neighbors <- find_neighbors(
-    obj = obj,
-    var1_search = "parkinson", 
-    label_col = "label_phe"
-)
+obj <- get_HPO()[seq(100),]
+top_neighbors <- find_neighbors(obj = obj,
+                                var1_search = "parkinson",
+                                label_col = "HPO_label")
 }

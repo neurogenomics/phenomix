@@ -8,26 +8,26 @@
 #' @importFrom DelayedArray setAutoBPPARAM
 #' @importFrom BiocParallel MulticoreParam
 #' @importFrom parallel detectCores
-assign_cores <- function(worker_cores = .90,
+assign_cores <- function(workers = .90,
+                         progressbar = TRUE,
                          verbose = TRUE) {
+    
     # Enable parallelization of HDF5 functions
     ## Allocate ~10% of your available cores to non-parallelized processes
-    worker_cores <- if (is.null(worker_cores)) .90 else worker_cores
+    workers <- if (is.null(workers)) .90 else workers
     total_cores <- parallel::detectCores()
-    if (worker_cores < 1) {
-        reserved_cores <- ceiling(total_cores * (1 - worker_cores))
+    if (workers < 1) {
+        reserved_cores <- ceiling(total_cores * (1 - workers))
         workers <- total_cores - reserved_cores
     } else {
-        workers <- worker_cores
+        workers <- workers
         reserved_cores <- total_cores - workers
     }
-    messager("+ ", workers, " core(s) assigned as workers (", 
-             reserved_cores, " reserved).",v=verbose)
-    DelayedArray::setAutoBPPARAM(BiocParallel::MulticoreParam(workers))
+    messager("+",workers,"core(s) assigned as workers",
+             paste0("(",reserved_cores, " reserved)."),v=verbose)
+    BPPARAM <- BiocParallel::MulticoreParam(workers = workers,
+                                            progressbar = progressbar)
+    DelayedArray::setAutoBPPARAM(BPPARAM = BPPARAM)
     # DelayedArray:::set_verbose_block_processing(verbose)
-    return(list(
-        worker_cores = workers,
-        reserved_cores = reserved_cores,
-        total_cores = total_cores
-    ))
+    return(BPPARAM)
 }

@@ -14,3 +14,19 @@
 #' usethis::use_data(MHC_genes, overwrite = TRUE)
 #' }
 "MHC_genes"
+
+
+
+#' OpenGWAS metadata
+#'
+#' Static copy of metadata for all GWAS/QTL datasets on
+#'  \href{https://gwas.mrcieu.ac.uk/}{OpenGWAS}.
+#'
+#' \code{
+#' OpenGWAS <- MungeSumstats::find_sumstats() 
+#' OpenGWAS$query = NULL
+#' OpenGWAS <- opengwas_meta(meta=OpenGWAS)
+#' OpenGWAS[,magma_done:=RCurl::url.exists(magma_out)]
+#' usethis::use_data(OpenGWAS, overwrite = TRUE)
+#' }
+"OpenGWAS"

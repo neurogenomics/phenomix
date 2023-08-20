@@ -23,8 +23,6 @@
 #' @param dat GWAS summary statistics munged by
 #' \link[MungeSumstats]{format_sumstats}.
 #' Can be a path to the saved file or \link[data.table]{data.table}.
-#' @param agg_by_genes Aggregate results by genes (\code{TRUE}) or SNPs
-#' (\code{FALSE}).
 #' @param adjust_z Whether to adjust Z-statistic using
 #'  the \code{model} and \code{formula}.
 #' @param nCores Number of cores to parallelise across.

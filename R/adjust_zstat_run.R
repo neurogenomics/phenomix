@@ -3,7 +3,7 @@ adjust_zstat_run <- function(dat,
                              formula,
                              verbose = TRUE,
                              ...) {
-    ADJ_ZSTAT <- NULL;
+    ADJ_ZSTAT <- ZSTAT <- NULL;
     #### Select model ####
     if (is.null(model)) {
         messager("Defaulting to model stats::lm.",

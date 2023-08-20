@@ -14,6 +14,7 @@
 #' @param log_vars Variables to perform natural log transformation on first.
 #' Only run on variables available in \code{dat}.
 #' @param formula Formula to use in \code{model}.
+#' @param gene_col Name of the gene column.
 #' @param verbose Print messages.
 #' @param ... Additional arguments passed to \code{model}.
 #' @inheritParams stats::p.adjust
@@ -43,7 +44,8 @@ adjust_zstat <- function(dat,
         dat = dat,
         method = method,
         P_var = NULL,
-        Q_var = "Q"
+        Q_var = "Q",
+        verbose = verbose
     )
     #### Log relevant variables ###
     log_transform(

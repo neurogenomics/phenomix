@@ -14,13 +14,13 @@
 run_gprofiler <- function(obj,
                           n_features = 3,
                           factors = seq(1, 4),
-                          reduction = NULL,
+                          keys = NULL,
                           show_plot = TRUE,
                           verbose = TRUE,
                           ...) {
     top_genes <- get_top_features(
         obj = obj,
-        reduction = reduction,
+        keys = keys,
         n_features = n_features,
         show_plot = FALSE,
         verbose = verbose
@@ -37,7 +37,7 @@ run_gprofiler <- function(obj,
     }) |> `names<-`(factors)
 
     gres <- gprofiler2::gost(query = gene_lists, ...)
-    if (show_plot) {
+    if (isTRUE(show_plot)) {
         gg_gprof <- gprofiler2::gostplot(gres)
         print(gg_gprof)
     }

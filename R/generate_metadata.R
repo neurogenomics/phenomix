@@ -27,10 +27,12 @@ generate_metadata <- function(munged_files,
                               force_new = FALSE,
                               save_dir = tempdir(),
                               verbose = TRUE) {
+    
     sample_size <- ncase <- ncontrol <- N <- NULL;
     save_path <- file.path(save_dir, "OpenGWAS_metadata.csv")
     #### Import existing file ####
-    if (file.exists(save_path) & (!force_new)) {
+    if (file.exists(save_path) &&
+        (isFALSE(force_new))) {
         messager("Importing existing metadata: ", save_path)
         metagwas_all <- utils::read.csv(save_path, row.names = 1)
         return(metagwas_all)

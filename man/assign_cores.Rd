@@ -4,7 +4,7 @@
 \alias{assign_cores}
 \title{Assign cores}
 \usage{
-assign_cores(worker_cores = 0.9, verbose = TRUE)
+assign_cores(workers = 0.9, progressbar = TRUE, verbose = TRUE)
 }
 \description{
 Automatically infer the number of available cores and

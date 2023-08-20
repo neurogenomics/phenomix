@@ -1,21 +1,20 @@
 #' Extract correlation matrix
 #' 
-#' Extract correlation matrix stored as a graph.
-#' 
+#' Extract correlation matrix stored as a graph. 
 #' @param assay Assay to used to compute correlation graph 
 #' if one does not already exist.
 #' @param graph_name Name of the graph to extract.
 #' @param method Pairwise correlation method.
 #' @inheritParams compute_cor
 #' @inheritParams scKirby::get_obsm
-#' @inheritParams SeuratObject::Reductions
+#' @inheritParams Seurat::Reductions
 #' 
 #' @return Trait-trait correlation matrix.
 #' 
 #' @export
 #' @examples 
 #' obj <- get_HPO()[seq(100),]
-#' cmat <- get_cor(obj = obj,
+#' obj2 <- get_cor(obj = obj,
 #'                 keys = "pca")
 get_cor <- function(obj,
                     keys = NULL,

@@ -6,14 +6,14 @@
 \usage{
 get_top_traits(
   obj,
-  metadata = NULL,
-  reduction = NULL,
+  obs = NULL,
+  keys = NULL,
   n_traits = 3,
-  factors = seq(1, 10),
+  factors = seq(10),
   invert_vars = FALSE,
   show_plot = TRUE,
   title = NULL,
-  x = "phenotype",
+  x = "trait",
   y = "loading",
   verbose = TRUE
 )
@@ -21,8 +21,10 @@ get_top_traits(
 \arguments{
 \item{obj}{\pkg{Seurat} object or dimensionality reduction object.}
 
-\item{metadata}{Phenotype metadata.
+\item{obs}{Phenotype metadata.
 Not needed if \code{obj} is a \pkg{Seurat} object.}
+
+\item{keys}{The keys of reductions to extract from.}
 
 \item{n_traits}{Number of top traits per reduction factor to select.}
 
@@ -41,13 +43,13 @@ Not needed if \code{obj} is a \pkg{Seurat} object.}
 \item{verbose}{Print messages.}
 }
 \value{
-\code{data.table} of top traits.
+\link[data.table]{data.table} of top traits.
 }
 \description{
 Create a radar chart of the traits (phenotypes) with the
 highest loadings for each reduction factor.
 }
 \examples{
-degas <- get_DEGAS()
-top_phenos <- get_top_traits(obj = degas)
+obj <- get_HPO()
+top_phenos <- get_top_traits(obj = obj)
 }

@@ -7,7 +7,7 @@
 plot_top(
   top_data,
   factors = NULL,
-  x = "label_phe",
+  x = "feature",
   y = "loading",
   fill = "factor",
   title = NULL,

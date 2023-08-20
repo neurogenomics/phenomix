@@ -6,10 +6,10 @@
 \usage{
 get_top_factors(
   obj,
-  metadata = NULL,
+  terms,
+  obs = NULL,
   keys = NULL,
-  term,
-  search_col = "label_phe",
+  search_col = NULL,
   n_quantiles = 10,
   select_quantiles = n_quantiles,
   plot_hist = FALSE,
@@ -19,12 +19,12 @@ get_top_factors(
 \arguments{
 \item{obj}{\pkg{Seurat} object or dimensionality reduction object.}
 
-\item{metadata}{Phenotype metadata.
+\item{terms}{Terms with which to perform substring search of observations.}
+
+\item{obs}{Phenotype metadata.
 Not needed if \code{obj} is a \pkg{Seurat} object.}
 
 \item{keys}{The keys of reductions to extract from.}
-
-\item{term}{Term with which to perform substring search of observations.}
 
 \item{search_col}{Which column in the observation metadata to perform 
 substring search.}
@@ -47,10 +47,8 @@ Search a reduction for observations (e.g. traits) that match a given
 Then get the factors with the highest mean loading for the matching features.
 }
 \examples{
-degas <- get_DEGAS()
-top_factors <- get_top_factors(
-    obj = degas,
-    term = "parkinson",
-    select_quantiles = 8:10
-)
+obj <- get_HPO()
+top_factors <- get_top_factors(obj = obj,
+                               terms = c("parkinson","cardio"),
+                               search_col = "HPO_label")
 }

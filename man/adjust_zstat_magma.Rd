@@ -16,7 +16,7 @@ adjust_zstat_magma(
 }
 \arguments{
 \item{magma}{MAGMA \emph{.genes.out} data.table
-produced by \link[MAGMA.Celltyping]{map.snps.to.genes}.}
+produced by \link[MAGMA.Celltyping]{map_snps_to_genes}.}
 
 \item{drop_mhc}{Drop genes from the MHC
 (Major Histocompatibility Complex) region.}

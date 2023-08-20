@@ -24,6 +24,7 @@ plot_enrichment <- function(res,
                             save_path=NULL,
                             verbose = TRUE,
                             ...) {
+    requireNamespace("ggplot2")
     types <- tolower(types)
     res_list <- list()
     if ("bar" %in% types) {

@@ -8,7 +8,7 @@ run_gprofiler(
   obj,
   n_features = 3,
   factors = seq(1, 4),
-  reduction = NULL,
+  keys = NULL,
   show_plot = TRUE,
   verbose = TRUE,
   ...
@@ -21,7 +21,7 @@ run_gprofiler(
 
 \item{factors}{Which factors to run gprofiler on.}
 
-\item{reduction}{Reduction to use. If \code{NULL}, defaults to first available reduction.}
+\item{keys}{The keys of reductions to extract from.}
 
 \item{show_plot}{Whether to print the plot or simply return it.}
 

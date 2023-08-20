@@ -4,54 +4,55 @@
 #' highest loadings for each reduction factor.
 #'
 #' @param obj \pkg{Seurat} object or dimensionality reduction object.
-#' @param metadata Phenotype metadata.
+#' @param obs Phenotype metadata.
 #' Not needed if \code{obj} is a \pkg{Seurat} object.
 #' @param n_traits Number of top traits per reduction factor to select.
 #' @param verbose Print messages.
 #' @inheritParams plot_top
 #' @inheritParams scKirby::get_obsm
-#'
-#' @return \code{data.table} of top traits.
+#' @returns \link[data.table]{data.table} of top traits.
 #' 
-#' @export
-#' @importFrom Seurat Reductions
-#' @importFrom reshape2 melt
-#' @importFrom dplyr rename group_by slice_max
-#' @importFrom data.table data.table
+#' @export 
+#' @import data.table
 #' @examples
-#' degas <- get_DEGAS()
-#' top_phenos <- get_top_traits(obj = degas)
+#' obj <- get_HPO()
+#' top_phenos <- get_top_traits(obj = obj)
 get_top_traits <- function(obj,
-                           metadata = NULL,
-                           reduction = NULL,
+                           obs = NULL,
+                           keys = NULL,
                            n_traits = 3,
-                           factors = seq(1,10),
+                           factors = seq(10),
                            invert_vars = FALSE,
                            show_plot = TRUE,
                            title = NULL,
-                           x = "phenotype",
+                           x = "trait",
                            y = "loading",
                            verbose = TRUE) {
-    Var1 <- Var2 <- value <- loading <- NULL;
-    embeddings <- scKirby::get_obsm(
-        obj = obj,
-        reduction = reduction,
-        verbose = verbose
-    )
-    if (is.null(metadata)) metadata <-  scKirby::get_obs(obj = obj)
-    top_traits <- reshape2::melt(embeddings) |>
-        merge(metadata,
-            by.x = "Var1", by.y = 0, all.x = TRUE
-        ) |>
-        dplyr::rename(phenotype = Var1,
-                      factor = Var2, 
-                      loading = value) |>
-        dplyr::group_by(factor) |>
-        dplyr::slice_max(order_by = abs(loading),
-                         n = n_traits) |>
-        data.table::data.table()
-
-    if (show_plot) {
+    # devoptera::args2vars(get_top_traits)
+    
+    loading <- NULL;
+    obsm <- scKirby::get_obsm(obj = obj,
+                              keys = keys,
+                              verbose = verbose)
+    keys <- names(obsm)
+    if(length(obsm)>1){ 
+        messager(">1 obsm loadings identified.",
+                 "Using first one only:",shQuote(keys[1]),v=verbose)
+    }
+    obsm <- obsm[[1]]
+    if (is.null(obs)) obs <- scKirby::get_obs(obj = obj)
+    
+    top_traits <- (
+        data.table::as.data.table(obsm, keep.rownames = "trait") |>
+            data.table::melt.data.table(id.vars = "trait", 
+                                        variable.name = "factor", 
+                                        value.name = "loading")
+    )[,.SD[abs(loading) %in% head(sort(abs(loading)), n_traits)],
+      by="factor"] |>
+        merge(data.table::as.data.table(obs,keep.rownames = "trait"),
+              by="trait") 
+    #### Plot ####
+    if (isTRUE(show_plot)) {
         gp <- plot_top(
             top_data = top_traits,
             x = x,

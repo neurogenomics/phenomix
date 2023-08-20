@@ -7,7 +7,7 @@
 plot_reduction(
   obj,
   keys = NULL,
-  metadata = NULL,
+  obs = NULL,
   x_dim = 1,
   y_dim = 2,
   fix_rownames = FALSE,
@@ -34,17 +34,21 @@ plot_reduction(
 
 \item{keys}{The keys of reductions to extract from.}
 
-\item{metadata}{Metadata associated with \code{obj}. 
+\item{obs}{Phenotype metadata associated with \code{obj}. 
 Will be automatically extracted from \code{obj} if it is a
  \code{Seurat} object.}
 
+\item{x_dim}{Which dimension to plot on the x-axis.}
+
+\item{y_dim}{Which dimension to plot on the y-axis.}
+
 \item{fix_rownames}{Replace non-ASCII characters in row names.}
 
-\item{color_var}{\code{metadata} variable to use as point color.}
+\item{color_var}{\code{obs} variable to use as point color.}
 
-\item{label_var}{\code{metadata} variable to use as point labels}
+\item{label_var}{\code{obs} variable to use as point labels}
 
-\item{size_var}{\code{metadata} variable to use as point size.}
+\item{size_var}{\code{obs} variable to use as point size.}
 
 \item{labels}{Whether to show labels using \link[ggrepel]{geom_text_repel}.}
 

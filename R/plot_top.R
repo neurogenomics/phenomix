@@ -13,36 +13,41 @@
 #' @param show_plot Whether to print the plot or simply return it.
 #'
 #' @return ggplot object
-#' @keywords internal
-#' @import ggplot2
+#' @keywords internal 
 #' @importFrom stringr str_split
 #' @importFrom methods is
 plot_top <- function(top_data,
                      factors = NULL,
-                     x = "label_phe",
+                     x = "feature",
                      y = "loading",
                      fill = "factor",
                      title = NULL,
                      invert_vars = FALSE,
                      show_plot = TRUE) {
-    if (is.null(factors)) factors <- seq(1, length(unique(top_data$factor)))
-    if (methods::is(factors, "character")) factors <- as.numeric(stringr::str_split(factors, "_", simplify = T)[, 2])
-    if (invert_vars) {
+    # devoptera::args2vars(plot_top)
+    requireNamespace("ggplot2")
+    
+    if (is.null(factors)) factors <- seq(length(unique(top_data$factor)))
+    if (methods::is(factors, "character")) {
+        factors <- stringr::str_split(factors, "_", simplify = TRUE)[, 2]|>
+            as.numeric()
+    }
+    if (isTRUE(invert_vars)) {
         x1 <- x
         fill1 <- fill
         x <- fill
         fill <- x1
     }
-
     factor_names <- unique(top_data$factor)[factors]
     #### Filtering  ####
     top_data <- top_data[top_data[["factor"]] %in% factor_names, ]
-    #### Plot     ####
-    gp <- ggplot(top_data, mapping = aes_string(x = x, y = y, fill = fill)) +
+    #### Plot ####
+    gp <- ggplot(top_data, 
+                 mapping = aes_string(x = x, y = y, fill = fill)) +
         geom_bar(stat = "identity") +
         coord_polar() +
         theme_minimal() +
         labs(title = title)
-    if (show_plot) print(gp)
+    if (isTRUE(show_plot)) methods::show(gp)
     return(gp)
 }

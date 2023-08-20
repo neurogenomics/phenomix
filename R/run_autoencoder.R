@@ -2,17 +2,21 @@
 #'
 #' Run a customisable deep autoencoder to reduce your data to N dimensions,
 #' and extract feature importance scores.
-#'
 #' Uses \link[h2o]{h2o.deeplearning}.
-#'
 #' @param obj Seurat object or matrix to run autoencoder on.
+#' @param obs Phenotype metadata.
 #' @param assay Assay to use.
 #' @param slot Data slot to use.
 #' @param transpose Whether to transpose the matrix first.
 #' @param seed Seed passed to \[base]{set.seed} 
 #' for reproducibility between runs.
-#' @param ... Additional parameters passed to \link[h2o]{h2o.deeplearning}.
+#' @param color_var Variable in \code{obs} to color points by.
+#' @param label_var Variable \code{obs} to label points by.
+#' @param normalise_method Normalisation method to apply to the data matrix
+#'  before training the autoencoder.
 #' @inheritParams h2o::h2o.deeplearning 
+#' @inheritDotParams h2o::h2o.deeplearning
+#' @returns Trained autoencoder.
 #' 
 #' @returns List containing:
 #' \itemize{
@@ -31,22 +35,19 @@
 #' autoencoder documentation}
 #' 
 #' @export
-#' @importFrom Matrix t 
-#' 
+#' @importFrom Matrix t
 #' @examples 
-#' #### Import data ####
-#' obj <- phenomix::get_HPO()
+#' obj <- get_HPO()[seq(100)]
 #' #### Subset the data to speed up example ####
-#' obj <- obj[obj@assays$RNA@var.features[1:300], ]
+#' obj <- obj[obj@assays$RNA@var.features[seq(300)], ]
 #' #### Train autoencoder ####
-#' ae_res <- phenomix::run_autoencoder(obj = obj, 
-#'                                     color_var = "group_depth3")
+#' ae_res <- run_autoencoder(obj = obj, color_var = "group_depth3")
 run_autoencoder <- function(obj,
-                            transpose = TRUE,
-                            normalize = TRUE,
+                            transpose = TRUE, 
+                            normalise_method = "log10p",
                             assay = NULL,
                             slot = NULL,
-                            metadata = NULL,
+                            obs = NULL,
                             color_var = NULL,
                             label_var = NULL,
                             hidden = c(2),
@@ -56,34 +57,21 @@ run_autoencoder <- function(obj,
                             epochs = 10,
                             seed = 2020,
                             ...){ 
-    obj <- phenomix::get_HPO()
-    # obj <- phenomix::get_GWAS_Atlas()
-    # obj <- phenomix::get_DEGAS()
-    # obj <- phenomix::get_dPRS()
-    # obj <- readRDS("../phenome_decomposition/raw_data/GWAS_Atlas/GWAS_Atlas_all.seurat.rds")
-    # library(dplyr); library(ggplot2); transpose <- TRUE; metadata <- NULL; epochs = 10; normalize_method = "log1p";
-    # color_var = "group_depth3"; label_var = "HPO_label"; 
-    # color_var = "Domain"; label_var = "Trait";
-    # assay = NULL; slot = NULL; activation = 'Tanh'; hidden=2; sparse =TRUE;variable_importances <- TRUE;
-    
-    # gwas <- Seurat::FindVariableFeatures(gwas, nfeatures = 5000)
-    # select_features <- Seurat::VariableFeatures(gwas)
-    # #### Subset data ####
-    # obj <- gwas# [select_features,] 
+    # devoptera::args2vars(run_autoencoder) 
     requireNamespace("h2o")
-    mat <- scKirby::get_x(obj = obj,
-                          assay = assay,
-                          slot = slot)
+    X <- scKirby::get_x(obj = obj,
+                        assay = assay,
+                        slot = slot)
     # mat[mat==0] <- NA
-    if(is.null(metadata)) metadata <-  scKirby::get_obs(obj = obj)
-    # nrow(metadata[is.na(metadata[[label_var]]),])
+    if(is.null(obs)) obs <-  scKirby::get_obs(obj = obj)
+    # nrow(obs[is.na(obs[[label_var]]),])
     #### Inpute needs to be in sample (trait) x feature (gene) format ####
-    if (transpose) {
+    if (isTRUE(transpose)) {
         mat <- Matrix::t(mat)
     }  
-    if(!is.null(normalize_method)){
+    if(!is.null(normalise_method)){
         mat <- normalise(mat = mat,
-                         method = normalize_method)
+                         method = normalise_method)
     }
     #### initialize H2O instance ####
     if (!is.null(seed)) set.seed(seed)
@@ -139,16 +127,16 @@ run_autoencoder <- function(obj,
                                 x_dim = 1,
                                 y_dim = 2,
                                 fix_rownames = TRUE,
-                                  metadata = metadata,
-                                  color_var = color_var,
-                                  label_var = label_var,
-                                  labels = FALSE)
+                                obs = obs,
+                                color_var = color_var,
+                                label_var = label_var,
+                                labels = FALSE)
     ### Reduce further with UMAP ####
     # {
     #     umap_res <- run_umap(mat = latent_mat,
     #                          transpose = FALSE)
     #     gg_umap <- plot_reduction(obj = umap_res,
-    #                               metadata = metadata,
+    #                               obs = obs,
     #                               fix_rownames = TRUE,
     #                               color_var = color_var,
     #                               label_var = label_var,
@@ -177,7 +165,7 @@ run_autoencoder <- function(obj,
     # pca_res <- run_pca(mat = latent_mat, 
     #                    transpose = FALSE)  
     # plot_reduction(obj = pca_res,
-    #               metadata = obj@meta.data,
+    #               obs = obj@meta.data,
     #               color_var = color_var,
     #               label_var = label_var,
     #               labels = FALSE)
