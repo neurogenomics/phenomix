@@ -1,7 +1,7 @@
 fix_colnames <- function(obj,
                          width = NULL,
                          make_unique = TRUE) {
-    if (methods::is(obj, "list")) {
+    if (is.list(obj)) {
         for (i in length(obj)) {
             cnames <- scKirby::get_obs_names(obj = obj[[i]])
             cnames <- fix_names(

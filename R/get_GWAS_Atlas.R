@@ -51,7 +51,7 @@
 #' }
 #' @export
 get_GWAS_Atlas <- function() {
-    tmp <- get_data(fname = "GWAS_Atlas_all.seurat.rds")
+    tmp <- get_data(file = "GWAS_Atlas_all.seurat.rds")
     dat <- readRDS(tmp)
     return(dat)
 }

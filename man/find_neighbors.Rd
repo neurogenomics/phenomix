@@ -6,7 +6,7 @@
 \usage{
 find_neighbors(
   obj,
-  graph_name = NULL,
+  graph_key = NULL,
   assay = NULL,
   slot = NULL,
   keys = NULL,
@@ -22,7 +22,7 @@ find_neighbors(
 \arguments{
 \item{obj}{\pkg{Seurat} object.}
 
-\item{graph_name}{Name of the graph to use.
+\item{graph_key}{Name of the graph to use.
 If none provided, will use the last graph available.
 If no graphs are available, new ones will be computed using
  Pearson's correlation on the raw counts matrix.}

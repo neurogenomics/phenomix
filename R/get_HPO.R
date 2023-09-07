@@ -18,6 +18,6 @@
 #' @examples
 #' obj <- get_HPO() 
 get_HPO <- function() {
-    tmp <- get_data(fname = "HPO_seurat.rds")
+    tmp <- get_data(file = "HPO_seurat.rds")
     readRDS(tmp)
 }

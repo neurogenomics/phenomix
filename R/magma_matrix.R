@@ -13,7 +13,6 @@
 #'  \item{\code{"ZSTAT"} : }{Unadjusted MAGMA Z-statistic.}
 #'  \item{\code{"P"} : }{MAGMA P-value.}
 #' }
-#' @param nCores Number of cores to parallelise across.
 #' @param fillna Value to fill \code{NA}s with.
 #' @param trans_fun Transformation function. 
 #' @param agg_fun Aggregation function.
@@ -21,6 +20,7 @@
 #' @param verbose Print messages.
 #' @inheritParams adjust_zstat
 #' @inheritParams phenomix_merge
+#' @inheritParams BiocParallel::MulticoreParam
 #' @return Sparse matrix.
 #' 
 #' @export 
@@ -50,7 +50,8 @@ magma_matrix <- function(magma_out,
     fill_value <- if (metric == "P") 1 else 0
     #### Merge all results ####
     BPPARAM <- assign_cores(workers = workers)
-    DAT <- BiocParallel::bplapply(BPPARAM = BPPARAM,
+    DAT <- BiocParallel::bplapply(
+        BPPARAM = BPPARAM,
         X = seq(length(magma_out)),
         FUN = function(i) {
             x <- names(magma_out)[i]

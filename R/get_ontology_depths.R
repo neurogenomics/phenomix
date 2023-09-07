@@ -1,9 +1,9 @@
 get_ontology_depths <- function(ontology,
                                 term_ids = NULL,
                                 as_depths = TRUE,
-                                nThread = NULL) {
+                                workers = NULL) {
     if (is.null(term_ids)) term_ids <- unique(ontology$id)
-    # cores <- assign_cores(worker_cores = nThread)
+     
     # lvls <- parallel::mclapply(term_ids, function(id){
     #     ancests <- ontologyIndex::get_ancestors(ontology = ontology,
     #                                             terms = id)

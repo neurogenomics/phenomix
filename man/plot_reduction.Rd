@@ -17,7 +17,8 @@ plot_reduction(
   labels = !is.null(label_var),
   max.overlaps = 30,
   show_plot = TRUE,
-  point_alpha = 0.6
+  point_alpha = 0.6,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -58,6 +59,8 @@ Defaults to 10.}
 \item{show_plot}{Whether to print the plot.}
 
 \item{point_alpha}{Opacity of data points.}
+
+\item{verbose}{Print messages.}
 }
 \value{
 ggplot object
@@ -65,4 +68,8 @@ ggplot object
 \description{
 Plot dimensionality reduction results
 from \code{run_<method>} or a Seurat object.
+}
+\examples{
+obj <- get_HPO()
+gp <- plot_reduction(obj = obj)
 }

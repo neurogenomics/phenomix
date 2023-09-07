@@ -13,11 +13,11 @@
 #'  \href{https://gwas.mrcieu.ac.uk/}{OpenGWAS}.
 #' If \code{TRUE}, a predefined formula and metadata
 #' processing procedure will be used.
-#' @param show_plot Print plot.
-#' @param nCores Number of cores to use in parallel.
+#' @param show_plot Print plot. 
 #' @param ... Additional arguments passed to
 #' \link[variancePartition]{fitExtractVarPartModel}.
 #' @inheritParams variancePartition::fitExtractVarPartModel
+#' @inheritParams BiocParallel::MulticoreParam
 #' 
 #' @returns \code{varPart} results.
 #' 
@@ -27,7 +27,7 @@
 #' @importFrom variancePartition fitExtractVarPartModel
 run_variancePartition <- function(obj,
                                   metadata = NULL,
-                                  nCores = NULL,
+                                  workers = NULL,
                                   formula = NULL,
                                   is_opengwas = FALSE,
                                   show_plot = TRUE,
@@ -35,11 +35,8 @@ run_variancePartition <- function(obj,
     if (is.null(formula) & (!is_opengwas)) {
         stopper("Must provide formula or set is_opengwas=TRUE (when applicable).")
     }
-    #### Register cores ####
-    if (is.null(nCores)) {
-        nCores <- assign_cores(worker_cores = nCores)$worker_cores
-    }
-    BiocParallel::register(BiocParallel::SnowParam(nCores))
+    #### Register cores #### 
+    BPPARAM <- assign_cores(workers = workers)
     #### Extract matrix ####
     mat <- scKirby::get_x(obj = obj)
     #### Extract metadata ####
@@ -74,10 +71,11 @@ run_variancePartition <- function(obj,
         exprObj = mat,
         formula = formula,
         data = metadata,
+        BPPARAM = BPPARAM,
         ...
     )
-
-    if (show_plot) {
+    #### Plot ####
+    if (isTRUE(show_plot)) {
         out_merged <- plot_variancePartition(varPart = varPart, 
                                              plot_PercentBars = TRUE, 
                                              plot_VarPart = TRUE)

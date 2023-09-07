@@ -35,11 +35,8 @@ get_top_traits <- function(obj,
                               keys = keys,
                               verbose = verbose)
     keys <- names(obsm)
-    if(length(obsm)>1){ 
-        messager(">1 obsm loadings identified.",
-                 "Using first one only:",shQuote(keys[1]),v=verbose)
-    }
-    obsm <- obsm[[1]]
+    obsm <- get_one_element(l = obsm, 
+                            verbose = verbose) 
     if (is.null(obs)) obs <- scKirby::get_obs(obj = obj)
     
     top_traits <- (

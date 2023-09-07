@@ -10,11 +10,11 @@
 run_mofa2(
   obj,
   groups = NULL,
-  metadata = NULL,
+  obs = NULL,
   assay = NULL,
   slot = NULL,
-  features = NULL,
-  metadata_idcol = "sample",
+  features = "variable_features",
+  obs_idcol = "sample",
   transpose = FALSE,
   maxiter = 1000,
   data_options = NULL,
@@ -22,8 +22,9 @@ run_mofa2(
   training_options = NULL,
   stochastic_options = NULL,
   mefisto_options = NULL,
-  outfile = file.path(tempdir(), "model.hdf5"),
+  outfile = tempfile(fileext = ".mofa_model.hdf5"),
   reductions = c("umap"),
+  use_basilisk = TRUE,
   seed = 2020,
   verbose = TRUE,
   ...
@@ -34,18 +35,23 @@ run_mofa2(
 
 \item{groups}{group information, only relevant when using the multi-group framework.}
 
-\item{metadata}{Metadata associated with \code{obj}. 
+\item{obs}{Metadata associated with \code{obj}. 
 Will be extracted automatically if \code{obj} is a \pkg{Seurat} object.}
 
 \item{assay}{Assay to use in \code{obj}.}
 
 \item{slot}{Slot to use in \code{obj}.}
 
-\item{features}{Features to use in reduction. 
-If \code{NULL} and \code{obj} is a \pkg{Seurat} object, 
-will use precalculated variable genes.}
+\item{features}{Features to use in reduction. Can be:
+\itemize{
+\item{\<vector\> : }{A character vector of feature names.}
+\item{"variable_features" : }{Will trigger the automatic extraction of
+ precalculated variable features
+  (via \link[scKirby]{get_variable_features}).}
+\item{\code{NULL} : }{Uses all features.}
+}}
 
-\item{metadata_idcol}{The name of the column to add to \code{metadata} 
+\item{obs_idcol}{The name of the column to add to \code{obs} 
 after fixing IDs.}
 
 \item{transpose}{First transpose each matrix in \code{mat_list}.}
@@ -69,15 +75,25 @@ If NULL, default options are used.}
 
 \item{outfile}{output file for the model (.hdf5 format). If \code{NULL}, a temporary file is created.}
 
-\item{reductions}{In addition to returning  MOFA factors,
-further reduce the data with "umap" and/or "tsne".}
+\item{reductions}{In addition to returning MOFA factors,
+further reduce the data by "umap" and/or "tsne" to the MOFA factors.}
+
+\item{use_basilisk}{use \code{basilisk} to automatically install a conda environment with mofapy2 and all dependencies? 
+If \code{FALSE} (default), you should specify the right python binary when loading R with \code{reticulate::use_python(..., force=TRUE)}
+or the right conda environment with \code{reticulate::use_condaenv(..., force=TRUE)}.}
 
 \item{seed}{Seed passed to \link[base]{set.seed}
 for reproducibility between runs.}
 
 \item{verbose}{Print messages.}
 
-\item{...}{Additional parameters passed to \link[MOFA2]{run_mofa}.}
+\item{...}{
+  Arguments passed on to \code{\link[MOFA2:run_mofa]{MOFA2::run_mofa}}
+  \describe{
+    \item{\code{object}}{an untrained \code{\link[MOFA2]{MOFA}} object}
+    \item{\code{save_data}}{logical indicating whether to save the training data in the hdf5 file. 
+This is useful for some downstream analysis (mainly functions with the prefix \code{plot_data}), but it can take a lot of disk space.}
+  }}
 }
 \description{
 Run Multi-Omics Factor Analysis v2 (MOFA2).
@@ -86,4 +102,8 @@ Run Multi-Omics Factor Analysis v2 (MOFA2).
 Uses \link[MOFA2]{run_mofa} to reduce a single dataset,
 or multiple views of the same dataset, into a
 set number of factors.
+}
+\examples{
+obj <- get_HPO()[seq(100),]
+res <- run_mofa2(obj, maxiter=10) 
 }

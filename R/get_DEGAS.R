@@ -57,7 +57,7 @@
 #' @examples 
 #' degas <- phenomix::get_DEGAS()
 get_DEGAS <- function() {
-    tmp <- get_data(fname = "DEGAS.rds")
+    tmp <- get_data(file = "DEGAS.rds")
     obj <- readRDS(tmp)
     return(obj)
 }

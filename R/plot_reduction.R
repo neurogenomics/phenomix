@@ -15,14 +15,15 @@
 #' @param x_dim Which dimension to plot on the x-axis.
 #' @param y_dim Which dimension to plot on the y-axis.
 #' @param point_alpha Opacity of data points.
-#' 
 #' @inheritParams scKirby::get_obsm
 #' @inheritParams ggrepel::geom_text_repel
-#'
-#' @return ggplot object
+#' @returns ggplot object
 #'
 #' @export 
 #' @importFrom ggrepel geom_text_repel
+#' @examples
+#' obj <- get_HPO()
+#' gp <- plot_reduction(obj = obj)
 plot_reduction <- function(obj,
                            keys = NULL,
                            obs = NULL,
@@ -35,8 +36,9 @@ plot_reduction <- function(obj,
                            labels = !is.null(label_var),
                            max.overlaps = 30,
                            show_plot = TRUE,
-                           point_alpha = .6) { 
-    
+                           point_alpha = .6,
+                           verbose = TRUE) { 
+    # devoptera::args2vars(plot_reduction)
     requireNamespace("ggplot2")
     
     if (is.null(obs)) {
@@ -45,11 +47,12 @@ plot_reduction <- function(obj,
     if (is.null(rownames(obs))) {
         stopper("obs must have rownames to merge with obj.")
     } 
-    #### Prepare data ####
-    obsm <- scKirby::get_obsm(
-        obj = obj,
-        keys = keys
-    ) 
+    #### Prepare data #### 
+    obsm <- scKirby::get_obsm(obj = obj,
+                              keys = keys) 
+    keys <- names(obsm)
+    obsm <- get_one_element(l = obsm, 
+                            verbose = verbose) 
     if(x_dim>ncol(obsm) || x_dim<1) {
         stopper(
             "x_dim must be an integer >= the number of obsm dimensions."
@@ -67,9 +70,11 @@ plot_reduction <- function(obj,
         obsm <- obsm |>
             `rownames<-`(gsub("-|[:]|[.]", "_", rownames(obsm)))
     }
+    keep_cols <- grep(paste(paste0("^",c("umap",keys)),collapse = "|"),
+                      names(obs),ignore.case = TRUE, invert = TRUE)
     plot_df <- merge(
         x = obsm,
-        y = obs[,!startsWith(colnames(obs),"UMAP")],
+        y = obs[,keep_cols],
         by = 0
     )
     if(nrow(plot_df)==0){
@@ -81,16 +86,17 @@ plot_reduction <- function(obj,
                  )
     }
     #### Plot ####
-    gp <- ggplot(plot_df, aes_string(
+    gp <- ggplot2::ggplot(plot_df, ggplot2::aes_string(
         x = colnames(obsm)[x_dim],
         y = colnames(obsm)[y_dim],
         color = color_var, label = label_var
     )) +
-        geom_point(aes_string(size = size_var), alpha = point_alpha) +
-        theme_bw()
+        ggplot2::geom_point(ggplot2::aes_string(size = size_var),
+                            alpha = point_alpha) +
+        ggplot2::theme_bw()
     if (isTRUE(labels)) {
         gp <- gp + ggrepel::geom_text_repel(max.overlaps = max.overlaps)
     }
-    if (isTRUE(show_plot)) print(gp)
+    if (isTRUE(show_plot)) methods::show(gp)
     return(gp)
 }

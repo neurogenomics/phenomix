@@ -31,6 +31,7 @@ get_cs2g_gwascatalog <- function(dat){
     ),
     keyby = "ID"
     ] 
+    obs <- data.frame(obs,row.names = obs$ID)
     return(list(data=dat,
                 obs=obs))
 }

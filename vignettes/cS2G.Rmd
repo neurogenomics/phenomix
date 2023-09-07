@@ -15,10 +15,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
 ```
 
 ```{r setup, include=TRUE, message=FALSE} 
-library(phenomix)
-
-library(dplyr)
-library(ggplot2)
+library(phenomix)  
 set.seed(2020)
 ```
 
@@ -30,9 +27,14 @@ set.seed(2020)
 combined SNPs to Genes (cS2G) model.
 
 ```{r, eval=FALSE}
-ukb_cs2g <- phenomix::get_cs2g_ukb(value_var = "cS2G", 
-                                   min_value = .75)
-ukb_pip <- phenomix::get_cs2g_ukb(value_var = "PIP")
+dataset <- "finemapping_cS2G_UKBB"
+ukb_cs2g <- phenomix::get_cs2g(dataset = dataset,
+                               value_var = "cS2G", 
+                               min_value = .75, 
+                               as_matrix = TRUE)
+ukb_pip <- phenomix::get_cs2g(dataset = dataset,
+                              value_var = "PIP",
+                              as_matrix = TRUE)
 ```
 
 ## Decompose
@@ -43,7 +45,7 @@ ukb_pip <- phenomix::get_cs2g_ukb(value_var = "PIP")
 umap <- phenomix::run_umap(mat = ukb_cs2g$data)
 
 gg_umap <- phenomix::plot_reduction(obj = umap, 
-                                    metadata = ukb_cs2g$metadata, 
+                                    obs = ukb_cs2g$obs, 
                                     size_var = "N_GENE", 
                                     color_var = "GROUP",
                                     label_var = "TRAIT") 
@@ -59,30 +61,32 @@ Integrate the cS2G and PIP scores with MOFA2.
 *Note*: We've set `maxiter=10` for fast demonstration purposes only. The recommended default is `1000`.
 
 ```{r, eval=FALSE}
-model <- phenomix::run_mofa2(mat_list = list(cS2G=ukb_cs2g$data, 
-                                             PIP=ukb_pip$data), 
-                   metadata = ukb_cs2g$metadata,
-                   metadata_idcol = "DISEASE.TRAIT", 
-                   ### Set  low maxiter for demo 
-                   maxiter = 10)
-MOFA2::plot_data_overview(model)
+res <- phenomix::run_mofa2(obj = list(cS2G=ukb_cs2g$data, 
+                                        PIP=ukb_pip$data), 
+                           obs = ukb_cs2g$obs,
+                           obs_idcol = "DISEASE.TRAIT", 
+                           ### Set  low maxiter for demo 
+                           maxiter = 10)
 ```
 
 ### Evaluate model 
 
 ```{r, eval=FALSE}
+model <- res$model
+MOFA2::plot_data_overview(model)
+
 head(model@cache$variance_explained$r2_total[[1]]) # group 1
 head(model@cache$variance_explained$r2_per_factor[[1]]) # group 1
 
 MOFA2::plot_variance_explained(model, x="view", y="factor")
 
 MOFA2::plot_factor(model, 
-  factor = 1:3,
+  factor = seq(3),
   color_by = "GROUP"
 )
 
 MOFA2::plot_factors(model, 
-  factors = 1:3,
+  factors = seq(3),
   color_by = "GROUP"
 )
 
@@ -90,8 +94,8 @@ MOFA2::plot_weights(model,
   view = "PIP",
   factor = 1,
   nfeatures = 10,     # Number of features to highlight
-  scale = T,          # Scale weights from -1 to 1
-  abs = F             # Take the absolute value?
+  scale = TRUE,          # Scale weights from -1 to 1
+  abs = FALSE             # Take the absolute value?
 )
 
 MOFA2::plot_top_weights(model,
@@ -126,8 +130,10 @@ MOFA2::plot_dimred(object = model,
 
 The larger GWAS Catalog dataset is also provided by `phenomix`. 
 
-```{r, eval=FALSE}
-gwascatalog <- get_cs2g_gwascatalog()
+```{r, eval=FALSE} 
+gwascatalog <- phenomix::get_cs2g(dataset = "gwas_catalog_cS2G", 
+                                  value_var = "cS2G",
+                                  as_matrix = TRUE)
 ```
 
 ## Run MOFA2
@@ -135,11 +141,11 @@ gwascatalog <- get_cs2g_gwascatalog()
 *Note*: We've set `maxiter=10` for fast demonstration purposes only. The recommended default is `1000`.
 
 ```{r, eval=FALSE}
-model <- phenomix::run_mofa2(mat_list = list(GWAScatalog=gwascatalog$data), 
-                   metadata = gwascatalog$metadata,
-                   metadata_idcol = "ID", 
-                   ### Set  low maxiter for demo
-                   maxiter = 10) 
+res2 <- phenomix::run_mofa2(obj = list(GWAScatalog=gwascatalog$data), 
+                            obs = gwascatalog$obs,
+                            obs_idcol = "ID", 
+                            ### Set  low maxiter for demo
+                            maxiter = 10) 
 ```
 
 ### Plot MOFA2 UMAP
@@ -147,7 +153,7 @@ model <- phenomix::run_mofa2(mat_list = list(GWAScatalog=gwascatalog$data),
 Run UMAP on the MOFA factors and visualize.
 
 ```{r, eval=FALSE}
-MOFA2::plot_dimred(object = model,
+MOFA2::plot_dimred(object = res2$model,
                    method = "UMAP", # TSNE 
                    color_by = "N_GENE")
 ```

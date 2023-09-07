@@ -6,7 +6,7 @@
 #' @param obj \pkg{Seurat} object.
 #' @param assay Assay to use.
 #' @param slot Slot to use. 
-#' @param graph_name Name of the graph to use.
+#' @param graph_key Name of the graph to use.
 #' If none provided, will use the last graph available.
 #' If no graphs are available, new ones will be computed using
 #'  Pearson's correlation on the raw counts matrix.
@@ -32,7 +32,7 @@
 #'                                 var1_search = "parkinson",
 #'                                 label_col = "HPO_label")
 find_neighbors <- function(obj,
-                           graph_name = NULL,
+                           graph_key = NULL,
                            assay = NULL,
                            slot = NULL,
                            keys = NULL,
@@ -44,7 +44,7 @@ find_neighbors <- function(obj,
                            add_original_names = TRUE,
                            verbose = TRUE) {
     
-    # devoptera::args2vars(find_neighbors, reassign = TRUE)
+    # devoptera::args2vars(find_neighbors); slot=NULL;
     
     trait1 <- trait2 <- similarity <- NULL;
     #### Get obs ####
@@ -59,13 +59,13 @@ find_neighbors <- function(obj,
     #### Extract/compute correlation matrix ####
     cmat <- get_cor(
         obj = obj,
-        graph_name = graph_name, 
+        graph_key = graph_key, 
         keys = keys,
         assay = assay,
         slot = slot,
         return_obj = FALSE,
         verbose = verbose
-    )
+    ) 
     #### Align naming of obs metadata and matrix ####
     if (is.null(label_col)) {
         sample_names <- rownames(cmat)
@@ -77,7 +77,9 @@ find_neighbors <- function(obj,
     fgraph <- cmat |>
         `row.names<-`(sample_names) |>
         `colnames<-`(sample_names)
-    if (!is.null(var1_search)) {
+    if(is.null(var1_search)){
+        stopper("Must provide terms to var1_search.")
+    } else {
         messager("Filtering results by var1_search:",
             paste(var1_search,collapse = " | "),
             v = verbose
@@ -133,7 +135,7 @@ find_neighbors <- function(obj,
 
     
     messager("Converting graph to data.table",v=verbose) 
-    top_candidates <- fgraph[targets1,] |>
+    top_candidates <- fgraph[targets1,,drop=FALSE] |>
         data.table::as.data.table(keep.rownames="trait1") |>
         data.table::melt.data.table(id.vars="trait1",
                                     variable.name="trait2",
@@ -159,8 +161,6 @@ find_neighbors <- function(obj,
         top_candidates$trait2_id <- names_dict[top_candidates$trait2]
     }
     messager("+ Returning", formatC(nrow(top_candidates), big.mark = ","),
-        "pair-wise similarities.",
-        v = verbose
-    )
+             "pair-wise similarities.",v = verbose)
     return(top_candidates)
 }

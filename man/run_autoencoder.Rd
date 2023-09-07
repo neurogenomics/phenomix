@@ -11,7 +11,7 @@ autoencoder documentation}
 run_autoencoder(
   obj,
   transpose = TRUE,
-  normalise_method = "log10p",
+  normalise_method = "log1p",
   assay = NULL,
   slot = NULL,
   obs = NULL,
@@ -23,20 +23,22 @@ run_autoencoder(
   variable_importances = TRUE,
   epochs = 10,
   seed = 2020,
+  verbose = TRUE,
   ...
 )
 }
 \arguments{
-\item{obj}{Seurat object or matrix to run autoencoder on.}
+\item{obj}{A single-cell object supported by \pkg{scKirby}.
+See \link[scKirby]{converters} for a table of all supported conversions.}
 
-\item{transpose}{Whether to transpose the matrix first.}
+\item{transpose}{Transpose the matrix with \code{Matrix::t}.}
 
 \item{normalise_method}{Normalisation method to apply to the data matrix
 before training the autoencoder.}
 
-\item{assay}{Assay to use.}
+\item{assay}{Name of the initial assay}
 
-\item{slot}{Data slot to use.}
+\item{slot}{Name of component object to return}
 
 \item{obs}{Phenotype metadata.}
 
@@ -56,8 +58,10 @@ networks. Defaults to TRUE.}
 
 \item{epochs}{How many times the dataset should be iterated (streamed), can be fractional. Defaults to 10.}
 
-\item{seed}{Seed passed to \[base]{set.seed} 
+\item{seed}{Seed passed to \link[base]{set.seed} 
 for reproducibility between runs.}
+
+\item{verbose}{Print messages.}
 
 \item{...}{
   Arguments passed on to \code{\link[h2o:h2o.deeplearning]{h2o::h2o.deeplearning}}
@@ -185,13 +189,11 @@ propagation, but might slow down backpropagation. Defaults to FALSE.}
     \item{\code{export_checkpoints_dir}}{Automatically export generated models to this directory.}
     \item{\code{auc_type}}{Set default multinomial AUC type. Must be one of: "AUTO", "NONE", "MACRO_OVR", "WEIGHTED_OVR", "MACRO_OVO",
 "WEIGHTED_OVO". Defaults to AUTO.}
-    \item{\code{verbose}}{\code{Logical}. Print scoring history to the console (Metrics per epoch). Defaults to FALSE.}
   }}
 }
 \value{
-Trained autoencoder.
-
-List containing:
+A trained autoencoder.
+Specifically, a named list containing:
 \itemize{
 \item{embedding : }{Latent space embedding from the smallest hidden layer.}
 \item{model : }{Trained autoencoder model with parameters.}
@@ -210,9 +212,6 @@ and extract feature importance scores.
 Uses \link[h2o]{h2o.deeplearning}.
 }
 \examples{
-obj <- get_HPO()[seq(100)]
-#### Subset the data to speed up example ####
-obj <- obj[obj@assays$RNA@var.features[seq(300)], ]
-#### Train autoencoder ####
+obj <- get_HPO()[seq(100),seq(50)] 
 ae_res <- run_autoencoder(obj = obj, color_var = "group_depth3")
 }

@@ -46,9 +46,14 @@ produced by \link[MAGMA.Celltyping]{map_snps_to_genes}.}
 
 \item{as_matrix}{Convert the data to a sparse matrix.}
 
-\item{verbose}{Print messages.}
+\item{workers}{
+    \code{integer(1)} Number of workers. Defaults to the maximum of 1 or
+    the number of cores determined by \code{detectCores} minus 2 unless
+    environment variables \code{R_PARALLELLY_AVAILABLECORES_FALLBACK} or
+    \code{BIOCPARALLEL_WORKER_NUMBER} are set otherwise.
+  }
 
-\item{nCores}{Number of cores to parallelise across.}
+\item{verbose}{Print messages.}
 }
 \value{
 Sparse matrix.

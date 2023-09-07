@@ -31,13 +31,8 @@ get_top_features <- function(obj,
                               keys = keys,
                               verbose = verbose)
     keys <- names(varm)
-    if(length(varm)>1){ 
-        messager(">1 varm loadings identified.",
-                 "Using first one only:",shQuote(keys[1]),v=verbose)
-    }
-    varm <- varm[[1]]
-    
-    
+    varm <- get_one_element(l = varm, 
+                            verbose = verbose) 
     top_features <- (
         data.table::as.data.table(varm,keep.rownames = "feature") |>
         data.table::melt.data.table(id.vars = "feature", 

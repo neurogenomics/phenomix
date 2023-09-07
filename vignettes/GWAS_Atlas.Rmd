@@ -11,10 +11,7 @@ vignette: >
 ---
 
 ```{r setup, include=TRUE, message=FALSE} 
-library(phenomix)
-
-library(dplyr)
-library(ggplot2)
+library(phenomix) 
 ```
 
 
@@ -23,9 +20,7 @@ library(ggplot2)
 ## GWAS Atlas
 
 ```{r, eval=FALSE}
-# dat <- phenomix::get_GWAS_Atlas()
-obj <- readRDS(file.path("/Desktop/phenome_decomposition/raw_data",
-                         "GWAS_Atlas/GWAS_Atlas_all.seurat.rds"))
+obj <- phenomix::get_GWAS_Atlas()
 knitr::kable(head(obj@meta.data))
 ```
 
@@ -223,7 +218,7 @@ knn <- phenomix::find_neighbors(obj = obj,
                                 graph_name = "MAGMA_cor",
                                 var1_search = "alzheimer", 
                                 label_col = "Trait")
-gg_cor <- phenomix:: plot_trait_cor(knn = knn, 
+gg_cor <- phenomix::plot_trait_cor(knn = knn, 
                                    top_n = 10)
 
 knitr::kable(head(knn))

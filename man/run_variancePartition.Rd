@@ -7,7 +7,7 @@
 run_variancePartition(
   obj,
   metadata = NULL,
-  nCores = NULL,
+  workers = NULL,
   formula = NULL,
   is_opengwas = FALSE,
   show_plot = TRUE,
@@ -23,7 +23,12 @@ to use in \code{formula}. If \code{obj} is a \pkg{Seurat} object,
 this can be left \code{NULL} and metadata
 will be extracted automatically.}
 
-\item{nCores}{Number of cores to use in parallel.}
+\item{workers}{
+    \code{integer(1)} Number of workers. Defaults to the maximum of 1 or
+    the number of cores determined by \code{detectCores} minus 2 unless
+    environment variables \code{R_PARALLELLY_AVAILABLECORES_FALLBACK} or
+    \code{BIOCPARALLEL_WORKER_NUMBER} are set otherwise.
+  }
 
 \item{formula}{specifies variables for the linear (mixed) model.  Must only specify covariates, since the rows of exprObj are automatically used as a response. e.g.: \code{~ a + b + (1|c)}}
 

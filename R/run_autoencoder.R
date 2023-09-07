@@ -3,22 +3,19 @@
 #' Run a customisable deep autoencoder to reduce your data to N dimensions,
 #' and extract feature importance scores.
 #' Uses \link[h2o]{h2o.deeplearning}.
-#' @param obj Seurat object or matrix to run autoencoder on.
 #' @param obs Phenotype metadata.
-#' @param assay Assay to use.
-#' @param slot Data slot to use.
-#' @param transpose Whether to transpose the matrix first.
-#' @param seed Seed passed to \[base]{set.seed} 
+#' @param seed Seed passed to \link[base]{set.seed} 
 #' for reproducibility between runs.
 #' @param color_var Variable in \code{obs} to color points by.
 #' @param label_var Variable \code{obs} to label points by.
 #' @param normalise_method Normalisation method to apply to the data matrix
 #'  before training the autoencoder.
+#' @inheritParams scKirby::get_x
+#' @inheritParams SeuratObject::CreateSeuratObject
 #' @inheritParams h2o::h2o.deeplearning 
 #' @inheritDotParams h2o::h2o.deeplearning
-#' @returns Trained autoencoder.
-#' 
-#' @returns List containing:
+#' @returns A trained autoencoder.
+#' Specifically, a named list containing:
 #' \itemize{
 #' \item{embedding : }{Latent space embedding from the smallest hidden layer.}
 #' \item{model : }{Trained autoencoder model with parameters.}
@@ -37,14 +34,11 @@
 #' @export
 #' @importFrom Matrix t
 #' @examples 
-#' obj <- get_HPO()[seq(100)]
-#' #### Subset the data to speed up example ####
-#' obj <- obj[obj@assays$RNA@var.features[seq(300)], ]
-#' #### Train autoencoder ####
+#' obj <- get_HPO()[seq(100),seq(50)] 
 #' ae_res <- run_autoencoder(obj = obj, color_var = "group_depth3")
 run_autoencoder <- function(obj,
                             transpose = TRUE, 
-                            normalise_method = "log10p",
+                            normalise_method = "log1p",
                             assay = NULL,
                             slot = NULL,
                             obs = NULL,
@@ -56,22 +50,20 @@ run_autoencoder <- function(obj,
                             variable_importances = TRUE, 
                             epochs = 10,
                             seed = 2020,
+                            verbose = TRUE,
                             ...){ 
-    # devoptera::args2vars(run_autoencoder) 
+    # devoptera::args2vars(run_autoencoder, reassign = TRUE)
     requireNamespace("h2o")
+    #### Input needs to be in sample (trait) x feature (gene) format ####
     X <- scKirby::get_x(obj = obj,
                         assay = assay,
-                        slot = slot)
-    # mat[mat==0] <- NA
-    if(is.null(obs)) obs <-  scKirby::get_obs(obj = obj)
-    # nrow(obs[is.na(obs[[label_var]]),])
-    #### Inpute needs to be in sample (trait) x feature (gene) format ####
-    if (isTRUE(transpose)) {
-        mat <- Matrix::t(mat)
-    }  
+                        n = 1,
+                        transpose = transpose, 
+                        slot = slot) 
+    if(is.null(obs)) obs <- scKirby::get_obs(obj = obj)
     if(!is.null(normalise_method)){
-        mat <- normalise(mat = mat,
-                         method = normalise_method)
+        X <- normalise(X = X,
+                       method = normalise_method)
     }
     #### initialize H2O instance ####
     if (!is.null(seed)) set.seed(seed)
@@ -79,7 +71,7 @@ run_autoencoder <- function(obj,
     options("h2o.use.data.table"=TRUE)
     #### Prepare data ####
     ## Need to convert to dense matrix, or else won't keep colnames ####
-    features <- h2o::as.h2o(as.matrix(mat))  
+    features <- h2o::as.h2o(as.matrix(X))  
     # labels <- h2o::as.h2o(obj[[label_var]]) 
     
     #### Train autoencoder ####
@@ -97,7 +89,7 @@ run_autoencoder <- function(obj,
     )
     
     #### Explore variable importance ####
-    if(variable_importances){
+    if(isTRUE(variable_importances)){
         var_importance <- data.table::data.table(h2o::h2o.varimp(ae1))  
         plot_importance <- h2o::h2o.varimp_plot(model = ae1)
         # ### Conduct gene set enrichment analysis with top N genes 
@@ -106,7 +98,9 @@ run_autoencoder <- function(obj,
         #                  top50=var_importance$variable[1:50],
         #                  top100=var_importance$variable[1:100]))
         # gprofiler2::gostplot(gres)
-    }else {var_importance <- plot_importance <- NULL }
+    } else {
+        var_importance <- plot_importance <- NULL 
+    }
    
     #### Extract the deep features #### 
     ### Figure out which layer is the smallest ###
@@ -119,11 +113,10 @@ run_autoencoder <- function(obj,
     #### Extract predictions (decoded data) ####
     # ae1_codings <- h2o::h2o.predict(object = ae1, 
     #                                 newdata = features)
-    latent_mat <- as.matrix(ae1_codings) |>
-        `row.names<-`(colnames(obj)) 
-    
+    obsm <- as.matrix(ae1_codings) |>
+        `row.names<-`(rownames(X)) 
     #### Plot traits in latent space ####
-    gg_latent <- plot_reduction(obj = latent_mat, 
+    gg_latent <- plot_reduction(obj = obsm, 
                                 x_dim = 1,
                                 y_dim = 2,
                                 fix_rownames = TRUE,
@@ -173,7 +166,7 @@ run_autoencoder <- function(obj,
     #                color_var = color_var,
     #                label_var = label_var,
     #                labels = FALSE)
-    return(list(embedding = latent_mat,
+    return(list(obsm = obsm,
                 model = ae1,
                 variable_importance = var_importance,
                 plot_latent = gg_latent,

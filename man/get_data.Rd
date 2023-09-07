@@ -5,7 +5,7 @@
 \title{Get data}
 \usage{
 get_data(
-  fname,
+  file,
   repo = "neurogenomics/phenomix",
   tag = "latest",
   save_dir = tools::R_user_dir(package = "phenomix", which = "cache"),
@@ -15,6 +15,9 @@ get_data(
 )
 }
 \arguments{
+\item{file}{name or vector of names of files to be downloaded. If \code{NULL},
+all assets attached to the release will be downloaded.}
+
 \item{repo}{Repository name in format "owner/repo". Defaults to \code{guess_repo()}.}
 
 \item{tag}{tag for the GitHub release to which this data should be attached.}

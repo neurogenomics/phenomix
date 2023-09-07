@@ -11,9 +11,7 @@ vignette: >
 ---
 
 ```{r setup, include=TRUE, message=FALSE} 
-library(phenomix)
-
-library(dplyr) 
+library(phenomix) 
 ```
 
 

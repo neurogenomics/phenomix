@@ -4,7 +4,11 @@
 \alias{get_ctd}
 \title{Get a CellTypeDataset}
 \usage{
-get_ctd(fname = "BlueLake2018_FrontalCortexOnly.rds")
+get_ctd(file = "BlueLake2018_FrontalCortexOnly.rds")
+}
+\arguments{
+\item{file}{name or vector of names of files to be downloaded. If \code{NULL},
+all assets attached to the release will be downloaded.}
 }
 \value{
 \pkg{CTD} object.

@@ -7,8 +7,7 @@
 #' @param qvalue_thresh q.value threshold to use when report
 #'  significant results summary.
 #' @param y_quantiles The number of quantiles to bin \code{ymat} data into.
-#' @param nCores Number of cores to use in parallel. 
-#' Will optimize if \code{NULL}.
+#' @inheritParams BiocParallel::MulticoreParam
 #'
 #' @export
 #' @importFrom parallel mclapply
@@ -33,11 +32,11 @@ iterate_lm <- function(xmat,
                        correction_method = "BH",
                        qvalue_thresh = .05,
                        y_quantiles = NULL,
-                       nCores = NULL) {
+                       workers = NULL) {
+    
     term <- p.value <- qvalue <- NULL;
-    if (is.null(nCores)) {
-        nCores <- assign_cores(worker_cores = nCores)$worker_cores
-    }
+    
+    BPPARAM <- assign_cores(workers = workers)
     gene_intersect <- intersect(rownames(xmat), rownames(ymat))
     message(length(gene_intersect), 
             " intersecting genes between xmat and ymat")
@@ -74,7 +73,7 @@ iterate_lm <- function(xmat,
             res_df$term <- ct
             return(res_df)
         }) |> data.table::rbindlist()
-    }, mc.cores = nCores) |>
+    }, mc.cores = workers) |>
         `names<-`(colnames(xmat)) |>
         data.table::rbindlist(idcol = "trait")
 

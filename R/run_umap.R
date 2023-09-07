@@ -1,24 +1,28 @@
 #' Run UMAP
 #'
-#' Run Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP).
+#' Run Uniform Manifold Approximation and Projection for Dimension Reduction 
+#' (UMAP).
 #'
-#' Uses \link[uwot]{umap}, but runs and returns PCA by default.
-#'
-#' @param mat Matrix to run UMAP on.
-#' @param transpose Whether to transpose the matrix first.
-#' @param add_names Add colnames and rownames to embeddings and loadings.
-#' @param seed Seed passed to \[base]{set.seed} for reproducibility between runs.
-#' @param ... Additional parameters passed to \link[uwot]{umap}.
+#' Uses \link[uwot]{umap}, but runs and returns PCA by default. 
+#' @param seed Seed passed to \link[base]{set.seed} for reproducibility 
+#' between runs.
+#' @param add_names Add observation (sample) names to the rows of the embedding.
+#' @inheritParams scKirby::get_x
 #' @inheritParams uwot::umap
+#' @inheritDotParams uwot::umap
 #'
 #' @importFrom Matrix t
 #' @importFrom uwot umap 
 #'
-#' @source \href{https://umap-learn.readthedocs.io/en/latest/}{UMAP documentation}
+#' @source \href{https://umap-learn.readthedocs.io/en/latest/}{
+#' UMAP documentation}
 #' @export
-run_umap <- function(mat,
+#' @examples
+#' obj <- get_HPO()[seq(50),seq(100)]
+#' um <- run_umap(obj)
+run_umap <- function(obj,
                      transpose = TRUE,
-                     pca = if(transpose) ncol(mat) else nrow(mat),
+                     pca = NULL,
                      add_names = TRUE,
                      n_components = 2,
                      n_neighbors = 15,
@@ -28,21 +32,32 @@ run_umap <- function(mat,
                      seed = 2020,
                      verbose = TRUE,
                      ...) {
+    # devoptera::args2vars(run_umap)
+    
     if (!is.null(seed)) set.seed(seed)
+    X <- scKirby::get_x(obj = obj,
+                        n = 1,
+                        transpose = transpose, 
+                        verbose = verbose) 
     #### Check pca arg ####
-    if (any(pca > ncol(mat))) {
-        pca <- min(pca, ncol(mat), na.rm = TRUE)
+    pca <- ncol(X) 
+    if (any(pca > ncol(X))) {
+        pca <- min(pca, ncol(X), na.rm = TRUE)
         messager(
             "Number of PCA dimensions cannot be",
-            "larger than the number of columns in mat.",
-            "Setting pca to ", pca
+            "larger than the number of columns in X.",
+            "Setting pca to", paste0(pca,".")
         )
     }
-    if (transpose) {
-        mat <- Matrix::t(mat)
+    #### Check n_neighbors arg ####
+    if(n_neighbors>=nrow(X)){
+        n_neighbors <- nrow(X)-1
+        messager("n_neighbors must be smaller than the dataset size.",
+                 paste0("Setting n_neighbors=",n_neighbors),v=verbose)
     }
-    umap <- uwot::umap(
-        X = as.matrix(mat),
+    #### Run UMAP ####
+    um <- uwot::umap(
+        X = as.matrix(X), ## Must be a dense matrix in uwot implementation
         ret_model = TRUE,
         ret_nn = TRUE,
         pca = pca,
@@ -53,19 +68,19 @@ run_umap <- function(mat,
         init = init,
         verbose = verbose,
         ...
-    )
-    if (add_names) {
-        umap$embedding <- umap$embedding |>
-            `colnames<-`(paste0("UMAP.", seq(1, ncol(umap$embedding)))) |>
-            `row.names<-`(rownames(mat))
+    ) 
+    if (isTRUE(add_names)) {
+        um$embedding <- um$embedding |>
+            `colnames<-`(paste0("UMAP.", seq(ncol(um$embedding)))) |>
+            `row.names<-`(rownames(X))
         tryCatch({
-            for (i in length(umap$pca_models)) {
-                pc_embed <- umap$pca_models[[i]]$rotation
-                umap$pca_models[[i]]$rotation <- pc_embed |>
-                    `colnames<-`(paste0("PC", seq(1, ncol(pc_embed)))) |>
-                    `row.names<-`(colnames(mat))
+            for (i in length(um$pca_models)) {
+                pc_embed <- um$pca_models[[i]]$rotation
+                um$pca_models[[i]]$rotation <- pc_embed |>
+                    `colnames<-`(paste0("PC", seq(ncol(pc_embed)))) |>
+                    `row.names<-`(colnames(X))
             }
-        }, error= function(e)message(e))
+        }, error= function(e) message(e))
     }
-    return(umap)
+    return(um)
 }

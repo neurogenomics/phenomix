@@ -11,19 +11,17 @@ vignette: >
 ---
 
 ```{r setup, include=TRUE, message=FALSE} 
-library(phenomix)
-
-library(dplyr)
-library(ggplot2)
+library(phenomix) 
 ```
 
 
 # Import data
 
-## DeGAs 
+## obj 
 
 ```{r}
-degas <- phenomix::get_DEGAS()
+obj <- phenomix::get_HPO()
+obj <- obj[seq(100),]
 ```
 
 
@@ -33,19 +31,19 @@ degas <- phenomix::get_DEGAS()
 
 Next, we will compute all pairwise trait-trait correlations.
 `extract_cor` returns the object with the correlation matrix 
-(within `degas@graphs$cor`).
+(within `obj@graphs$cor`).
 
 ```{r}
-degas <- phenomix::extract_cor(obj = degas,
-                               return_obj = TRUE)
+obj <- phenomix::get_cor(obj = obj,
+                         return_obj = TRUE)
 ```
 
 The correlation matrix by itself 
 can easily be extracted by setting `return_obj = FALSE`.
 
-```R
-cmat <- phenomix::extract_cor(obj = degas,
-                              return_obj = FALSE)
+```{r}
+cmat <- phenomix::get_cor(obj = obj,
+                          return_obj = FALSE)
 ```
 
 ### Find neighbors
@@ -58,9 +56,9 @@ to perform a case-insensitive substring search to find traits of interest.
 data.table for further processing.
 
 ```{r}
-knn <- phenomix::find_neighbors(obj = degas, 
+knn <- phenomix::find_neighbors(obj = obj, 
                                 var1_search = c("parkinson","alzheimer"), 
-                                label_col = "label_phe")
+                                label_col = "HPO_label")
 ```
 
 ### Plot
@@ -69,7 +67,7 @@ Finally, we can plot the top N most similar traits to your traits of interest.
 
 ```{r}
 gg_cor <- phenomix::plot_trait_cor(knn = knn,
-                                   top_n = 5)
+                                   top_n = 30)
 ```
 
 
@@ -88,10 +86,10 @@ It's also worth mentioned that if the graph of interest doesn't exist, `find_nei
 ## Find neighbors
 
 ```{r}
-knn <- phenomix::find_neighbors(obj = degas, 
-                                reduction = "contributionGene",
+knn <- phenomix::find_neighbors(obj = obj, 
+                                keys = "pca",
                                 var1_search = c("parkinson","alzheimer"), 
-                                label_col = "label_phe")
+                                label_col = "HPO_label")
 ```
 
 ## Plot
@@ -107,15 +105,16 @@ gg_cor <- phenomix::plot_trait_cor(knn = knn,
 
 ## Import dPRS data
 
-Now let's try with another GWAS decomposition dataste: dPRS.
+Now let's try with another dataset, this time based on GWAS sumatats: dPRS. 
 
-```{r}
+```{r, eval=FALSE}
 dprs <- phenomix::get_dPRS()
+dprs <- dprs[seq(100)]
 ```
 
 ## Find neighbors
 
-```{r}
+```{r, eval=FALSE}
 knn <- phenomix::find_neighbors(obj = dprs, 
                                 var1_search = c("parkinson"), 
                                 label_col = "GBE_NAME")
@@ -123,9 +122,9 @@ knn <- phenomix::find_neighbors(obj = dprs,
 
 ## Plot
 
-```{r}
+```{r, eval=FALSE}
 gg_cor <- phenomix::plot_trait_cor(knn = knn, 
-                                   top_n = 5)
+                                   top_n = 20)
 ```
 
 

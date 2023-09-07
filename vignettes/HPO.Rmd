@@ -12,9 +12,6 @@ vignette: >
 
 ```{r setup, include=TRUE, message=FALSE} 
 library(phenomix)
-
-library(dplyr)
-library(ggplot2)
 ```
 
 Analyze gene associations for 9k+ traits in the Human Phenotype Ontology (HPO). 
@@ -22,14 +19,14 @@ Analyze gene associations for 9k+ traits in the Human Phenotype Ontology (HPO).
 # Import data
 
 ```{r}
-obj_hpo <- phenomix::get_HPO() 
+obj <- phenomix::get_HPO() 
 ```
 
 # Plot UMAP
 
 ```{r}
-gg_umap <- phenomix::plot_reduction(obj = obj_hpo, 
-                                    reduction = "umap", 
+gg_umap <- phenomix::plot_reduction(obj = obj, 
+                                    keys = "umap", 
                                     color_var = "group_depth2")
 ```
 
@@ -37,7 +34,7 @@ gg_umap <- phenomix::plot_reduction(obj = obj_hpo,
 # TF-IDF
 
 ```{r}
-tfidf_hpo <- scNLP::plot_tfidf(object = obj_hpo, 
+tfidf_hpo <- scNLP::plot_tfidf(obj = obj, 
                                terms_per_cluster = 2,
                                size_var = "n_genes",
                                color_var = "group_depth2",
@@ -57,13 +54,13 @@ tfidf_hpo <- scNLP::plot_tfidf(object = obj_hpo,
 
 ```{r, eval=FALSE}
 #### Run ####
-model_obj <- phenomix::run_mofa2(obj = obj_hpo, 
+model_obj <- phenomix::run_mofa2(obj = obj, 
                                  assay = "RNA")
-obj_hpo <- model_obj$obj
+obj <- model_obj$obj
 #### Plot ####
-gg_mofa2 <- phenomix::plot_reduction(obj = obj_hpo, 
+gg_mofa2 <- phenomix::plot_reduction(obj = obj, 
                                      reduction = "mofa2")
-gg_mofa2umap <- phenomix::plot_reduction(obj = obj_hpo, 
+gg_mofa2umap <- phenomix::plot_reduction(obj = obj, 
                                          reduction = "mofa2umap")
 ```
 

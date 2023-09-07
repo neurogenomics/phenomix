@@ -21,6 +21,7 @@ get_cs2g_ukb <- function(dat){
     obs[, TRAIT := stringr::str_split(DISEASE.TRAIT, "_",
                                       n = 2, simplify = TRUE
     )[, 2]]
+    obs <- data.frame(obs,row.names = obs$ID)
     return(list(data=dat,
                 obs=obs))
 }

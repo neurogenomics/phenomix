@@ -81,7 +81,7 @@
 #' @examples 
 #' dprs <- phenomix::get_dPRS()
 get_dPRS <- function() {
-    tmp <- get_data(fname = "dPRS.rds")
+    tmp <- get_data(file = "dPRS.rds")
     obj <- readRDS(tmp)
     return(obj)
 }

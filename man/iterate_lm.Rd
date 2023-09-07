@@ -10,7 +10,7 @@ iterate_lm(
   correction_method = "BH",
   qvalue_thresh = 0.05,
   y_quantiles = NULL,
-  nCores = NULL
+  workers = NULL
 )
 }
 \arguments{
@@ -26,8 +26,12 @@ significant results summary.}
 
 \item{y_quantiles}{The number of quantiles to bin \code{ymat} data into.}
 
-\item{nCores}{Number of cores to use in parallel. 
-Will optimize if \code{NULL}.}
+\item{workers}{
+    \code{integer(1)} Number of workers. Defaults to the maximum of 1 or
+    the number of cores determined by \code{detectCores} minus 2 unless
+    environment variables \code{R_PARALLELLY_AVAILABLECORES_FALLBACK} or
+    \code{BIOCPARALLEL_WORKER_NUMBER} are set otherwise.
+  }
 }
 \description{
 Iterate linear regression across all traits and celltypes
