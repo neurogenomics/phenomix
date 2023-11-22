@@ -1,7 +1,7 @@
 Package: phenomix
 Type: Package
 Title: Explore the phenome 
-Version: 0.99.5
+Version: 0.99.6
 Authors@R: c(person(given = "Brian",
                     family = "Schilder",
                     role = c("cre"),
@@ -35,8 +35,10 @@ Imports:
     heatmaply,
     patchwork,
     Seurat, 
+    SeuratObject,
     gprofiler2,
     GeneOverlap,
+    parallel,
     BiocParallel,
     AnnotationDbi,
     DelayedArray, 
@@ -47,7 +49,6 @@ Imports:
     uwot,
     GenomicRanges,
     GenomicFiles,
-    ontologyIndex,
     VariantAnnotation,
     GenomeInfoDb,
     piggyback,
@@ -76,11 +77,13 @@ Suggests:
     h2o,
     recipes,
     downloadR,
-    HPOExplorer
+    HPOExplorer,
+    MultiEWCE
 Remotes:
     github::neurogenomics/scNLP,
     github::neurogenomics/scKirby,
     github::neurogenomics/HPOExplorer,
+    github::neurogenomics/MultiEWCE,
     github::RajLabMSSM/echotabix,
     github::RajLabMSSM/downloadR
 RoxygenNote: 7.2.3

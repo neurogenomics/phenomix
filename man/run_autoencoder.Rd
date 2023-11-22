@@ -11,7 +11,7 @@ autoencoder documentation}
 run_autoencoder(
   obj,
   transpose = TRUE,
-  normalise_method = "log1p",
+  normalise_method = NULL,
   assay = NULL,
   slot = NULL,
   obs = NULL,
@@ -19,7 +19,7 @@ run_autoencoder(
   label_var = NULL,
   hidden = c(2),
   activation = "Tanh",
-  sparse = FALSE,
+  sparse = TRUE,
   variable_importances = TRUE,
   epochs = 10,
   seed = 2020,

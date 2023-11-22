@@ -20,6 +20,8 @@ regress_gene_info(
 
 \item{correction_method}{Multiple-testing correction 
 method to be passed to \code{stats::p.adjust}.}
+
+\item{verbose}{Print messages.}
 }
 \description{
 Queries \code{biomaRt} for \code{gene_attributes} and then regresses them out of \code{xmat}.

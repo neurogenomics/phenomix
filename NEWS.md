@@ -1,3 +1,11 @@
+# phenomix 0.99.6
+
+## New features
+
+* Transfer `phenoRx::prepare_hpo` to `phenomix`
+* Remove all ontology-related functions (now within `HPOExplorer`)
+* Explore `bigstatsr`/`bigreadr` a bit.
+
 # phenomix 0.99.5
 
 ## New features

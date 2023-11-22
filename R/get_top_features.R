@@ -31,8 +31,8 @@ get_top_features <- function(obj,
                               keys = keys,
                               verbose = verbose)
     keys <- names(varm)
-    varm <- get_one_element(l = varm, 
-                            verbose = verbose) 
+    varm <- scKirby::get_n_elements(l = varm, 
+                                    verbose = verbose) 
     top_features <- (
         data.table::as.data.table(varm,keep.rownames = "feature") |>
         data.table::melt.data.table(id.vars = "feature", 

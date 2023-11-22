@@ -35,12 +35,14 @@ run_umap <- function(obj,
     # devoptera::args2vars(run_umap)
     
     if (!is.null(seed)) set.seed(seed)
-    X <- scKirby::get_x(obj = obj,
-                        n = 1,
-                        transpose = transpose, 
-                        verbose = verbose) 
+    X <- obj
+    # X <- scKirby::get_x(obj = obj,
+    #                     n = 1,
+    #                     as_sparse = FALSE,
+    #                     transpose = transpose,
+    #                     verbose = verbose)
     #### Check pca arg ####
-    pca <- ncol(X) 
+    # if(is.null(pca)) pca <- ncol(X) 
     if (any(pca > ncol(X))) {
         pca <- min(pca, ncol(X), na.rm = TRUE)
         messager(

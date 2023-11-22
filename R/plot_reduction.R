@@ -42,7 +42,8 @@ plot_reduction <- function(obj,
     requireNamespace("ggplot2")
     
     if (is.null(obs)) {
-        obs <- scKirby::get_obs(obj = obj)
+        obs <- scKirby::get_obs(obj = obj,
+                                verbose = verbose)
     }
     if (is.null(rownames(obs))) {
         stopper("obs must have rownames to merge with obj.")
@@ -50,9 +51,10 @@ plot_reduction <- function(obj,
     #### Prepare data #### 
     obsm <- scKirby::get_obsm(obj = obj,
                               keys = keys) 
-    keys <- names(obsm)
-    obsm <- get_one_element(l = obsm, 
-                            verbose = verbose) 
+    keys <- names(obsm) 
+    obsm <- scKirby::get_n_elements(l = obsm,
+                                    n = 1,
+                                    verbose = verbose) 
     if(x_dim>ncol(obsm) || x_dim<1) {
         stopper(
             "x_dim must be an integer >= the number of obsm dimensions."
@@ -89,7 +91,8 @@ plot_reduction <- function(obj,
     gp <- ggplot2::ggplot(plot_df, ggplot2::aes_string(
         x = colnames(obsm)[x_dim],
         y = colnames(obsm)[y_dim],
-        color = color_var, label = label_var
+        color = color_var, 
+        label = label_var
     )) +
         ggplot2::geom_point(ggplot2::aes_string(size = size_var),
                             alpha = point_alpha) +

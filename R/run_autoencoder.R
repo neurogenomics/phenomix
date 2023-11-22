@@ -38,7 +38,7 @@
 #' ae_res <- run_autoencoder(obj = obj, color_var = "group_depth3")
 run_autoencoder <- function(obj,
                             transpose = TRUE, 
-                            normalise_method = "log1p",
+                            normalise_method = NULL,#"log1p",
                             assay = NULL,
                             slot = NULL,
                             obs = NULL,
@@ -46,30 +46,39 @@ run_autoencoder <- function(obj,
                             label_var = NULL,
                             hidden = c(2),
                             activation = 'Tanh',
-                            sparse = FALSE,
+                            sparse = TRUE,
                             variable_importances = TRUE, 
                             epochs = 10,
                             seed = 2020,
                             verbose = TRUE,
                             ...){ 
-    # devoptera::args2vars(run_autoencoder, reassign = TRUE)
+    # devoptera::args2vars(run_autoencoder, reassign = TRUE);epochs=100;hidden=c(200,50,200); sparse=TRUE; slot="scale.data"
+    
     requireNamespace("h2o")
     #### Input needs to be in sample (trait) x feature (gene) format ####
     X <- scKirby::get_x(obj = obj,
                         assay = assay,
                         n = 1,
                         transpose = transpose, 
-                        slot = slot) 
+                        as_sparse = TRUE,
+                        slot = slot)
     if(is.null(obs)) obs <- scKirby::get_obs(obj = obj)
     if(!is.null(normalise_method)){
-        X <- normalise(X = X,
-                       method = normalise_method)
+        X <- scKirby:::normalise(X = X,
+                                 method = normalise_method,
+                                 verbose = verbose)
     }
     #### initialize H2O instance ####
     if (!is.null(seed)) set.seed(seed)
-    h2o::h2o.init(max_mem_size = "15g")  
+    h2o::h2o.init(max_mem_size = "32g",
+                  nthreads = -1)  
     options("h2o.use.data.table"=TRUE)
     #### Prepare data ####
+    #### Drop features with no variation ####
+    # X <- filter_matrix(X = X, )
+    
+    #### Shuffle samples ####
+    X <- X[sample(nrow(features),replace = FALSE),]
     ## Need to convert to dense matrix, or else won't keep colnames ####
     features <- h2o::as.h2o(as.matrix(X))  
     # labels <- h2o::as.h2o(obj[[label_var]]) 
@@ -84,14 +93,26 @@ run_autoencoder <- function(obj,
         # distribution = "quantile",
         sparse = sparse,
         variable_importances = variable_importances, 
-        epochs = epochs
+        epochs = epochs,
+        seed = seed,
+        shuffle_training_data = TRUE, 
+        mini_batch_size=100
         # ...
     )
+    h2o::h2o.list_models() 
+    
+    #### Get metrics ####
+    metrics <- h2o::h2o.HGLMMetrics(ae1)
+    pred <- h2o::h2o.predict(ae1, features)
+    # cres <- h2o::h2o.cor(x = features[1:10,], y = pred[1:10,])
+    # recon <- h2o::h2o.reconstruct(object = ae1, data = features)
     
     #### Explore variable importance ####
     if(isTRUE(variable_importances)){
-        var_importance <- data.table::data.table(h2o::h2o.varimp(ae1))  
+        var_importance <- h2o::h2o.varimp(ae1) |> data.table::data.table()  
         plot_importance <- h2o::h2o.varimp_plot(model = ae1)
+        # hm_importance <- h2o::h2o.varimp_heatmap(object = list(ae1,ae1))
+        
         # ### Conduct gene set enrichment analysis with top N genes 
         # gres <- gprofiler2::gost(
         #     query = list(top10=var_importance$variable[1:10],
@@ -104,8 +125,8 @@ run_autoencoder <- function(obj,
    
     #### Extract the deep features #### 
     ### Figure out which layer is the smallest ###
-    compressed_layer <- which(ae1@parameters$hidden==
-                                  min(ae1@parameters$hidden))[1]
+    compresed_nodes <- min(ae1@parameters$hidden)
+    compressed_layer <- which(ae1@parameters$hidden==compresed_nodes)[1]
     ae1_codings <- h2o::h2o.deepfeatures(object = ae1,
                                          data = features,
                                          ## Note: referring to HIDDEN layer
@@ -116,26 +137,35 @@ run_autoencoder <- function(obj,
     obsm <- as.matrix(ae1_codings) |>
         `row.names<-`(rownames(X)) 
     #### Plot traits in latent space ####
-    gg_latent <- plot_reduction(obj = obsm, 
-                                x_dim = 1,
-                                y_dim = 2,
-                                fix_rownames = TRUE,
-                                obs = obs,
-                                color_var = color_var,
-                                label_var = label_var,
-                                labels = FALSE)
+    
+    
+    gg_latent <- lapply(seq.int(1,compresed_nodes,by = 2), function(i){
+        plot_reduction(obj = obsm, 
+                        x_dim = i,
+                        y_dim = i+1,
+                        fix_rownames = TRUE,
+                        obs = obs,
+                        color_var = "id_type",#"nFeature_freq",
+                        label_var = label_var,
+                       show_plot = FALSE,
+                        labels = FALSE)
+    })
+    gg_latent_merged <- patchwork::wrap_plots(gg_latent,
+                                              ncol = 5, 
+                                              guides = "collect") 
     ### Reduce further with UMAP ####
-    # {
-    #     umap_res <- run_umap(mat = latent_mat,
-    #                          transpose = FALSE)
-    #     gg_umap <- plot_reduction(obj = umap_res,
-    #                               obs = obs,
-    #                               fix_rownames = TRUE,
-    #                               color_var = color_var,
-    #                               label_var = label_var,
-    #                               labels = FALSE)
-    #     plotly::ggplotly(gg_umap)
-    # }
+    {
+        umap_res <- run_umap(obj = obsm,
+                             pca = 10,
+                             transpose = FALSE)
+        gg_umap <- plot_reduction(obj = umap_res,
+                                  obs = obs,  
+                                  # fix_rownames = TRUE,
+                                  color_var = color_var,
+                                  label_var = label_var,
+                                  labels = FALSE)
+        plotly::ggplotly(gg_umap)
+    }
     # 
     #### Compare to UMAP run on original matrix ####
     # gg_umap <- plot_reduction(obj,

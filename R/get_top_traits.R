@@ -35,8 +35,8 @@ get_top_traits <- function(obj,
                               keys = keys,
                               verbose = verbose)
     keys <- names(obsm)
-    obsm <- get_one_element(l = obsm, 
-                            verbose = verbose) 
+    obsm <- scKirby::get_n_elements(l = obsm, 
+                                    verbose = verbose) 
     if (is.null(obs)) obs <- scKirby::get_obs(obj = obj)
     
     top_traits <- (

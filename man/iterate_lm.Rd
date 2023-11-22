@@ -9,8 +9,10 @@ iterate_lm(
   ymat,
   correction_method = "BH",
   qvalue_thresh = 0.05,
-  y_quantiles = NULL,
-  workers = NULL
+  quantize = list(x = NULL, y = NULL),
+  progressbar = TRUE,
+  workers = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -21,31 +23,35 @@ iterate_lm(
 \item{correction_method}{Multiple-testing correction 
 method to be passed to \code{stats::p.adjust}.}
 
-\item{qvalue_thresh}{q.value threshold to use when report
+\item{qvalue_thresh}{q-value threshold to use when report
 significant results summary.}
 
-\item{y_quantiles}{The number of quantiles to bin \code{ymat} data into.}
+\item{quantize}{A named list where the values of "x" and "y" indicaite the 
+number of quantiles to bin the respective "xmat" and "ymat" datasets into.}
 
-\item{workers}{
-    \code{integer(1)} Number of workers. Defaults to the maximum of 1 or
-    the number of cores determined by \code{detectCores} minus 2 unless
-    environment variables \code{R_PARALLELLY_AVAILABLECORES_FALLBACK} or
-    \code{BIOCPARALLEL_WORKER_NUMBER} are set otherwise.
-  }
+\item{progressbar}{logical(1) Enable progress bar 
+(based on \code{plyr:::progress_text}).
+ Enabling the progress bar changes the default value of tasks to 
+ \code{.Machine$integer.max}, so that progress is reported for 
+ each element of X.}
+
+\item{workers}{Number (>1) or proportion (<1) of worker cores to use.}
+
+\item{verbose}{Print messages.}
 }
 \description{
 Iterate linear regression across all traits and celltypes
 }
 \examples{
-### DeGAs loadings
-obj <- get_DEGAS()
-xmat <- get_varm(obj)
-xmat <- xmat[, 1:10] # Let's use just 10 components as an example
+### Phenotype dataset
+obj <- get_HPO()
+xmat <- scKirby::get_x(obj)[["RNA.data"]]
+xmat <- xmat[,seq(10)] # Let's use just 10 traits as an example
 
-### Celltype Dataset
-ctd <- get_BlueLake2018_FrontalCortexOnly()
+### Celltypes Dataset
+ctd <- get_ctd()
 ymat <- ctd[[1]]$specificity
 res_lm <- iterate_lm(xmat = xmat,
                      ymat = ymat, 
-                     nCores = 1)
+                     workers = 1)
 }
