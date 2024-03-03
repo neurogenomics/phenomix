@@ -2,6 +2,7 @@
 #'
 #' @param xmat gene x trait matrix.
 #' @param ymat gene x celltype matrix.
+#' @param test_method Association testing method to use.
 #' @param correction_method Multiple-testing correction 
 #' method to be passed to \code{stats::p.adjust}.
 #' @param qvalue_thresh q-value threshold to use when report
@@ -28,7 +29,7 @@
 #'                      workers = 1)
 iterate_lm <- function(xmat,
                        ymat,
-                       method = c("glm","anova"),
+                       test_method = c("glm","anova"),
                        correction_method = "BH",
                        qvalue_thresh = .05,
                        quantize = list(x=NULL,
@@ -37,7 +38,7 @@ iterate_lm <- function(xmat,
                        workers = NULL,
                        verbose=TRUE) {  
     p <- q <- NULL;
-    method <- match.arg(method)
+    test_method <- match.arg(test_method)
     data.table::setDTthreads(threads = 1)
     cores <- set_cores(workers = workers,
                        progressbar = progressbar,
@@ -70,9 +71,9 @@ iterate_lm <- function(xmat,
     lm_res <- iterate_lm_long(xmat = xmat,
                               ymat = ymat, 
                               cores = cores,
-                              method=method)
+                              method = test_method)
     ### Multiple-testing correction 
-    if(method=="anova"){  
+    if(test_method=="anova"){  
         lm_res[,q:=stats::p.adjust(p = p, method = correction_method)] 
     } else { 
         model_p <- model_q <- term <- xvar <- NULL;

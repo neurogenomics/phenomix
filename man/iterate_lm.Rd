@@ -7,7 +7,7 @@
 iterate_lm(
   xmat,
   ymat,
-  method = c("glm", "anova"),
+  test_method = c("glm", "anova"),
   correction_method = "BH",
   qvalue_thresh = 0.05,
   quantize = list(x = NULL, y = NULL),
@@ -20,6 +20,8 @@ iterate_lm(
 \item{xmat}{gene x trait matrix.}
 
 \item{ymat}{gene x celltype matrix.}
+
+\item{test_method}{Association testing method to use.}
 
 \item{correction_method}{Multiple-testing correction 
 method to be passed to \code{stats::p.adjust}.}
