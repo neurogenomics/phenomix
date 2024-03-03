@@ -61,7 +61,6 @@ run_mofa2 <- function(obj,
                       seed = 2020,
                       verbose = TRUE,
                       ...) {
-    # devoptera::args2vars(run_mofa2)
     requireNamespace("MOFA2")
     
     if (!is.null(seed)) set.seed(seed)
@@ -108,6 +107,7 @@ run_mofa2 <- function(obj,
         obs <- obs[traits,]
     } 
     #### Create MOFA object ####
+    
     MOFAobject <- MOFA2::create_mofa(
         data = obj,
         groups = groups,

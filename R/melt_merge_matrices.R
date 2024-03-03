@@ -1,11 +1,11 @@
 melt_merge_matrices <- function(xmat,
                                 ymat){
-    xdt <- data.table::as.data.table(xmat,
+    ydt <- data.table::as.data.table(ymat,
                                      keep.rownames = "feature") |>
-        data.table::setnames(2,"x")
-    ydt <- melt_matrix(ymat, 
-                       variable.name = "yvar",
-                       value.name = "y")
+        data.table::setnames(2,"y")
+    xdt <- melt_matrix(xmat, 
+                       variable.name = "xvar",
+                       value.name = "x")
     dt <- xdt[ydt, on="feature"] 
     return(dt)
 }

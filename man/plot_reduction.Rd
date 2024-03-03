@@ -53,7 +53,9 @@ Will be automatically extracted from \code{obj} if it is a
 
 \item{labels}{Whether to show labels using \link[ggrepel]{geom_text_repel}.}
 
-\item{max.overlaps}{Exclude text labels that overlap too many things.
+\item{max.overlaps}{Exclude text labels when they overlap too many other
+things. For each text label, we count how many other text labels or other
+data points it overlaps, and exclude the text label if it has too many overlaps.
 Defaults to 10.}
 
 \item{show_plot}{Whether to print the plot.}

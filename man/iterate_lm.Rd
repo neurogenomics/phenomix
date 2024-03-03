@@ -7,6 +7,7 @@
 iterate_lm(
   xmat,
   ymat,
+  method = c("glm", "anova"),
   correction_method = "BH",
   qvalue_thresh = 0.05,
   quantize = list(x = NULL, y = NULL),
@@ -43,14 +44,15 @@ number of quantiles to bin the respective "xmat" and "ymat" datasets into.}
 Iterate linear regression across all traits and celltypes
 }
 \examples{
-### Phenotype dataset
-obj <- get_HPO()
-xmat <- scKirby::get_x(obj)[["RNA.data"]]
-xmat <- xmat[,seq(10)] # Let's use just 10 traits as an example
-
 ### Celltypes Dataset
 ctd <- get_ctd()
-ymat <- ctd[[1]]$specificity
+xmat <- ctd[[1]]$specificity
+
+### Phenotype dataset
+obj <- get_HPO()
+ymat <- scKirby::get_x(obj)[["RNA.data"]]
+ymat <- ymat[,seq(10)] # Let's use just 10 traits as an example
+
 res_lm <- iterate_lm(xmat = xmat,
                      ymat = ymat, 
                      workers = 1)

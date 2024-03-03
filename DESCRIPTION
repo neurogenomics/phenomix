@@ -86,6 +86,6 @@ Remotes:
     github::neurogenomics/MultiEWCE,
     github::RajLabMSSM/echotabix,
     github::RajLabMSSM/downloadR
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 VignetteBuilder: knitr 
 Config/testthat/edition: 3

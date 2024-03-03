@@ -14,33 +14,35 @@
 #' @import data.table 
 #' @importFrom stats p.adjust
 #' @examples
-#' ### Phenotype dataset
-#' obj <- get_HPO()
-#' xmat <- scKirby::get_x(obj)[["RNA.data"]]
-#' xmat <- xmat[,seq(10)] # Let's use just 10 traits as an example
-#'
 #' ### Celltypes Dataset
 #' ctd <- get_ctd()
-#' ymat <- ctd[[1]]$specificity
+#' xmat <- ctd[[1]]$specificity
+#' 
+#' ### Phenotype dataset
+#' obj <- get_HPO()
+#' ymat <- scKirby::get_x(obj)[["RNA.data"]]
+#' ymat <- ymat[,seq(10)] # Let's use just 10 traits as an example
+#' 
 #' res_lm <- iterate_lm(xmat = xmat,
 #'                      ymat = ymat, 
 #'                      workers = 1)
 iterate_lm <- function(xmat,
                        ymat,
+                       method = c("glm","anova"),
                        correction_method = "BH",
                        qvalue_thresh = .05,
                        quantize = list(x=NULL,
                                        y=NULL),
                        progressbar = TRUE,
                        workers = NULL,
-                       verbose=TRUE) {
-    # devoptera::args2vars(iterate_lm)
-    
-    x <- y <- p <- q <- NULL;
+                       verbose=TRUE) {  
+    p <- q <- NULL;
+    method <- match.arg(method)
     data.table::setDTthreads(threads = 1)
     cores <- set_cores(workers = workers,
                        progressbar = progressbar,
                        verbose = verbose) 
+    t1 <- Sys.time()
     ## Filter data
     X_list <- filter_matrices(X_list = list(xmat=xmat,
                                             ymat=ymat),
@@ -56,51 +58,43 @@ iterate_lm <- function(xmat,
     ## Quantize data
     if(is.numeric(quantize$x)){
         xmat <- scKirby:::quantize_matrix(X=xmat,
-                                         n=quantize$x, 
-                                         verbose = verbose)
+                                          n=quantize$x, 
+                                          verbose = verbose)
     }
     if(is.numeric(quantize$y)){
         ymat <- scKirby:::quantize_matrix(X=ymat,
-                                         n=quantize$y, 
-                                         verbose = verbose)
+                                          n=quantize$y, 
+                                          verbose = verbose)
     }
-    
-    ## Iterate over xmat cols
-    lm_res <- BiocParallel::bplapply(
-        BPPARAM = cores$params,
-        X = stats::setNames(seq(ncol(xmat)), 
-                            colnames(xmat)), 
-        FUN = function(i) {
-            tt <- colnames(xmat)[i]
-            if(!progressbar){
-                messager("-",tt,": (",i,"/",ncol(xmat),")", 
-                         parallel=TRUE)    
-            } 
-            ## Prepare data for rstatix 
-            dt <- melt_merge_matrices(
-                xmat = xmat[,tt, drop=FALSE],
-                ymat = ymat) 
-            dt <- dt[!is.na(x) & !is.na(y),]
-            if(isFALSE(dt_var_check(dt,"feature",verbose=!progressbar)) ||
-               isFALSE(dt_var_check(dt, "x", verbose=!progressbar)) ||
-               isFALSE(dt_var_check(dt, "y", verbose=!progressbar)) ){
-                return(NULL)
-            }
-            ## Run tests
-            res <- dt |>
-                rstatix::group_by(yvar) |> 
-                rstatix::anova_test(formula = y ~ x) |>
-                data.table::data.table() 
-            return(res)
-    }) |> 
-        data.table::rbindlist(idcol = "xvar",
-                              fill = TRUE) 
+    #### Run tests ####
+    lm_res <- iterate_lm_long(xmat = xmat,
+                              ymat = ymat, 
+                              cores = cores,
+                              method=method)
     ### Multiple-testing correction 
-    lm_res[,q:=stats::p.adjust(p = p, method = correction_method)] 
-    ### Filter only sig results 
+    if(method=="anova"){  
+        lm_res[,q:=stats::p.adjust(p = p, method = correction_method)] 
+    } else { 
+        model_p <- model_q <- term <- xvar <- NULL;
+        lm_res|>data.table::setnames("p.value","p")
+        model_res <- lm_res[term %in% c("(Intercept)")]|>
+            data.table:::setnames(c("p","estimate","statistic"),
+                                  c("model_p","model_estimate","model_statistic"))
+        model_res[,model_q:=stats::p.adjust(p = model_p, 
+                                            method = correction_method)]  
+        lm_res <- merge(lm_res[grepl("^x[:]",term)] ,
+                        model_res[,c("model_id","model_p","model_q",
+                                     "model_estimate","model_statistic")], 
+                        by="model_id")
+        lm_res[,xvar:=gsub("^x\\:xvar","",term)]|>
+            data.table::setcolorder("xvar",3)
+        lm_res[,q:=ifelse(model_q<0.05,p,min(1,model_q+p))] 
+    }   
+    #### Report ####
     messager(formatC(nrow(lm_res[q<qvalue_thresh,]), big.mark = ","),
-            "significant results @",
-            correction_method, "<", qvalue_thresh)
+             "significant results @",
+             correction_method, "<", qvalue_thresh)
+    methods::show(Sys.time()-t1)
     ### Return FULL results (not just sig)
     return(lm_res)
 }

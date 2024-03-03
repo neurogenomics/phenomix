@@ -189,6 +189,8 @@ propagation, but might slow down backpropagation. Defaults to FALSE.}
     \item{\code{export_checkpoints_dir}}{Automatically export generated models to this directory.}
     \item{\code{auc_type}}{Set default multinomial AUC type. Must be one of: "AUTO", "NONE", "MACRO_OVR", "WEIGHTED_OVR", "MACRO_OVO",
 "WEIGHTED_OVO". Defaults to AUTO.}
+    \item{\code{custom_metric_func}}{Reference to custom evaluation function, format: `language:keyName=funcName`}
+    \item{\code{gainslift_bins}}{Gains/Lift table number of bins. 0 means disabled.. Default value -1 means automatic binning. Defaults to -1.}
   }}
 }
 \value{
