@@ -7,13 +7,15 @@
 iterate_lm(
   xmat,
   ymat,
-  test_method = c("glm", "anova"),
+  test_method = c("glm", "anova", "lm.ridge", "rlm"),
+  multivariate = FALSE,
   correction_method = "BH",
   qvalue_thresh = 0.05,
   quantize = list(x = NULL, y = NULL),
   progressbar = TRUE,
   workers = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{
@@ -23,14 +25,21 @@ iterate_lm(
 
 \item{test_method}{Association testing method to use.}
 
+\item{multivariate}{If \code{TRUE}, runs tests with each column in 
+\code{xmat} as a multivariate predictor in a single model 
+(one model per column in \code{yvar}). If\code{FALSE},
+runs tests with each column in \code{xmat} as a univariate predictor in
+separate models (one model per column in \code{yvar}).}
+
 \item{correction_method}{Multiple-testing correction 
-method to be passed to \code{stats::p.adjust}.}
+method to be passed to \link[stats]{p.adjust}.}
 
 \item{qvalue_thresh}{q-value threshold to use when report
 significant results summary.}
 
-\item{quantize}{A named list where the values of "x" and "y" indicaite the 
-number of quantiles to bin the respective "xmat" and "ymat" datasets into.}
+\item{quantize}{A named list where the values of "x" and "y" indicate the 
+number of quantiles to bin the respective \code{xmat} and 
+\code{ymat} datasets into.}
 
 \item{progressbar}{logical(1) Enable progress bar 
 (based on \code{plyr:::progress_text}).
@@ -41,6 +50,8 @@ number of quantiles to bin the respective "xmat" and "ymat" datasets into.}
 \item{workers}{Number (>1) or proportion (<1) of worker cores to use.}
 
 \item{verbose}{Print messages.}
+
+\item{...}{Additional parameters passed to the statistical test function.}
 }
 \description{
 Iterate linear regression across all traits and celltypes

@@ -19,6 +19,7 @@ SystemRequirements: Python (>= 3.7.0)
 biocViews:
     Software
 Imports: 
+    Rdimtools,
     scKirby,
     utils,
     methods,
@@ -85,7 +86,8 @@ Remotes:
     github::neurogenomics/HPOExplorer,
     github::neurogenomics/MultiEWCE,
     github::RajLabMSSM/echotabix,
-    github::RajLabMSSM/downloadR
+    github::RajLabMSSM/downloadR,
+    github::satijalab/seurat-wrappers
 RoxygenNote: 7.3.1
 VignetteBuilder: knitr 
 Config/testthat/edition: 3

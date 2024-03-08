@@ -19,7 +19,7 @@ regress_gene_info(
  and then regress from \code{xmat}.}
 
 \item{correction_method}{Multiple-testing correction 
-method to be passed to \code{stats::p.adjust}.}
+method to be passed to \link[stats]{p.adjust}.}
 
 \item{verbose}{Print messages.}
 }

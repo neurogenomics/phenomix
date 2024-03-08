@@ -7,12 +7,14 @@
 prepare_hpo(
   dt_genes = HPOExplorer::load_phenotype_to_genes(1),
   dt_annot = HPOExplorer::load_phenotype_to_genes(3),
+  hpo = HPOExplorer::get_hpo(),
   ctd = NULL,
-  ct_results = MultiEWCE::load_example_results("Descartes_All_Results_extras.rds"),
-  id_types = c("disease_id", "hpo_id"),
+  ct_results = MSTExplorer::map_celltype(MSTExplorer::load_example_results()),
+  id_types = c("hpo_id"),
   min_quantile = 35,
-  min_genes = NULL,
-  value.var = "evidence_score_mean",
+  min_value = NULL,
+  celltype_col = c("cl_name", "cl_id", "CellType"),
+  value.var = "evidence_score_sum",
   vars.to.regress = "n_genes",
   run_nlp = FALSE,
   run_impute = FALSE,
@@ -21,9 +23,51 @@ prepare_hpo(
   verbose = TRUE
 )
 }
+\arguments{
+\item{dt_genes}{\link{data.table} of phenotype to gene associations.}
+
+\item{dt_annot}{\link{data.table} of phenotype to disease annotations.}
+
+\item{hpo}{Human Phenotype Ontology object,
+loaded from \link[KGExplorer]{get_ontology}.}
+
+\item{ctd}{\link{list} of \link{data.table} of cell type specificity data.}
+
+\item{ct_results}{\link{data.table} of cell type enrichment results.}
+
+\item{id_types}{\link{character} vector of identifiers to use for
+disease and HPO terms.}
+
+\item{min_quantile}{\link{numeric} minimum quantile for filtering
+cell type enrichment results.}
+
+\item{min_value}{The minimum sum of columns to include from the data matrix.}
+
+\item{celltype_col}{Name of the cell type column.}
+
+\item{value.var}{Name of the column whose values will be filled to cast. Function \code{guess()} tries to, well, guess this column automatically, if none is provided.
+
+  Cast multiple \code{value.var} columns simultaneously by passing their names as a \code{character} vector. See Examples. }
+
+\item{vars.to.regress}{Variables to regress out (previously latent.vars in
+RegressOut). For example, nUMI, or percent.mito.}
+
+\item{run_nlp}{Label clusters using natural language processing via 
+\link[scNLP]{plot_tfidf}.}
+
+\item{run_impute}{Run imputation on the \link{Seurat} object using
+\link[SeuratWrappers]{RunALRA}.}
+
+\item{workers}{Number of workers (threads) to parallelise processes across
+using \pkg{future}.}
+
+\item{seed}{Random seed to set.}
+
+\item{verbose}{Print messages.}
+}
 \description{
-Conver the Human Phenotype Ontology (HPO) to a Seurat object with
-extensive metadata.
+Convert the Human Phenotype Ontology (HPO) to a \link{Seurat} object 
+with extensive metadata.
 }
 \examples{
 obj <- prepare_hpo(id_types="hpo_id")
