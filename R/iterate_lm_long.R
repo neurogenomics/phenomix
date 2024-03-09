@@ -1,8 +1,9 @@
 iterate_lm_long <- function(xmat,
                             ymat, 
                             cores, 
-                            method,
+                            test_method,
                             multivariate,
+                            scale_fn,
                             ...){
     x <- y <- xvar <- NULL; 
     progressbar <- cores$params$progressbar
@@ -30,10 +31,14 @@ iterate_lm_long <- function(xmat,
                isFALSE(dt_var_check(dt, "y", verbose=!progressbar)) ){
                 return(NULL)
             } 
-            ## Run tests: glm   
-            if(method=="glm"){
+            if(test_method=="glm"){
                 if(isTRUE(multivariate)){
-                    messager("Method: glm (multivariate)",v=!progressbar)
+                    #### glm: multivariate ####
+                    messager("test_method: glm (multivariate)",v=!progressbar)
+                    if(!is.null(scale_fn)){
+                        dt[,x:=scale_fn(x)]
+                        dt[,y:=scale_fn(y)]
+                    }
                     mod <- stats::glm(data = dt,
                                       formula = y~x*xvar,
                                       ...)
@@ -41,13 +46,19 @@ iterate_lm_long <- function(xmat,
                         data.table::data.table()  
                     add_model_id(res,i)
                 } else {
+                    #### glm: univariate ####
                     res <- lapply(stats::setNames(unique(dt$xvar),
                                                   unique(dt$xvar)),
                                   function(xv){
-                        messager("Method: glm (univariate)",v=!progressbar)
-                        mod <- stats::glm(data = dt[xvar==xv],
+                        messager("test_method: glm (univariate)",v=!progressbar)
+                        dt_sub <- dt[xvar==xv]
+                          if(!is.null(scale_fn)){
+                              dt_sub[,x:=scale_fn(x)]
+                              dt_sub[,y:=scale_fn(y)]
+                        }
+                        mod <- stats::glm(data = dt_sub,
                                           formula = y~x,
-                                          ...)
+                                          ...) 
                         res <- broom::tidy(mod) |>
                             data.table::data.table() 
                         add_model_id(res,i)
@@ -55,23 +66,36 @@ iterate_lm_long <- function(xmat,
                         data.table::rbindlist(idcol = "xvar",
                                               fill = TRUE)
                 }
-            } else if(method=="anova") {
-            ## Run tests: ANOVA 
-                messager("Method: ANOVA",v=!progressbar) 
+            } else if(test_method=="anova") {
+                #### ANOVA ####
+                if(!is.null(scale_fn)){
+                    dt[,x:=scale_fn(x)]
+                    dt[,y:=scale_fn(y)]
+                }
+                messager("test_method: ANOVA",v=!progressbar) 
                 res <- dt |>
                 rstatix::group_by(xvar) |>
                 rstatix::anova_test(formula = y ~ x,
                                     ...) |>
                 data.table::data.table()
-            } else if(method=="lm.ridge"){ 
-            ### XGboost ####
+            } else if(test_method=="lm.ridge"){ 
+                #### lm.ridge ####
+                if(!is.null(scale_fn)){
+                    dt[,x:=scale_fn(x)]
+                    dt[,y:=scale_fn(y)]
+                }
                 mod <- MASS::lm.ridge(formula= y~x+xvar,
                                       data=dt,
                                       ...)
                 res <- broom::tidy(mod) |>
                     data.table::data.table() 
                 add_model_id(res,i)
-            } else if(method=="rlm"){ 
+            } else if(test_method=="rlm"){ 
+                #### rlm ####
+                if(!is.null(scale_fn)){
+                    dt[,x:=scale_fn(x)]
+                    dt[,y:=scale_fn(y)]
+                }
                 mod <- MASS::rlm(formula= y~x+xvar,
                                  data=dt,
                                  ...)

@@ -7,9 +7,10 @@
 iterate_lm(
   xmat,
   ymat,
-  test_method = c("glm", "anova", "lm.ridge", "rlm"),
+  test_method = c("glm", "glm_univariate", "anova", "lm.ridge", "rlm"),
   multivariate = FALSE,
-  correction_method = "BH",
+  scale_fn = NULL,
+  correction_method = "fdr",
   qvalue_thresh = 0.05,
   quantize = list(x = NULL, y = NULL),
   progressbar = TRUE,
@@ -30,6 +31,11 @@ iterate_lm(
 (one model per column in \code{yvar}). If\code{FALSE},
 runs tests with each column in \code{xmat} as a univariate predictor in
 separate models (one model per column in \code{yvar}).}
+
+\item{scale_fn}{A function to scale the x and y variables with
+before running the regression. This helps to make the coefficients
+comparable across different models.
+Set to \code{NULL} to skip the scaling step.}
 
 \item{correction_method}{Multiple-testing correction 
 method to be passed to \link[stats]{p.adjust}.}
@@ -67,6 +73,6 @@ ymat <- scKirby::get_x(obj)[["RNA.data"]]
 ymat <- ymat[,seq(10)] # Let's use just 10 traits as an example
 
 res_lm <- iterate_lm(xmat = xmat,
-                     ymat = ymat, 
+                     ymat = ymat, scale_fn=base::scale,
                      workers = 1)
 }
