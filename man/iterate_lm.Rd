@@ -69,10 +69,11 @@ xmat <- ctd[[1]]$specificity
 
 ### Phenotype dataset
 obj <- get_HPO()
-ymat <- scKirby::get_x(obj)[["RNA.data"]]
+ymat <- scKirby::get_x(obj, n=1)
 ymat <- ymat[,seq(10)] # Let's use just 10 traits as an example
 
 res_lm <- iterate_lm(xmat = xmat,
-                     ymat = ymat, scale_fn=base::scale,
+                     ymat = ymat, 
+                     test_method = "glm_univariate",
                      workers = 1)
 }

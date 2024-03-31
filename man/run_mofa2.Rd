@@ -12,11 +12,12 @@ run_mofa2(
   groups = NULL,
   obs = NULL,
   assay = NULL,
-  slot = NULL,
+  layer = NULL,
   features = "variable_features",
   obs_idcol = "sample",
   transpose = FALSE,
   maxiter = 1000,
+  num_factors = NULL,
   data_options = NULL,
   model_options = NULL,
   training_options = NULL,
@@ -40,7 +41,7 @@ Will be extracted automatically if \code{obj} is a \pkg{Seurat} object.}
 
 \item{assay}{Assay to use in \code{obj}.}
 
-\item{slot}{Slot to use in \code{obj}.}
+\item{layer}{Layer to use in \code{obj}.}
 
 \item{features}{Features to use in reduction. Can be:
 \itemize{

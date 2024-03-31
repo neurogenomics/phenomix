@@ -9,6 +9,15 @@ plot_hpo_pseudotime(
   dt_genes = HPOExplorer::load_phenotype_to_genes(1),
   disease_ids = dt_genes$disease_id[1:3],
   learn_graph_control = list(prune_graph = FALSE),
+  merge_trajectories = TRUE,
+  symptom_color = "red",
+  bg_colors = c("#5000ff", "white"),
+  trajectory_graph_color = ggplot2::alpha("white", 0.8),
+  title_col = NULL,
+  title_width = 100,
+  color_by_symptoms = TRUE,
+  point_alpha = 0.5,
+  show_plot = TRUE,
   ...
 )
 }
@@ -84,4 +93,8 @@ order_cells and choose_graph_segments in non-interactive mode.}
 Plot the Human Phenotype Ontology (HPO) in genomic latent space,
 then compute pseudotime trajectories between a subset of phenotypes that
 are symptoms of a given disease (or set of diseases).
+}
+\examples{
+obj <- get_HPO()
+out <- plot_hpo_pseudotime(obj)
 }

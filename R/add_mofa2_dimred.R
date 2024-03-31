@@ -3,11 +3,10 @@ add_mofa2_dimred <- function(obj,
                              assay = NULL,
                              keys = NULL,
                              verbose = TRUE) {
-    # devoptera::args2vars(add_mofa2_dimred)
     
-    DRL <- scKirby::mofa_to_dro(obj = model,
-                                keys = keys,
-                                verbose = verbose)
+    DRL <- scKirby::mofa_to_dimreduc(obj = model,
+                                     keys = keys,
+                                     verbose = verbose)
     was_list <- if(!is.list(obj)){
         obj <- list(obj)
         FALSE 

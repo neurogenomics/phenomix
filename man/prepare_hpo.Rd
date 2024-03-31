@@ -15,12 +15,16 @@ prepare_hpo(
   min_value = NULL,
   celltype_col = c("cl_name", "cl_id", "CellType"),
   value.var = "evidence_score_sum",
-  vars.to.regress = "n_genes",
+  default_assay = "score",
+  nfeatures = NULL,
+  vars.to.regress = paste0("nFeature_", default_assay),
   run_nlp = FALSE,
   run_impute = FALSE,
   workers = 1,
   seed = 2023,
-  verbose = TRUE
+  verbose = TRUE,
+  save_path = NULL,
+  force_new = FALSE
 )
 }
 \arguments{
@@ -48,6 +52,12 @@ cell type enrichment results.}
 \item{value.var}{Name of the column whose values will be filled to cast. Function \code{guess()} tries to, well, guess this column automatically, if none is provided.
 
   Cast multiple \code{value.var} columns simultaneously by passing their names as a \code{character} vector. See Examples. }
+
+\item{default_assay}{Default assay to set with \link[Seurat]{DefaultAssay}.}
+
+\item{nfeatures}{Number of features to select as top variable features;
+only used when \code{selection.method} is set to \code{'dispersion'} or
+\code{'vst'}}
 
 \item{vars.to.regress}{Variables to regress out (previously latent.vars in
 RegressOut). For example, nUMI, or percent.mito.}

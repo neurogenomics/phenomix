@@ -1,18 +1,26 @@
 iterate_lm_long <- function(xmat,
                             ymat, 
-                            cores, 
+                            BPPARAM, 
                             test_method,
                             multivariate,
                             scale_fn,
                             ...){
-    x <- y <- xvar <- NULL; 
-    progressbar <- cores$params$progressbar
-    add_model_id <- function(res,i){ 
-        mid <- gsub("file",paste0("model",i,"_"),basename(tempfile()))
-        res[,model_id:=mid,]  
+    progressbar <- BPPARAM$progressbar
+    #### Select lm function ####
+    lm_fun <- if(test_method=="glm"){
+        iterate_lm_long_glm
+    } else if(test_method=="anova") {
+        iterate_lm_long_anova
+    } else if(test_method=="lm.ridge"){ 
+        iterate_lm_long_ridge
+    } else if(test_method=="rlm"){ 
+        iterate_lm_long_rlm
+    } else {
+        stopper("test_method not recognized.")
     }
+    #### Run ####
     BiocParallel::bplapply(
-        BPPARAM = cores$params,
+        BPPARAM = BPPARAM,
         X = stats::setNames(seq(ncol(ymat)), 
                             colnames(ymat)), 
         FUN = function(i) {
@@ -31,78 +39,12 @@ iterate_lm_long <- function(xmat,
                isFALSE(dt_var_check(dt, "y", verbose=!progressbar)) ){
                 return(NULL)
             } 
-            if(test_method=="glm"){
-                if(isTRUE(multivariate)){
-                    #### glm: multivariate ####
-                    messager("test_method: glm (multivariate)",v=!progressbar)
-                    if(!is.null(scale_fn)){
-                        dt[,x:=scale_fn(x)]
-                        dt[,y:=scale_fn(y)]
-                    }
-                    mod <- stats::glm(data = dt,
-                                      formula = y~x*xvar,
-                                      ...)
-                    res <- broom::tidy(mod) |>
-                        data.table::data.table()  
-                    add_model_id(res,i)
-                } else {
-                    #### glm: univariate ####
-                    res <- lapply(stats::setNames(unique(dt$xvar),
-                                                  unique(dt$xvar)),
-                                  function(xv){
-                        messager("test_method: glm (univariate)",v=!progressbar)
-                        dt_sub <- dt[xvar==xv]
-                          if(!is.null(scale_fn)){
-                              dt_sub[,x:=scale_fn(x)]
-                              dt_sub[,y:=scale_fn(y)]
-                        }
-                        mod <- stats::glm(data = dt_sub,
-                                          formula = y~x,
-                                          ...) 
-                        res <- broom::tidy(mod) |>
-                            data.table::data.table() 
-                        add_model_id(res,i)
-                    }) |> 
-                        data.table::rbindlist(idcol = "xvar",
-                                              fill = TRUE)
-                }
-            } else if(test_method=="anova") {
-                #### ANOVA ####
-                if(!is.null(scale_fn)){
-                    dt[,x:=scale_fn(x)]
-                    dt[,y:=scale_fn(y)]
-                }
-                messager("test_method: ANOVA",v=!progressbar) 
-                res <- dt |>
-                rstatix::group_by(xvar) |>
-                rstatix::anova_test(formula = y ~ x,
-                                    ...) |>
-                data.table::data.table()
-            } else if(test_method=="lm.ridge"){ 
-                #### lm.ridge ####
-                if(!is.null(scale_fn)){
-                    dt[,x:=scale_fn(x)]
-                    dt[,y:=scale_fn(y)]
-                }
-                mod <- MASS::lm.ridge(formula= y~x+xvar,
-                                      data=dt,
-                                      ...)
-                res <- broom::tidy(mod) |>
-                    data.table::data.table() 
-                add_model_id(res,i)
-            } else if(test_method=="rlm"){ 
-                #### rlm ####
-                if(!is.null(scale_fn)){
-                    dt[,x:=scale_fn(x)]
-                    dt[,y:=scale_fn(y)]
-                }
-                mod <- MASS::rlm(formula= y~x+xvar,
-                                 data=dt,
-                                 ...)
-                res <- broom::tidy(mod) |>
-                    data.table::data.table() 
-                add_model_id(res,i)
-            } 
+            res <- lm_fun(dt=dt,
+                          multivariate=multivariate,
+                          progressbar=progressbar,
+                          scale_fn=scale_fn,
+                          i=i,
+                          ...)
             return(res)
         }) |> 
         data.table::rbindlist(idcol = "yvar",

@@ -4,7 +4,7 @@
 \alias{map_phenotypes}
 \title{Map phenotypes}
 \usage{
-map_phenotypes(phenotypes, ont = HPOExplorer::get_hpo())
+map_phenotypes(phenotypes, ont = KGExplorer::get_ontology("hp"))
 }
 \arguments{
 \item{phenotypes}{A character vector of phenotype terms.}

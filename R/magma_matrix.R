@@ -49,7 +49,7 @@ magma_matrix <- function(magma_out,
     }
     fill_value <- if (metric == "P") 1 else 0
     #### Merge all results ####
-    BPPARAM <- set_cores(workers = workers)
+    BPPARAM <- KGExplorer::set_cores(workers = workers)
     DAT <- BiocParallel::bplapply(
         BPPARAM = BPPARAM,
         X = seq(length(magma_out)),

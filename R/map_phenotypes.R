@@ -12,7 +12,7 @@
 #' phenotypes <- unique(meta$trait)
 #' pmap <- map_phenotypes(phenotypes=phenotypes) 
 map_phenotypes <- function(phenotypes,
-                           ont = HPOExplorer::get_hpo()){ 
+                           ont = KGExplorer::get_ontology("hp")){ 
     requireNamespace("HPOExplorer")
     
     pfilt <- phenotypes[tolower(phenotypes) %in% tolower(ont$name)] 

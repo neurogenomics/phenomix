@@ -5,9 +5,8 @@
 \title{Get the Human Phenotype Ontology}
 \source{
 \code{
-save_path <-  file.path("/Desktop/phenome_decomposition",
-                        "raw_data/HPO/HPO_seurat.rds")
-obj <- prepare_HPO(save_path = save_path)
+save_path <- file.path(tempdir(),"prepare_hpo.rds")
+obj <- prepare_hpo(save_path = save_path)
 piggyback::pb_upload(file = save_path,
                      repo = "neurogenomics/phenomix",
                      overwrite = TRUE)

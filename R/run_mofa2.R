@@ -10,7 +10,7 @@
 #' @param obs Metadata associated with \code{obj}. 
 #' Will be extracted automatically if \code{obj} is a \pkg{Seurat} object.
 #' @param assay Assay to use in \code{obj}.
-#' @param slot Slot to use in \code{obj}.
+#' @param layer Layer to use in \code{obj}.
 #' @param features Features to use in reduction. Can be:
 #' \itemize{
 #' \item{\<vector\> : }{A character vector of feature names.}
@@ -36,6 +36,7 @@
 #' @source \href{https://biofam.github.io/MOFA2/}{MOFA2 site}
 #'
 #' @export
+#' @import Seurat
 #' @import scKirby
 #' @importFrom Matrix t 
 #' @examples
@@ -45,11 +46,12 @@ run_mofa2 <- function(obj,
                       groups = NULL,
                       obs = NULL,
                       assay = NULL,
-                      slot = NULL,
+                      layer = NULL,
                       features = "variable_features",
                       obs_idcol = "sample",
                       transpose = FALSE,
                       maxiter = 1000,
+                      num_factors=NULL,
                       data_options = NULL,
                       model_options = NULL,
                       training_options = NULL,
@@ -62,6 +64,7 @@ run_mofa2 <- function(obj,
                       verbose = TRUE,
                       ...) {
     requireNamespace("MOFA2")
+    requireNamespace("Seurat")
     
     if (!is.null(seed)) set.seed(seed)
     #### Get assays ####
@@ -86,7 +89,8 @@ run_mofa2 <- function(obj,
         make_unique = TRUE
     )
     #### Prepare groups ####
-    if (is.null(obs)){
+    if (is.null(obs) &&
+        scKirby::is_class(obj,"seurat")){
         obs <- scKirby::get_obs(obj = obj, 
                                 verbose = verbose)
     }
@@ -99,21 +103,22 @@ run_mofa2 <- function(obj,
     if(is.list(obj)){
         traits <- Reduce(base::intersect,lapply(obj,scKirby::get_obs_names)) 
         all_traits <- unique(mapply(obj,FUN=colnames))
-        messager(formatC(length(traits),big.mark = ","),
-                 "/",
-                 formatC(length(all_traits),big.mark = ","),
-                 "intersecting traits will be used.",v=verbose)
-        obj <- lapply(obj,function(x){x[,traits]})
-        obs <- obs[traits,]
+        if(length(traits)>0){
+            messager(formatC(length(traits),big.mark = ","),
+                     "/",
+                     formatC(length(all_traits),big.mark = ","),
+                     "intersecting traits will be used.",v=verbose)
+            obj <- lapply(obj,function(x){x[,traits]})
+            obs <- obs[traits,]
+        } 
     } 
     #### Create MOFA object ####
-    
     MOFAobject <- MOFA2::create_mofa(
         data = obj,
         groups = groups,
         assay = assay,
         features = features,
-        slot = slot
+        layer = layer
     )
     #### Model parameters ####
     if (is.null(data_options)) {
@@ -122,12 +127,16 @@ run_mofa2 <- function(obj,
     if (is.null(model_options)) {
         model_options <- MOFA2::get_default_model_options(MOFAobject)
     }
+    if(!is.null(num_factors)){
+        model_options$num_factors <- num_factors
+    }
     if (is.null(training_options)) {
         training_options <- MOFA2::get_default_training_options(MOFAobject)
         training_options$seed <- seed
         training_options$maxiter <- maxiter
     }
     #### Prepare MOFA object ####
+    # Sys.setenv("MKL_NUM_THREADS"=10)
     MOFAobject <- MOFA2::prepare_mofa(
         object = MOFAobject,
         data_options = data_options,
@@ -164,12 +173,14 @@ run_mofa2 <- function(obj,
         verbose = verbose
     )
     #### Add MOFA/MOFA+UMAP reductions back into obj ####
-    obj <- add_mofa2_dimred(
-        obj = obj,
-        model = model,
-        assay = assay,
-        keys = c("mofa",paste("mofa",reductions,sep="_")),
-    )
+    obj <- MOFA2::add_mofa_factors_to_seurat(seurat_object = obj, 
+                                             mofa_object = model)
+    # obj <- add_mofa2_dimred(
+    #     obj = obj,
+    #     model = model,
+    #     assay = assay,
+    #     keys = c("mofa",paste("mofa",reductions,sep="_"))
+    # )
     return(list(
         model = model,
         obj = obj

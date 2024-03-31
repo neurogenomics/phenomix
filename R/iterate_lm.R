@@ -20,7 +20,7 @@
 #'  comparable across different models.
 #'  Set to \code{NULL} to skip the scaling step.  
 #' @param ... Additional parameters passed to the statistical test function.
-#' @inheritParams set_cores
+#' @inheritParams KGExplorer::set_cores
 #'
 #' @export
 #' @import data.table 
@@ -32,11 +32,12 @@
 #' 
 #' ### Phenotype dataset
 #' obj <- get_HPO()
-#' ymat <- scKirby::get_x(obj)[["RNA.data"]]
+#' ymat <- scKirby::get_x(obj, n=1)
 #' ymat <- ymat[,seq(10)] # Let's use just 10 traits as an example
 #' 
 #' res_lm <- iterate_lm(xmat = xmat,
-#'                      ymat = ymat, scale_fn=base::scale,
+#'                      ymat = ymat, 
+#'                      test_method = "glm_univariate",
 #'                      workers = 1)
 iterate_lm <- function(xmat,
                        ymat,
@@ -58,9 +59,13 @@ iterate_lm <- function(xmat,
     p <- q <- NULL;
     test_method <- match.arg(test_method)
     data.table::setDTthreads(threads = 1)
-    cores <- set_cores(workers = workers,
-                       progressbar = progressbar,
-                       verbose = verbose) 
+    if(test_method=="glm_univariate"){
+        test_method <- "glm"
+        multivariate <- FALSE
+    }
+    BPPARAM <- KGExplorer::set_cores(workers = workers,
+                                     progressbar = progressbar,
+                                     verbose = verbose) 
     t1 <- Sys.time()
     ## Filter data
     X_list <- filter_matrices(X_list = list(xmat=xmat,
@@ -88,7 +93,7 @@ iterate_lm <- function(xmat,
     #### Run tests ####
     lm_res <- iterate_lm_long(xmat = xmat,
                               ymat = ymat, 
-                              cores = cores,
+                              BPPARAM = BPPARAM,
                               test_method = test_method,
                               multivariate = multivariate,
                               scale_fn = scale_fn,

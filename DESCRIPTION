@@ -55,7 +55,8 @@ Imports:
     piggyback,
     gh,
     tools,
-    echotabix
+    echotabix,
+    KGExplorer
 Suggests:
     markdown,
     rmarkdown,
@@ -79,12 +80,13 @@ Suggests:
     recipes,
     downloadR,
     HPOExplorer,
-    MultiEWCE
+    Nebulosa,
+    arrow
 Remotes:
     github::neurogenomics/scNLP,
     github::neurogenomics/scKirby,
+    github::neurogenomics/KGExplorer,
     github::neurogenomics/HPOExplorer,
-    github::neurogenomics/MultiEWCE,
     github::RajLabMSSM/echotabix,
     github::RajLabMSSM/downloadR,
     github::satijalab/seurat-wrappers

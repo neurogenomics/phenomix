@@ -36,7 +36,7 @@ run_variancePartition <- function(obj,
         stopper("Must provide formula or set is_opengwas=TRUE (when applicable).")
     }
     #### Register cores #### 
-    BPPARAM <- set_cores(workers = workers)
+    BPPARAM <- KGExplorer::set_cores(workers = workers)
     #### Extract matrix ####
     mat <- scKirby::get_x(obj = obj)
     #### Extract metadata ####

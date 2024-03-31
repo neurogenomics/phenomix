@@ -37,16 +37,26 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
                         min_value = NULL,
                         celltype_col=c("cl_name","cl_id","CellType"),
                         value.var = "evidence_score_sum",
-                        vars.to.regress = "n_genes",
+                        default_assay = "score",
+                        nfeatures = NULL,
+                        vars.to.regress = paste0("nFeature_",
+                                                 default_assay),
                         run_nlp = FALSE,
                         run_impute = FALSE,
                         workers = 1,
                         seed = 2023,
-                        verbose = TRUE){ 
+                        verbose = TRUE,
+                        save_path=NULL,
+                        force_new=FALSE){ 
     top_celltype <- gene_symbol <- disease_id <- disease_db <- id <- 
         ancestor_name <- ancestor_name_abnormality <- NULL
     
     celltype_col <- celltype_col[1]
+    #### Check for existing file ####
+    if(file.exists(save_path) && !force_new){
+        messager("Loading precomputed data:",save_path)
+        return(readRDS(save_path))
+    }
     set.seed(seed)
     #### Create annotations ####
     if(is.null(dt_annot)){
@@ -184,15 +194,15 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
     dt_annot_melt <- dt_annot_melt[!is.na(id)]
     shared_ids <- intersect(colnames(X_ref),
                             dt_annot_melt$id)
-    obj <- list(data=list("freq"=X_ref[,shared_ids]),
+    obj <- list(data=list(X_ref[,shared_ids])|>`names<-`(default_assay),
                 obs=data.frame(
                     dt_annot_melt,
                     row.names = dt_annot_melt$id)[shared_ids,]
                 ) 
     ref <- scKirby::process_seurat(obj = obj,
-                                   nfeatures = nrow(obj),
+                                   nfeatures = nfeatures,
                                    vars.to.regress = vars.to.regress,
-                                   default_assay = "freq",
+                                   default_assay = default_assay,
                                    workers = workers)
     #### Impute ####
     if(isTRUE(run_impute)){
@@ -205,6 +215,8 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
                                        default_assay = "alra",
                                        workers = workers)
     }
+    #### Save ####
+    if(!is.null(save_path)) cache_save(ref,save_path)
     #### Run scNLP ####
     if(isTRUE(run_nlp)){ 
         ref$name_definition <- paste(ref$id_name,
@@ -214,7 +226,7 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
             ref,
             label_var = "name_definition",
             terms_per_cluster = 1,
-            size_var = "n_genes",
+            size_var = paste0("nFeature_",default_assay),
             point_size = .5,
             point_palette = pals::kovesi.cyclic_mrybm_35_75_c68_s25(
                 length(unique(ref@meta.data[["seurat_clusters"]]))

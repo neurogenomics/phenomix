@@ -9,62 +9,82 @@
 #' @inheritParams monocle3::learn_graph
 #' @inheritDotParams monocle3::plot_cells
 #' @export
+#' @examples
+#' obj <- get_HPO()
+#' out <- plot_hpo_pseudotime(obj)
 plot_hpo_pseudotime <- function(obj,
                                 dt_genes = HPOExplorer::load_phenotype_to_genes(1),
                                 disease_ids=dt_genes$disease_id[1:3],
                                 learn_graph_control=list(prune_graph=FALSE),
+                                merge_trajectories = TRUE,
+                                symptom_color="red",
+                                bg_colors=c("#5000ff","white"),
+                                trajectory_graph_color=ggplot2::alpha("white",.8),
+                                title_col=NULL,
+                                title_width=100,
+                                color_by_symptoms=TRUE,
+                                point_alpha=.5,
+                                show_plot=TRUE,
                                 ...
                                 ){
-    requireNamespace("monocle3")
-    requireNamespace("SeuratWrappers")
-    gene_symbol <- disease_id <- NULL;
-    
+    disease_id <- NULL;
+    colnames(obj) <- replace_char_fun(colnames(obj))
+    disease_ids <- unique(disease_ids)
     #### Add disease metadata
     ## Using gene overlap (670998 p2d pairs) ##
     # nrow(unique(dt_genes[,c("hpo_id","disease_id")]))
-    p2d <- dt_genes[disease_id %in% disease_ids,
-                    list(count=data.table::uniqueN(gene_symbol)),
-                    by=c("hpo_id","disease_id")]#|>
-        # data.table::dcast.data.table(formula = hpo_id~disease_id,
-        #                              value.var = "count")
-    if(nrow(p2d)==0) stopper("No hpo_ids found for the given disease_ids.")
-    # p2d <- p2d[colnames(ref),]
-    # ## Using annotation overlap (258276 p2d pairs)
-    # nrow(unique(dt_annot[,c("hpo_id","disease_id")]))
-    # p2d <- dt_annot[,count:=1]|>
-    #     data.table::dcast.data.table(formula = hpo_id~disease_id,
-    #                                  value.var = "count",
-    #                                  )
-    #### Merge with rest of annotations ####
-    ## make Seurat way too slow having this many columns...
-    # dt_annot_melt <- data.table::merge.data.table(dt_annot_melt,
-    #                                               p2d,
-    #                                               by.x = "id",
-    #                                               by.y = "hpo_id",
-    #                                               all.x = TRUE)
-  
-    hpo_ids <- intersect(unique(p2d$hpo_id),
-                         colnames(obj))
-    if(length(hpo_ids)==0) {
-        stopper("No hpo_ids oevrlapping with samples (colnames) in obj.")
+    if(isTRUE(merge_trajectories)){
+        out <- run_hpo_pseudotime(obj = obj, 
+                                  disease_ids = disease_ids,
+                                  dt_genes = dt_genes, 
+                                  learn_graph_control = learn_graph_control,
+                                  color_by_symptoms=color_by_symptoms,
+                                  title=stringr::str_wrap(
+                                      paste0(unique(disease_ids),
+                                             collapse = "; "),
+                                      20*2.5
+                                  ),
+                                  point_alpha=point_alpha,
+                                  symptom_color=symptom_color,
+                                  bg_colors=bg_colors,
+                                  trajectory_graph_color = trajectory_graph_color,
+                                  ...)
+        if(show_plot) methods::show(out$plot)
+    } else {
+        out <- list()
+        out[["subplots"]] <- lapply(stats::setNames(disease_ids,
+                                                    disease_ids),
+                                    function(d){
+            if(!is.null(title_col) && 
+                         title_col %in% names(dt_genes)){
+                # dt_genes <- HPOExplorer::add_disease(dt_genes) 
+                title <- dt_genes[!is.na(get(title_col)) &
+                                  disease_id==d][[title_col]][1]
+                subtitle <- d
+            } else {
+                title <- d
+                subtitle <- NULL
+            }
+          run_hpo_pseudotime(obj = obj, 
+                             disease_ids = d,
+                             dt_genes = dt_genes, 
+                             learn_graph_control = learn_graph_control,
+                             title = stringr::str_wrap(title,
+                                                       width = title_width),
+                             subtitle=subtitle,
+                             point_alpha=point_alpha,
+                             color_by_symptoms=color_by_symptoms,
+                             ...)
+        })
+        out[["plot"]] <- patchwork::wrap_plots(lapply(out$subplots,
+                                                      function(x)x$plot)) +
+            patchwork::plot_layout(guides = "collect",
+                                   axes = "collect", 
+                                   axis_titles = "collect")
+        if(show_plot) methods::show(out[["plot"]] )
     }
-    cds <- SeuratWrappers::as.cell_data_set(obj)
-    cds_sub <- monocle3::cluster_cells(
-        cds = cds[,hpo_ids],
-        k = max(as.integer(cds@colData$seurat_clusters)))
-    cds_sub <- monocle3::learn_graph(cds_sub, 
-                                     learn_graph_control=learn_graph_control)
-    cds_sub <- monocle3::order_cells(cds_sub, root_cells = colnames(cds_sub))
-    monocle3::principal_graph(cds) <- monocle3::principal_graph(cds_sub)
-    monocle3::principal_graph_aux(cds) <- monocle3::principal_graph_aux(cds_sub) 
-    plt <- monocle3::plot_cells(cds,
-                                # color_cells_by = "ancestor_name_abnormality",
-                                # group_cells_by = "top_celltype"
-                                )
-    return(
-        list(data=cds,
-             plot=plt)
-    )
+    return(out)
+    
     # pseudo_dt <- t(cds@principal_graph_aux$UMAP$pr_graph_cell_proj_dist)|>`colnames<-`(c("umap1","umap2"))
     
     # gm <- ref@graphs$freq_nn[highlights$hpo_id,

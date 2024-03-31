@@ -7,7 +7,7 @@ run_mofa2_features <- function(obj,
         reduce <- union
     }
     if(is.null(features)) {
-        features <- scKirby::get_var_names(obj = obj) 
+        features <- rownames(obj) 
     } else if(all(features=="variable_features")){
         features <- scKirby::get_variable_features(obj = obj, 
                                                    reduce = reduce)
