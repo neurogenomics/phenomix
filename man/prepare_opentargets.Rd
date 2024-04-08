@@ -9,7 +9,7 @@ prepare_opentargets(
   formula = "approvedSymbol ~ diseaseId",
   nfeatures = NULL,
   default_assay = "score",
-  vars.to.regress = paste0("nFeature_", default_assay),
+  vars.to.regress = NULL,
   save_path = NULL,
   force_new = FALSE,
   ...

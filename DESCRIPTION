@@ -81,7 +81,9 @@ Suggests:
     downloadR,
     HPOExplorer,
     Nebulosa,
-    arrow
+    arrow,
+    ggsankey,
+    Hmisc
 Remotes:
     github::neurogenomics/scNLP,
     github::neurogenomics/scKirby,
@@ -89,7 +91,8 @@ Remotes:
     github::neurogenomics/HPOExplorer,
     github::RajLabMSSM/echotabix,
     github::RajLabMSSM/downloadR,
-    github::satijalab/seurat-wrappers
+    github::satijalab/seurat-wrappers,
+    github::davidsjoberg/ggsankey
 RoxygenNote: 7.3.1
 VignetteBuilder: knitr 
 Config/testthat/edition: 3

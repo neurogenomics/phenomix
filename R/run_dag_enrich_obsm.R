@@ -1,29 +1,51 @@
-run_dag_enrich_obsm <- function(obsm, 
+run_dag_enrich_obsm <- function(obj, 
                                 ont,
+                                id_col,
+                                reduction,
                                 min_hits,
                                 min_offspring,
                                 replace_char,
-                                top_n=100,
-                                trans_fun=NULL,
-                                q_threshold=.05){
-    z_score <- NULL;
+                                top_n,
+                                trans_fun,
+                                value_threshold,
+                                p_threshold,
+                                q_threshold,
+                                sort_by){
     
+    obsm <- scKirby::get_obsm(obj, keys=reduction, n = 1)
     ont_prefixes <- unique(stringr::str_split(ont@terms,pattern = ":",
                                               simplify = TRUE)[,1])
     obsm <- obsm[grepl(paste(paste0("^",ont_prefixes),collapse = "|"),
                        rownames(obsm)),]
     if(!is.null(trans_fun)) obsm <- trans_fun(obsm)
     if(nrow(obsm)==0) stopper("No matching terms found in obsm.")
-    messager("Running dag_enrich_on_offsprings.") 
-    lapply(stats::setNames(seq(ncol(obsm)),
-                           colnames(obsm)), 
-           function(i){
+    id_dict <- if(is.null(id_col)) {
+        stats::setNames(colnames(obj),
+                        colnames(obj))
+    } else {
+        if(!id_col %in% colnames(obj@meta.data)){
+            messager("Could not find",paste0("id_col=",shQuote(id_col)),
+                     "Defaulting to colnames(obj).")
+            stats::setNames(colnames(obj),
+                            colnames(obj))
+        }
+        stats::setNames(obj[[id_col]][,1],
+                        rownames(obj[[id_col]]))
+    }
+    messager("Running dag_enrich_on_offsprings.")
+    BPPARAM <- KGExplorer::set_cores()
+    RES <- BiocParallel::bplapply(stats::setNames(seq(ncol(obsm)),
+                                                  colnames(obsm)), 
+                                  BPPARAM = BPPARAM, 
+                                  function(i){
         val <- obsm[,i]
-        nms <- names(tail(sort(val),top_n))
-        nms <- replace_char_fun(nms,replace_char)
+        if(!is.null(value_threshold)) val <- val[val>value_threshold]
+        nms <- id_dict[names(tail(sort(val),top_n))]|>unname()
+        nms <- map_id_sep(nms,replace_char)
         nms <- intersect(nms,ont@terms)
         if(length(nms)<min_hits) {
-            messager("Not enough terms found for",colnames(obsm)[i])
+            messager("Not enough terms found for",colnames(obsm)[i],
+                     v=!BPPARAM$progressbar)
             return(NULL)
         }
         res <- simona::dag_enrich_on_offsprings(dag = ont, 
@@ -32,10 +54,16 @@ run_dag_enrich_obsm <- function(obsm,
                                                 min_offspring = min_offspring) |>
             data.table::data.table(key="term")
         res <- cbind(group=colnames(obsm)[i],res)
-        res[,combined_score:=(1-p_adjust)*z_score]
-        if(is.null(q_threshold)) return(res)
-        res_sig <- res[p_adjust<q_threshold,][!is.na(combined_score)]|>
-            data.table::setorderv(c("combined_score"),c(-1))
-        res_sig
-    }) |> data.table::rbindlist()
+        res$input_ids <- paste(nms,collapse = ";")
+        res$input_names <- paste(KGExplorer::map_ontology_terms(ont = ont, 
+                                                                terms = nms,
+                                                                to = "name",
+                                                                verbose = FALSE),
+                                 collapse = ";")
+        return(res)
+    }) |> data.table::rbindlist(fill=TRUE)
+    run_dag_enrich_postprocess(RES=RES,
+                               p_threshold=p_threshold,
+                               q_threshold=q_threshold,
+                               sort_by=sort_by)
 }

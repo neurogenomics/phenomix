@@ -9,10 +9,7 @@ plot_top_celltypes <- function(obj,
                                types=c("radial","pie","reduction"),
                                reduction="umap",
                                prefix="^q[.]",
-                               cluster_vars=c("seurat_clusters",
-                                              "dag_enrich.name",
-                                              "dag_enrich.name_wrap",
-                                              "cluster_colors"),
+                               cluster_vars=c("seurat_clusters"),
                                color_col=cluster_vars[1],
                                label_col=cluster_vars[1],
                                enriched_proportion_threshold=.2,
@@ -52,6 +49,9 @@ plot_top_celltypes <- function(obj,
                                    n=1)|>
             data.table::data.table(keep.rownames = "rn") 
         embed_cols <- names(embed)[-1]
+        for(e in embed_cols){
+            if(e %in% names(meta)) meta <- meta[,-c(e), with=FALSE]
+        }
         meta <- merge(meta,embed, by="rn")
     }
     meta_melt <- (
@@ -82,7 +82,7 @@ plot_top_celltypes <- function(obj,
         umap_1=mean(get(embed_cols[1])),
         umap_2=mean(get(embed_cols[2]))
     ),
-    by=c(cluster_vars,"celltype")]|>
+    by=c(unique(c(cluster_vars,label_col,"celltype")))]|>
         data.table::setorderv(c(cluster_vars,"celltype_sig_count","mean_q"),
                               c(rep(1,length(cluster_vars)),-1,1))
     

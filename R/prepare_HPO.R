@@ -10,6 +10,8 @@
 #' disease and HPO terms.
 #' @param min_quantile \link{numeric} minimum quantile for filtering
 #' cell type enrichment results.
+#' @param min_genes The minimum number of genes of phenotypes/diseases
+#' to include from the data matrix.
 #' @param min_value The minimum sum of columns to include from the data matrix.
 #' @param celltype_col Name of the cell type column. 
 #' @param run_nlp Label clusters using natural language processing via 
@@ -19,12 +21,13 @@
 #' @inheritParams HPOExplorer::hpo_to_matrix
 #' @inheritParams HPOExplorer::make_phenos_dataframe
 #' @inheritParams scKirby::process_seurat
+#' @inheritDotParams scKirby::process_seurat
 #' 
 #' @export
 #' @import data.table
 #' @import HPOExplorer
 #' @examples
-#' obj <- prepare_hpo(id_types="hpo_id")
+#' obj <- prepare_hpo(id_types="hpo_id", min_genes=10)
 prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
                         dt_annot = HPOExplorer::load_phenotype_to_genes(3),
                         hpo = HPOExplorer::get_hpo(),
@@ -34,26 +37,30 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
                             MSTExplorer::map_celltype(),
                         id_types = c("hpo_id"),#c("disease_id","hpo_id"),
                         min_quantile = 35,
+                        min_genes = NULL,
                         min_value = NULL,
                         celltype_col=c("cl_name","cl_id","CellType"),
+                        celltype_value="q",
                         value.var = "evidence_score_sum",
                         default_assay = "score",
                         nfeatures = NULL,
-                        vars.to.regress = paste0("nFeature_",
-                                                 default_assay),
+                        vars.to.regress = NULL, # paste0("nFeature_",default_assay),
                         run_nlp = FALSE,
                         run_impute = FALSE,
                         workers = 1,
                         seed = 2023,
                         verbose = TRUE,
                         save_path=NULL,
-                        force_new=FALSE){ 
+                        force_new=FALSE,
+                        ...){ 
     top_celltype <- gene_symbol <- disease_id <- disease_db <- id <- 
         ancestor_name <- ancestor_name_abnormality <- NULL
     
     celltype_col <- celltype_col[1]
     #### Check for existing file ####
-    if(file.exists(save_path) && !force_new){
+    if(!is.null(save_path) &&
+       file.exists(save_path) && 
+       isFALSE(force_new)){
         messager("Loading precomputed data:",save_path)
         return(readRDS(save_path))
     }
@@ -137,8 +144,8 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
         dt_annot_melt <- dt_annot_melt[, head(.SD, 1), by="id"][colnames(X_ref),]
         ## Add id_name column for labeling
         id_names <- gsub("_id$","_name",id_types)
-        id_names <- id_names[id_names %in% names(dt_annot)]
-        dt_annot_melt[,id_name:=data.table::fcoalesce(as.list(get(id_names),"id"))]
+        id_names <- id_names[id_names %in% names(dt_annot)] 
+        dt_annot_melt[,name:=data.table::fcoalesce(.SD),.SDcols=c(id_names,"id")]
     }
     {
         #### Add per sample gene_symbol counts ####
@@ -166,15 +173,15 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
     #     dplyr::slice_head(n = 1) |> data.table::data.table() 
     ct_results_cast <- data.table::dcast.data.table(
         ct_results,
-        formula = hpo_id ~ paste("q",get(celltype_col),sep="."),
+        formula = hpo_id ~ paste(celltype_value,get(celltype_col),sep="."),
         fun.aggregate = mean,
-        value.var = "q",
+        value.var = celltype_value,
         na.rm = TRUE)
     #### Add
-    ct_cols <- grep("^q\\.",names(ct_results_cast), value = TRUE)
+    ct_cols <- grep(paste0("^",celltype_value,"\\."),names(ct_results_cast), value = TRUE)
     ct_results_cast[,
                     top_celltype:=gsub(
-                        "^q\\.","",
+                        paste0("^",celltype_value,"\\."),"",
                         ct_cols[apply(ct_results_cast[,ct_cols, with=FALSE],1,
                                       which.min)])
     ]
@@ -187,6 +194,9 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
                                                   by.y = "hpo_id",
                                                   all.x = TRUE) 
     #### Filter out any terms with <x genes ####
+    if(!is.null(min_genes)){
+        X_ref <- X_ref[,Matrix::colSums(X_ref!=0)>min_genes]
+    }
     if(!is.null(min_value)){
         X_ref <- X_ref[,Matrix::colSums(X_ref)>=min_value]
     }
@@ -203,7 +213,9 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
                                    nfeatures = nfeatures,
                                    vars.to.regress = vars.to.regress,
                                    default_assay = default_assay,
-                                   workers = workers)
+                                   workers = workers,
+                                   ...)
+    ref$orig.ident <- "HPO"
     #### Impute ####
     if(isTRUE(run_impute)){
         messager("Running imputation.",v=verbose)
@@ -216,11 +228,10 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
                                        workers = workers)
     }
     #### Save ####
-    if(!is.null(save_path)) cache_save(ref,save_path)
+    KGExplorer::cache_save(ref,save_path)
     #### Run scNLP ####
     if(isTRUE(run_nlp)){ 
-        ref$name_definition <- paste(ref$id_name,
-                                     ref$ancestor_name,
+        ref$name_definition <- paste(ref$name,
                                      ref$definition)
         scnlp_res <- scNLP::plot_tfidf(
             ref,

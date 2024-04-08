@@ -12,6 +12,7 @@
 plot_feature_density <- function(obj,
                                  features=sample(rownames(obj),3),
                                  alpha=.5,
+                                 method=c("wkde","ks")[1],
                                  joint=TRUE,
                                  joint_only=FALSE,
                                  joint_title=if(length(unique(features))>10){
@@ -32,14 +33,15 @@ plot_feature_density <- function(obj,
     messager(length(features2),"/",length(features),"features found in object.")
     
     plts <- Nebulosa::plot_density(obj,
+                                   method=method,
                                    alpha=alpha,
-                                   features =  features2,
+                                   features = features2,
                                    joint = joint,
                                    ...) 
     ### Add theme ####
     plts <- lapply(plts,function(p){
         p + theme_nightlight() + 
-            color_nightlight()
+            scale_color_nightlight()
     })
     if(!is.null(joint_title)){
         plts[[length(plts)]] <- plts[[length(plts)]] + 

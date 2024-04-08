@@ -8,6 +8,7 @@ plot_feature_density(
   obj,
   features = sample(rownames(obj), 3),
   alpha = 0.5,
+  method = c("wkde", "ks")[1],
   joint = TRUE,
   joint_only = FALSE,
   joint_title = if (length(unique(features)) > 10) {
@@ -22,6 +23,16 @@ plot_feature_density(
 }
 \arguments{
 \item{features}{Features (e.g. genes) to visualize}
+
+\item{method}{Kernel density estimation method:
+\itemize{
+\item \code{ks}: Computes density using the \code{kde} function from the
+ \code{ks} package.
+\item \code{wkde}: Computes density using a modified version of the
+\code{kde2d} function from the \code{MASS}
+package to allow weights. Bandwidth selection from the \code{ks} package
+ is used instead.
+}}
 
 \item{joint}{Return joint density plot? By default \code{FALSE}}
 
@@ -59,15 +70,6 @@ patchwork (see example).}
 computed reduction is visualized}
     \item{\code{dims}}{Vector of length 2 specifying the dimensions to be plotted. By
 default, the first two dimensions are considered.}
-    \item{\code{method}}{Kernel density estimation method:
-\itemize{
-\item \code{ks}: Computes density using the \code{kde} function from the
- \code{ks} package.
-\item \code{wkde}: Computes density using a modified version of the
-\code{kde2d} function from the \code{MASS}
-package to allow weights. Bandwidth selection from the \code{ks} package
- is used instead.
-}}
     \item{\code{adjust}}{Numeric value to adjust to bandwidth. Default: 1. Not available
 for \code{ks} method}
     \item{\code{size}}{Size of the geom to be plotted (e.g. point size)}

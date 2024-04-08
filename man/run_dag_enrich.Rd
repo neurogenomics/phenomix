@@ -7,15 +7,24 @@
 run_dag_enrich(
   obj,
   ont,
+  id_col = NULL,
   reduction = NULL,
   cluster_col = NULL,
   min_hits = 3,
   min_offspring = 100,
   trans_fun = NULL,
   replace_char = list(. = ":", `_` = ":"),
+  value_threshold = NULL,
+  p_threshold = 0.05,
   q_threshold = 0.05,
-  top_n = 100
+  top_n = 100,
+  sort_by = c(log2_fold_enrichment = -1)
 )
+}
+\arguments{
+\item{value_threshold}{Minimum weight to include a term 
+(after applying \code{truns_fun}).
+ Only used when \code{reduction} is provided.}
 }
 \description{
 Run enrichment of terms in a DAG ontology.

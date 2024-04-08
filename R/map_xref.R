@@ -12,6 +12,7 @@ map_xref <- function(dat,
             if(length(r)==0) NA else unlist(r)
         })]
     }
+    dat[,(new_col):=map_id_sep(get(new_col))]
     dat[get(new_col)=="NA",(new_col):=NA]
     messager("% of non-NA rows:",
              round(sum(!is.na(dat[[new_col]]))/nrow(dat)*100,2),v=verbose)

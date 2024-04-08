@@ -12,10 +12,15 @@ plot_dag_enrich(
   min_depth = NULL,
   exact_depth = NULL,
   exact_ont_ancestors = FALSE,
+  sort_by = c(log2_fold_enrichment = -1),
   cluster_col = "seurat_clusters",
+  id_col = NULL,
   label_col = "dag_enrich.name_wrap",
+  cluster_id_alpha = 0.9,
+  cluster_id_size = 3,
   color_col = cluster_col,
   replace_char = list(. = ":", `_` = ":"),
+  p_threshold = 0.05,
   q_threshold = 0.05,
   preferred_palettes = "kovesi.cyclic_mygbm_30_95_c78",
   add_labels = TRUE,
@@ -28,6 +33,10 @@ plot_dag_enrich(
   repel = TRUE,
   box = TRUE,
   box.padding = 1,
+  max.overlaps = 100,
+  na.value = "grey50",
+  force_new = FALSE,
+  return_obj = FALSE,
   show_plot = TRUE,
   ...
 )
@@ -37,6 +46,15 @@ plot_dag_enrich(
 
 \item{box}{Use geom_label/geom_label_repel (includes a box around the text
 labels)}
+
+\item{box.padding}{Amount of padding around bounding box, as unit or number.
+Defaults to 0.25. (Default unit is lines, but other units can be specified
+by passing \code{unit(x, "units")}).}
+
+\item{max.overlaps}{Exclude text labels when they overlap too many other
+things. For each text label, we count how many other text labels or other
+data points it overlaps, and exclude the text label if it has too many overlaps.
+Defaults to 10.}
 
 \item{...}{
   Arguments passed on to \code{\link[Seurat:LabelClusters]{Seurat::LabelClusters}}

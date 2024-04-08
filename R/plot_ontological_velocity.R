@@ -35,7 +35,7 @@ plot_ontological_velocity <- function(obj,
                        colnames(obj),NA))   
         }
         obj <- obj[,!is.na(obj@meta.data[[id_col]])]
-        colnames(obj) <- make.unique(replace_char_fun(obj$hp_id))
+        colnames(obj) <- make.unique(map_id_sep(obj$hp_id))
     }  
     dist_lca <- simona::longest_distances_via_LCA(ont,
                                                   terms = ont@terms)
@@ -63,12 +63,12 @@ plot_ontological_velocity <- function(obj,
         if(length(nns)<2) return(NULL)
         emb <- (obj@reductions$umap@cell.embeddings |>data.frame())[nns,]
         #### remove suffixes from make.unique ####
-        nns <- replace_char_fun(
+        nns <- map_id_sep(
             stringr::str_split(nns,"[.]", simplify = TRUE)[,1]
         ) 
         nns <- intersect(nns,ont@terms)
         if(length(nns)<2) return(NULL)
-        emb$id <- replace_char_fun(
+        emb$id <- map_id_sep(
                 stringr::str_split(rownames(emb),"[.]", simplify = TRUE)[,1]
             ) 
         combos <- expand.grid(id1=nns,

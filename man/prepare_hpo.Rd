@@ -12,19 +12,22 @@ prepare_hpo(
   ct_results = MSTExplorer::map_celltype(MSTExplorer::load_example_results()),
   id_types = c("hpo_id"),
   min_quantile = 35,
+  min_genes = NULL,
   min_value = NULL,
   celltype_col = c("cl_name", "cl_id", "CellType"),
+  celltype_value = "q",
   value.var = "evidence_score_sum",
   default_assay = "score",
   nfeatures = NULL,
-  vars.to.regress = paste0("nFeature_", default_assay),
+  vars.to.regress = NULL,
   run_nlp = FALSE,
   run_impute = FALSE,
   workers = 1,
   seed = 2023,
   verbose = TRUE,
   save_path = NULL,
-  force_new = FALSE
+  force_new = FALSE,
+  ...
 )
 }
 \arguments{
@@ -44,6 +47,9 @@ disease and HPO terms.}
 
 \item{min_quantile}{\link{numeric} minimum quantile for filtering
 cell type enrichment results.}
+
+\item{min_genes}{The minimum number of genes of phenotypes/diseases
+to include from the data matrix.}
 
 \item{min_value}{The minimum sum of columns to include from the data matrix.}
 
@@ -74,11 +80,34 @@ using \pkg{future}.}
 \item{seed}{Random seed to set.}
 
 \item{verbose}{Print messages.}
+
+\item{...}{
+  Arguments passed on to \code{\link[scKirby:process_seurat]{scKirby::process_seurat}}
+  \describe{
+    \item{\code{obj}}{A single-cell object supported by \pkg{scKirby}.
+See \link[scKirby]{converters} for a table of all supported conversions.}
+    \item{\code{meta.data}}{Additional cell-level metadata to add to the Seurat object.
+Should be a \code{\link[base]{data.frame}} where the rows are cell names and
+the columns are additional metadata fields. Row names in the metadata need
+to match the column names of the counts matrix.}
+    \item{\code{dims}}{Which dimensions to use as input features, used only if
+\code{features} is NULL}
+    \item{\code{add_specificity}}{Add a new assay called "specificity" by deriving
+specificity scores from the input data.}
+    \item{\code{n.components}}{The dimension of the space to embed into.}
+    \item{\code{cluster_reduction}}{Recompute neighbors graph based on UMAP
+to get clusters that best reflect UMAP space.
+For this same reason, only cluster in two dimensions,
+because this is the view we most often use.
+That said, this may reduce the generalisability of these clusters/graph.}
+    \item{\code{max_mem}}{Max limit on memory usage, to be passed to environmental
+variable \code{future.globals.maxSize}.}
+  }}
 }
 \description{
 Convert the Human Phenotype Ontology (HPO) to a \link{Seurat} object 
 with extensive metadata.
 }
 \examples{
-obj <- prepare_hpo(id_types="hpo_id")
+obj <- prepare_hpo(id_types="hpo_id", min_genes=10)
 }
