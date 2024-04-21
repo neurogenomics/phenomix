@@ -6,11 +6,12 @@
 #' @inheritDotParams scKirby::process_seurat
 #' @import KGExplorer
 #' @export
-prepare_opentargets <- function(data_type="associationByOverallDirect",
-                                formula = "approvedSymbol ~ diseaseId",
+prepare_opentargets <- function(data_type="associationByDatasourceIndirect",#"associationByOverallDirect",
+                                formula = "approvedSymbol ~ id",
                                 nfeatures=NULL,
                                 default_assay = "score",
                                 vars.to.regress = NULL, #paste0("nFeature_",default_assay),
+                                fill=0,
                                 save_path=NULL,
                                 force_new=FALSE,
                                 ...){
@@ -23,7 +24,7 @@ prepare_opentargets <- function(data_type="associationByOverallDirect",
         return(readRDS(save_path))
     } 
     #### Get gene-disease relationship data ####
-    d <- KGExplorer::get_opentargets(data_type=data_type,
+    d <- KGExplorer::get_opentargets(data_type = data_type,
                                      force_new = force_new)
     #### Get sample metadata ####
     obs <- KGExplorer::get_opentargets(data_type = "diseases",
@@ -61,19 +62,45 @@ prepare_opentargets <- function(data_type="associationByOverallDirect",
         #### Convert ensembl IDs to gene symbols ####
         d[,approvedSymbol:=var[targetId]$approvedSymbol]
     # }
+    #### Add IDs ####
+    if("datasourceId" %in% names(d)){
+        d[,id:=paste(map_id_sep(diseaseId),datasourceId,sep=".")]
+    } else {
+        d[,id:=map_id_sep(diseaseId)]
+    }
     #### Convert to sparse matrix ####
     messager("Constructing matrix:",formula)
-    X <- data.table::dcast.data.table(d,
-                                      formula = as.formula(formula),
-                                      value.var = "score",
-                                      fun.aggregate = mean, 
-                                      fill = 0,
-                                      na.rm = TRUE) |>
-        KGExplorer::dt_to_matrix(as_sparse = TRUE)
+    ### Chunk by file to avoid memory issues
+    chunks <- unique(d$file)
+    BPPARAM <- KGExplorer::set_cores()
+    X <- BiocParallel::bplapply(chunks,
+                                 BPPARAM = BPPARAM,
+                                 function(f){
+        data.table::dcast.data.table(d[file==f,],
+                                     formula = as.formula(formula),
+                                     value.var = "score",
+                                     fun.aggregate = mean, 
+                                     fill = fill,
+                                     na.rm = TRUE) |>
+            KGExplorer::dt_to_matrix(as_sparse = TRUE)
+    })
+    messager("Merging",length(X),"sparse matrices.")
+    X <- Reduce(Seurat::RowMergeSparseMatrices,X)
+    #### Report matrix stats ####
+    messager("Merged matrix:",nrow(X),"x",ncol(X))
+    ## Check gene sparsity 
+    ngenes <- Matrix::colSums(X>0)
+    messager(sum(ngenes<2),"/",length(ngenes),
+             paste0("(",round(sum(ngenes<2)/length(ngenes)*100,1),"%)"),
+             "traits have <2 genes.")
     #### Subset by intersecting IDs ####
-    ids <- intersect(obs$id, d$diseaseId)
-    obs <- obs[id %in% ids,]
-    X <- X[,ids]
+    obs <- merge(
+        unique(d[,-c("targetId","score","evidenceCount","approvedSymbol")]),
+          obs[,-c("file")],
+          by.x="diseaseId",
+         by.y="id",
+        all.x=TRUE)
+    X <- X[,obs$id]
     var <- var[approvedSymbol %in% rownames(X),.SD[1],by="approvedSymbol"]
     #### Remove columns in obs/var that are lists ####
     obs <- obs[,names(obs)[!sapply(obs,is.list)], with=FALSE]

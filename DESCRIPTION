@@ -83,7 +83,8 @@ Suggests:
     Nebulosa,
     arrow,
     ggsankey,
-    Hmisc
+    Hmisc,
+    proxy
 Remotes:
     github::neurogenomics/scNLP,
     github::neurogenomics/scKirby,

@@ -37,7 +37,7 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
                             MSTExplorer::map_celltype(),
                         id_types = c("hpo_id"),#c("disease_id","hpo_id"),
                         min_quantile = 35,
-                        min_genes = NULL,
+                        min_genes = 1,
                         min_value = NULL,
                         celltype_col=c("cl_name","cl_id","CellType"),
                         celltype_value="q",
@@ -195,7 +195,7 @@ prepare_hpo <- function(dt_genes = HPOExplorer::load_phenotype_to_genes(1),
                                                   all.x = TRUE) 
     #### Filter out any terms with <x genes ####
     if(!is.null(min_genes)){
-        X_ref <- X_ref[,Matrix::colSums(X_ref!=0)>min_genes]
+        X_ref <- X_ref[,Matrix::colSums(X_ref!=0)>=min_genes]
     }
     if(!is.null(min_value)){
         X_ref <- X_ref[,Matrix::colSums(X_ref)>=min_value]

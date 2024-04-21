@@ -1,30 +1,31 @@
-run_hpo_pseudotime <- function(obj,
-                               disease_ids,
-                               root_cells,
-                               p2d,
-                               id_col,
-                               learn_graph_control,
-                               use_partition=TRUE,
-                               color_cells_by = "is_symptom",
-                               title=NULL,
-                               subtitle=NULL,
-                               color_by_symptoms=TRUE,
-                               symptom_color="red",
-                               bg_colors=c("#5000ff","white"),
-                               trajectory_graph_color=ggplot2::alpha("white",.8),
-                               point_alpha=.5,
-                               add_density=TRUE,
-                               density_filled=FALSE,
-                               density_adjust=1,
-                               density_alpha=point_alpha,
-                               ...){
+run_pseudotime <- function(obj,
+                           disease_ids,
+                           root_cells,
+                           map_root_cells=TRUE,
+                           p2d,
+                           id_col,
+                           learn_graph_control,
+                           use_partition=TRUE,
+                           color_cells_by = "is_symptom",
+                           title=NULL,
+                           subtitle=NULL,
+                           color_by_symptoms=TRUE,
+                           symptom_color="red",
+                           bg_colors=c("#5000ff","white"),
+                           trajectory_graph_color=ggplot2::alpha("white",.8),
+                           point_alpha=.5,
+                           add_density=TRUE,
+                           density_filled=FALSE,
+                           density_adjust=1,
+                           density_alpha=point_alpha,
+                           ...){
     requireNamespace("monocle3")
     requireNamespace("SeuratWrappers")
     requireNamespace("dplyr")
-    gene_symbol <- disease_id <- NULL; 
+    disease_id <- mondo_id <- NULL; 
     
-    messager("Running pseudotime analysis for:", 
-             paste(disease_ids, collapse = "; ")) 
+    cat("\nRunning pseudotime analysis for:", 
+        paste(disease_ids, collapse = "; "),"\n")
     p2d <- p2d[disease_id %in% disease_ids|  
                mondo_id %in% disease_ids,]
     if(nrow(p2d)==0) {
@@ -65,23 +66,24 @@ run_hpo_pseudotime <- function(obj,
         SeuratWrappers::as.cell_data_set(obj)
     ) 
     #### Choose root cells ####
-    if(is.null(root_cells)) {
+    if(length(root_cells)==0) {
         messager("Setting disease_ids as root cells.")
         root_cells <- disease_ids
     }
+    root_cells <- as.character(na.omit(root_cells))
     if(length(root_cells)>0){ 
         root_cells <- c(
             colnames(obj)[map_id_sep(colnames(obj)) %in% map_id_sep(root_cells)],
-            if(!is.null(id_col) && id_col %in% colnames(obj@meta.data)){
+            if(isTRUE(map_root_cells) && 
+               !is.null(id_col) &&
+               id_col %in% colnames(obj@meta.data)){
                 colnames(obj)[map_id_sep(obj@meta.data[[id_col]]) %in% map_id_sep(root_cells)]    
             },
-            if("mondo_id" %in% colnames(obj@meta.data)){
+            if(isTRUE(map_root_cells) && 
+               "mondo_id" %in% colnames(obj@meta.data)){
                 colnames(obj)[map_id_sep(obj@meta.data[["mondo_id"]]) %in% map_id_sep(root_cells)]
             }
-        )|> unique()
-        if(length(root_cells)>0){
-            messager("Using",length(root_cells),"root cells.")
-        }
+        )|> unique() 
     } 
     #### Choose k ####
     k <- min(ncol(cds[,unique(c(hpo_ids,root_cells))]),
@@ -97,7 +99,10 @@ run_hpo_pseudotime <- function(obj,
                                      use_partition=use_partition,
                                      learn_graph_control=learn_graph_control)
     if(length(root_cells)==0){
+        messager("0 root_cells found. Using all cells as roots.")
         root_cells <- colnames(cds_sub)
+    } else{
+        messager("Using",length(root_cells),"root cells.")
     }
     cds@colData$is_root <- as.factor(colnames(cds) %in% root_cells)
     messager("Running monocle3::order_cells with",ncol(cds_sub),"cells and",

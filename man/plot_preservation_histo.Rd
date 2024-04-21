@@ -9,7 +9,8 @@ plot_preservation_histo(
   lvl = "hd",
   key = c(hd = "High-dimensional", md = "Mid-dimensional", ld = "Low-dimensional"),
   title = paste(key[lvl], "space"),
-  subtitle = paste0("(", consist_dt[[paste0("dim_", lvl)]][1], " dimensions)")
+  subtitle = paste0("(", consist_dt[[paste0("dim_", lvl)]][1], " dimensions)"),
+  xlim = c(-1, 1)
 )
 }
 \description{

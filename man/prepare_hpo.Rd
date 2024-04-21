@@ -12,7 +12,7 @@ prepare_hpo(
   ct_results = MSTExplorer::map_celltype(MSTExplorer::load_example_results()),
   id_types = c("hpo_id"),
   min_quantile = 35,
-  min_genes = NULL,
+  min_genes = 1,
   min_value = NULL,
   celltype_col = c("cl_name", "cl_id", "CellType"),
   celltype_value = "q",

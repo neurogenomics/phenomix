@@ -102,7 +102,7 @@ plot_factors_sankey <- function(factor.traits,
             expression("" %->% "   factor trait loadings   " %->% "   Traits" ))
         ) +
         ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = c(0,.5,1),
-                                                           size = xtext_size)) 
+                                                           size = xtext_size)) +
         theme_nightlight()
     #### Return ####
     return(list(

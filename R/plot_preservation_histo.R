@@ -11,8 +11,10 @@ plot_preservation_histo <- function(consist_dt,
                                     title=paste(key[lvl],"space"), 
                                     subtitle=paste0(
                                         "(",consist_dt[[paste0("dim_",lvl)]][1],
-                                        " dimensions)")
+                                        " dimensions)"),
+                                    xlim=c(-1,1)
                                     ){
+    id_type <- NULL;
     ## histograms of high-dimensional cor 
     ggplot2::ggplot(consist_dt,
                     ggplot2::aes(x=!!ggplot2::sym(paste0("cor_",lvl)),
@@ -30,7 +32,7 @@ plot_preservation_histo <- function(consist_dt,
                                                              na.rm=TRUE)),
                                             by=id_type],
                             ggplot2::aes(xintercept=mean_cor, color=id_type))+  
-        ggplot2::xlim(0,1)+
+        ggplot2::lims(x=xlim )+
         ggplot2::theme_minimal() +
         ggplot2::labs(title=title,
                       subtitle=subtitle,

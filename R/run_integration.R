@@ -23,7 +23,7 @@ run_integration <- function(obj,
                             k.weight = 100,
                             orig.reduction = "pca", 
                             new.reduction = "cca",
-                            cluster_reduction = new.reduction,
+                            cluster_reduction = "umap",
                             verbose = TRUE,
                             ...){
     # SeuratWrappers::scVIIntegration()
@@ -70,7 +70,17 @@ run_integration <- function(obj,
                                                 nfeatures = nfeatures)
             obj <- Seurat::ScaleData(obj, 
                                      vars.to.regress = vars.to.regress)
-            # obj <- Seurat::RunPCA(obj, npcs=max(dims))
+            if(!orig.reduction %in% names(obj@reductions)){
+                if(orig.reduction=="pca"){
+                    messager(
+                        "PCA not found in merged object.",
+                        "Running PCA within each object split.by group now.")
+                    obj <- Seurat::RunPCA(obj, 
+                                          npcs=max(dims))
+                } else{
+                    stop("orig.reduction not found in object.")
+                }
+            }
             obj <- Seurat::IntegrateLayers(object = obj, 
                                            method = method, 
                                            orig.reduction = orig.reduction, 
@@ -82,7 +92,7 @@ run_integration <- function(obj,
             # re-join layers after integration
             obj[[assay]] <- SeuratObject::JoinLayers(obj[[assay]]) 
             obj <- Seurat::FindNeighbors(obj, 
-                                         reduction = cluster_reduction,
+                                         reduction = new.reduction,
                                          dims = dims)
             obj <- Seurat::FindClusters(obj)
             max_dims <- ncol(obj@reductions[[new.reduction]])
@@ -95,6 +105,13 @@ run_integration <- function(obj,
                                    reduction = new.reduction, 
                                    dims = dims, 
                                    return.model = TRUE)
+            if(cluster_reduction!=new.reduction){
+                max_dims <- ncol(obj@reductions[[cluster_reduction]])
+                obj <- Seurat::FindNeighbors(obj, 
+                                             reduction = cluster_reduction,
+                                             dims = seq(max_dims))
+                obj <- Seurat::FindClusters(obj)
+            }
         } else if(pipeline=="seuratv4"){ 
             #### Seurat <v5 strategy ####
             ## Merge then split to ensure the union of all genes is used during integration 
@@ -132,7 +149,8 @@ run_integration <- function(obj,
                                            normalize_data = FALSE) 
         }  
         #### Save obj ####
-        KGExplorer::cache_save(obj = obj, save_path = save_path) 
+        KGExplorer::cache_save(obj = obj, 
+                               save_path = save_path) 
     }
     return(obj)
 }

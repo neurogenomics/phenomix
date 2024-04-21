@@ -6,13 +6,82 @@
 \usage{
 plot_ontological_velocity(
   obj,
+  graph_name = tail(names(obj@graphs), 1),
+  reduction = tail(Seurat::Reductions(obj), 1),
   ont = KGExplorer::get_ontology("hp"),
   id_col = NULL,
-  iterations = 5000,
-  k = 30,
-  agg_fun = stats::weighted.mean,
-  show_plot = TRUE
+  iterations = 1000,
+  max_dist = 0.2,
+  k = 20,
+  agg_fun = function(x) {
+     mean(x, na.rm = TRUE)
+ },
+  max_size = 1,
+  linewidth_range = c(0, 1),
+  L = 5,
+  res = 5,
+  show_plot = TRUE,
+  ...
 )
+}
+\arguments{
+\item{max_size}{size of the arrow in centimetres}
+
+\item{L}{typical length of a streamline in x and y units}
+
+\item{res}{resolution parameter (higher numbers increases the resolution)}
+
+\item{...}{
+  Arguments passed on to \code{\link[Seurat:DimPlot]{Seurat::DimPlot}}
+  \describe{
+    \item{\code{object}}{Seurat object}
+    \item{\code{dims}}{Dimensions to plot, must be a two-length numeric vector specifying x- and y-dimensions}
+    \item{\code{cells}}{Vector of cells to plot (default is all cells)}
+    \item{\code{cols}}{Vector of colors, each color corresponds to an identity class. This may also be a single character
+or numeric value corresponding to a palette as specified by \code{\link[RColorBrewer]{brewer.pal.info}}.
+By default, ggplot2 assigns colors. We also include a number of palettes from the pals package.
+See \code{\link[Seurat]{DiscretePalette}} for details.}
+    \item{\code{pt.size}}{Adjust point size for plotting}
+    \item{\code{reduction}}{Which dimensionality reduction to use. If not specified, first searches for umap, then tsne, then pca}
+    \item{\code{group.by}}{Name of one or more metadata columns to group (color) cells by
+(for example, orig.ident); pass 'ident' to group by identity class}
+    \item{\code{split.by}}{A factor in object metadata to split the plot by, pass 'ident'
+to split by cell identity'}
+    \item{\code{shape.by}}{If NULL, all points are circles (default). You can specify any
+cell attribute (that can be pulled with FetchData) allowing for both
+different colors and different shapes on cells.  Only applicable if \code{raster = FALSE}.}
+    \item{\code{order}}{Specify the order of plotting for the idents. This can be
+useful for crowded plots if points of interest are being buried. Provide
+either a full list of valid idents or a subset to be plotted last (on top)}
+    \item{\code{shuffle}}{Whether to randomly shuffle the order of points. This can be
+useful for crowded plots if points of interest are being buried. (default is FALSE)}
+    \item{\code{seed}}{Sets the seed if randomly shuffling the order of points.}
+    \item{\code{label}}{Whether to label the clusters}
+    \item{\code{label.size}}{Sets size of labels}
+    \item{\code{label.color}}{Sets the color of the label text}
+    \item{\code{label.box}}{Whether to put a box around the label text (geom_text vs
+geom_label)}
+    \item{\code{repel}}{Repel labels}
+    \item{\code{alpha}}{Alpha value for plotting (default is 1)}
+    \item{\code{cells.highlight}}{A list of character or numeric vectors of cells to
+highlight. If only one group of cells desired, can simply
+pass a vector instead of a list. If set, colors selected cells to the color(s)
+in \code{cols.highlight} and other cells black (white if dark.theme = TRUE);
+will also resize to the size(s) passed to \code{sizes.highlight}}
+    \item{\code{cols.highlight}}{A vector of colors to highlight the cells as; will
+repeat to the length groups in cells.highlight}
+    \item{\code{sizes.highlight}}{Size of highlighted cells; will repeat to the length
+groups in cells.highlight.  If \code{sizes.highlight = TRUE} size of all
+points will be this value.}
+    \item{\code{na.value}}{Color value for NA points when using custom scale}
+    \item{\code{ncol}}{Number of columns for display when combining plots}
+    \item{\code{combine}}{Combine plots into a single \code{\link[patchwork]{patchwork}ed}
+ggplot object. If \code{FALSE}, return a list of ggplot objects}
+    \item{\code{raster}}{Convert points to raster format, default is \code{NULL} which
+automatically rasterizes if plotting more than 100,000 cells}
+    \item{\code{raster.dpi}}{Pixel resolution for rasterized plots, passed to geom_scattermore().
+Default is c(512, 512).}
+  }}
 }
 \description{
 Plot ontological velocity.

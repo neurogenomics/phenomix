@@ -17,7 +17,7 @@ run_integration(
   k.weight = 100,
   orig.reduction = "pca",
   new.reduction = "cca",
-  cluster_reduction = new.reduction,
+  cluster_reduction = "umap",
   verbose = TRUE,
   ...
 )
