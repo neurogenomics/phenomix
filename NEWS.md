@@ -5,6 +5,15 @@
 * Transfer `phenoRx::prepare_hpo` to `phenomix`
 * Remove all ontology-related functions (now within `HPOExplorer`)
 * Explore `bigstatsr`/`bigreadr` a bit.
+* New functions, introduced while writing up thesis:
+    - `clip_outliers`
+    - `run_cor`
+    - `run_knn_overlap`
+    - `un_ontological_similarity`
+    - `run_phate`
+    - `run_preseveration`
+    - `run_pseudotime_subtypes`
+    - `seurat_to_ontological_similarity`
 
 ## Bug fixes
 
