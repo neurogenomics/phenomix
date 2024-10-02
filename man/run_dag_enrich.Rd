@@ -12,19 +12,24 @@ run_dag_enrich(
   cluster_col = NULL,
   min_hits = 3,
   min_offspring = 100,
+  min_depth = NULL,
   trans_fun = NULL,
   replace_char = list(. = ":", `_` = ":"),
   value_threshold = NULL,
   p_threshold = 0.05,
   q_threshold = 0.05,
   top_n = 100,
-  sort_by = c(log2_fold_enrichment = -1)
+  sort_by = c(log2_fold_enrichment = -1),
+  on_offspring = TRUE
 )
 }
 \arguments{
 \item{value_threshold}{Minimum weight to include a term 
 (after applying \code{truns_fun}).
  Only used when \code{reduction} is provided.}
+
+\item{on_offspring}{Use the function \link[simona]{dag_enrich_on_offsprings}
+(TRUE) or \link[simona]{dag_enrich_on_items} (FALSE).}
 }
 \description{
 Run enrichment of terms in a DAG ontology.

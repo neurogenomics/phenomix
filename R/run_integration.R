@@ -24,16 +24,24 @@ run_integration <- function(obj,
                             orig.reduction = "pca", 
                             new.reduction = "cca",
                             cluster_reduction = "umap",
+                            max_mem = 8000*1024^2,
+                            workers=1,
+                            seed=2020,
                             verbose = TRUE,
                             ...){
     # SeuratWrappers::scVIIntegration()
     # SeuratWrappers::FastMNNIntegration()
+    
     
     pipeline <- match.arg(pipeline)
     if(file.exists(save_path)){
         message("Loading cached file: ",save_path)
         obj <- readRDS(save_path)
     } else {
+        requireNamespace("future")
+        set.seed(seed) 
+        future::plan(strategy = "multicore", workers = workers)
+        options(future.globals.maxSize = max_mem)
         force(obj)
         force(split.by)
         ## remove traits with no gene associations 

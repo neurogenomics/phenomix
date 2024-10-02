@@ -35,7 +35,7 @@
 #' @importFrom Matrix t
 #' @examples 
 #' obj <- get_HPO()[seq(100),seq(50)] 
-#' ae_res <- run_autoencoder(obj = obj, color_var = "group_depth3")
+#' ae_res <- run_autoencoder(obj = obj, color_var = "nFeature_score")
 run_autoencoder <- function(obj,
                             transpose = TRUE, 
                             normalise_method = NULL,#"log1p",
@@ -49,10 +49,13 @@ run_autoencoder <- function(obj,
                             sparse = TRUE,
                             variable_importances = TRUE, 
                             epochs = 10,
+                            mini_batch_size=1,
                             seed = 2020,
+                            max_mem_size=Sys.getenv("R_MAX_VSIZE"),
+                            nthreads = -1,
                             verbose = TRUE,
                             ...){ 
-    # devoptera::args2vars(run_autoencoder, reassign = TRUE);epochs=100;hidden=c(200,50,200); sparse=TRUE; slot="scale.data"
+    # epochs=100;hidden=c(200,50,200); sparse=TRUE; slot="scale.data"
     
     requireNamespace("h2o")
     #### Input needs to be in sample (trait) x feature (gene) format ####
@@ -70,15 +73,15 @@ run_autoencoder <- function(obj,
     }
     #### initialize H2O instance ####
     if (!is.null(seed)) set.seed(seed)
-    h2o::h2o.init(max_mem_size = "32g",
-                  nthreads = -1)  
+    h2o::h2o.init(max_mem_size = max_mem_size,
+                  nthreads = nthreads)  
     options("h2o.use.data.table"=TRUE)
     #### Prepare data ####
     #### Drop features with no variation ####
     # X <- filter_matrix(X = X, )
     
     #### Shuffle samples ####
-    X <- X[sample(nrow(features),replace = FALSE),]
+    X <- X[sample(nrow(X),replace = FALSE),]
     ## Need to convert to dense matrix, or else won't keep colnames ####
     features <- h2o::as.h2o(as.matrix(X))  
     # labels <- h2o::as.h2o(obj[[label_var]]) 
@@ -96,8 +99,8 @@ run_autoencoder <- function(obj,
         epochs = epochs,
         seed = seed,
         shuffle_training_data = TRUE, 
-        mini_batch_size=100
-        # ...
+        mini_batch_size=mini_batch_size,
+        ...
     )
     h2o::h2o.list_models() 
     
@@ -125,8 +128,8 @@ run_autoencoder <- function(obj,
    
     #### Extract the deep features #### 
     ### Figure out which layer is the smallest ###
-    compresed_nodes <- min(ae1@parameters$hidden)
-    compressed_layer <- which(ae1@parameters$hidden==compresed_nodes)[1]
+    compressed_nodes <- min(ae1@parameters$hidden)
+    compressed_layer <- which(ae1@parameters$hidden==compressed_nodes)[1]
     ae1_codings <- h2o::h2o.deepfeatures(object = ae1,
                                          data = features,
                                          ## Note: referring to HIDDEN layer
@@ -136,34 +139,35 @@ run_autoencoder <- function(obj,
     #                                 newdata = features)
     obsm <- as.matrix(ae1_codings) |>
         `row.names<-`(rownames(X)) 
-    #### Plot traits in latent space ####
-    
-    
-    gg_latent <- lapply(seq.int(1,compresed_nodes,by = 2), function(i){
+    #### Plot traits in latent space #### 
+    gg_latent <- lapply(seq.int(1,compressed_nodes,by = 2), function(i){
         plot_reduction(obj = obsm, 
                         x_dim = i,
                         y_dim = i+1,
                         fix_rownames = TRUE,
                         obs = obs,
-                        color_var = "id_type",#"nFeature_freq",
+                        color_var = color_var,
                         label_var = label_var,
-                       show_plot = FALSE,
+                        show_plot = FALSE,
                         labels = FALSE)
-    })
-    gg_latent_merged <- patchwork::wrap_plots(gg_latent,
-                                              ncol = 5, 
-                                              guides = "collect") 
+    })|>patchwork::wrap_plots(guides = "collect") +
+        patchwork::plot_layout(axes = "collect",
+                               axis_titles = "collect",
+                               guides = "collect")
     ### Reduce further with UMAP ####
     {
         umap_res <- run_umap(obj = obsm,
-                             pca = 10,
+                             pca = NULL,
                              transpose = FALSE)
-        gg_umap <- plot_reduction(obj = umap_res,
+        ggplot2::ggplot(umap_res$embedding, ggplot2::aes(x=UMAP.1, y=UMAP.2)) +
+            ggplot2::geom_point(alpha=.1, size=1) 
+        
+        
+        gg_umap <- plot_reduction(obj = umap_res$embedding,
                                   obs = obs,  
-                                  # fix_rownames = TRUE,
                                   color_var = color_var,
                                   label_var = label_var,
-                                  labels = FALSE)
+                                  labels = FALSE) 
         plotly::ggplotly(gg_umap)
     }
     # 

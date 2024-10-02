@@ -13,31 +13,58 @@
 #' @importFrom sparsesvd sparsesvd
 #'
 #' @export
-run_sparsesvd <- function(mat,
+#' @examples
+#' obj <- get_HPO()[,1:50]
+#' obj2 <-run_sparsesvd(obj, rank=50L)
+run_sparsesvd <- function(obj,
                           transpose = TRUE,
                           add_names = TRUE,
-                          rank = 0L,
+                          rank = 50L,
                           tol = 1e-15,
-                          kappa = 1e-6) {
-    if (transpose) {
-        mat <- Matrix::t(mat)
-    }
-    mat <- Matrix::Matrix(mat, sparse = TRUE)
+                          kappa = 1e-6,
+                          assay=NULL,
+                          layer=NULL) {
+    ## Extract matrix 
+    X <- scKirby::get_x(obj,
+                        n=1,
+                        simplify = TRUE,
+                        as_sparse = TRUE,
+                        layer = layer,
+                        assay = assay,
+                        transpose = transpose)
+    ## Run SSVD
+    messager("Running SparseSVD.")
     ssvd <- sparsesvd::sparsesvd(
-        M = mat,
+        M = X,
         rank = rank,
         tol = tol,
         kappa = kappa
     )
+    ## Add names to submatrices
     if (add_names) {
-        ssvd_names <- paste0("SSVD.", seq(1, ncol(ssvd$u)))
+        ssvd_names <- paste0("SSVD_", seq(1, ncol(ssvd$u)))
         ssvd$u <- ssvd$u |>
             `colnames<-`(ssvd_names) |>
-            `row.names<-`(rownames(mat))
+            `row.names<-`(rownames(X))
         ssvd$v <- ssvd$v |>
             `colnames<-`(ssvd_names) |>
-            `row.names<-`(colnames(mat))
+            `row.names<-`(colnames(X))
         ssvd$d <- setNames(ssvd$d, ssvd_names)
     }
+    ## Add DimReducObject
+    if(scKirby::is_class(obj,"seurat")){
+        obj[["ssvd"]] = SeuratObject::CreateDimReducObject(
+            embeddings = ssvd$u,
+            loadings = ssvd$v,
+            key = "ssvd_",
+            assay=Seurat::DefaultAssay(obj)
+        )
+        return(obj)
+    } else {
+        return(ssvd)
+    }
+    # obs <- merge(ssvd$u, obj@meta.data[,c("nFeature_score"),drop=FALSE], by="row.names")[,-1]
+    # Xcor=WGCNA::cor(obs)[,'nFeature_score']
+    # sort(Xcor)
     return(ssvd)
 }

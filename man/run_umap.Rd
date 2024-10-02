@@ -14,7 +14,7 @@ run_umap(
   pca = NULL,
   add_names = TRUE,
   n_components = 2,
-  n_neighbors = 15,
+  n_neighbors = 30,
   min_dist = 0.01,
   metric = "euclidean",
   init = "spectral",

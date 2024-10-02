@@ -48,7 +48,7 @@ jobs:
         run_pkgdown: ${{ true }}
         has_runit: ${{ false }}
         has_latex: ${{ false }}
-        GITHUB_TOKEN: ${{ secrets.PAT_GITHUB }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run_docker: ${{ false }}
         docker_user: bschilder
         docker_org: neurogenomicslab

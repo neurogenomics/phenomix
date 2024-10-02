@@ -1,13 +1,14 @@
 map_xref <- function(dat,
                      prefix="MONDO",
                      new_col=paste0(tolower(prefix),"_id"),
+                     xrefs_col="dbXRefs",
                      verbose=TRUE){
-    dbXRefs <- id <- NULL
+    id <- NULL
     messager("Adding xref column:",new_col,v=verbose)
     dat[grepl(paste0("^",prefix),id),(new_col):=id]
     dat[get(new_col)=="NA",(new_col):=NA]
     if(sum(is.na(unlist(dat[[new_col]])))>0) {
-        dat[is.na(get(new_col)),(new_col):=sapply(dbXRefs,function(x){
+        dat[is.na(get(new_col)),(new_col):=sapply(get(xrefs_col),function(x){
             r <- grep(paste0("^",prefix),unlist(x),value = TRUE)
             if(length(r)==0) NA else unlist(r)
         })]

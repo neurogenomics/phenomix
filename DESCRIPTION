@@ -84,7 +84,8 @@ Suggests:
     arrow,
     ggsankey,
     Hmisc,
-    proxy
+    proxy,
+    rnndescent
 Remotes:
     github::neurogenomics/scNLP,
     github::neurogenomics/scKirby,
@@ -94,6 +95,6 @@ Remotes:
     github::RajLabMSSM/downloadR,
     github::satijalab/seurat-wrappers,
     github::davidsjoberg/ggsankey
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr 
 Config/testthat/edition: 3

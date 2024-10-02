@@ -5,6 +5,8 @@
 #' @param value_threshold Minimum weight to include a term 
 #' (after applying \code{truns_fun}).
 #'  Only used when \code{reduction} is provided.
+#' @param on_offspring Use the function \link[simona]{dag_enrich_on_offsprings}
+#'  (TRUE) or \link[simona]{dag_enrich_on_items} (FALSE).
 #' @export
 #' @examples
 #' ont <- KGExplorer::get_ontology("hp")
@@ -17,6 +19,7 @@ run_dag_enrich <- function(obj,
                            cluster_col = NULL,
                            min_hits = 3, 
                            min_offspring = 100,
+                           min_depth=NULL,
                            trans_fun=NULL,
                            replace_char=list("."=":",
                                              "_"=":"),
@@ -24,8 +27,12 @@ run_dag_enrich <- function(obj,
                            p_threshold=.05,
                            q_threshold=.05,
                            top_n=100,
-                           sort_by= c("log2_fold_enrichment"=-1)
+                           sort_by= c("log2_fold_enrichment"=-1),
+                           on_offspring=TRUE
                            ){
+    if(!is.null(min_depth)){
+        KGExplorer::filter_ontology()
+    }
     
     if(is.null(reduction)){
         if(is.null(cluster_col)){
@@ -40,7 +47,8 @@ run_dag_enrich <- function(obj,
                            replace_char=replace_char,
                            p_threshold=p_threshold,
                            q_threshold=q_threshold,
-                           sort_by=sort_by)
+                           sort_by=sort_by,
+                           on_offspring=on_offspring)
     } else {
         run_dag_enrich_obsm(obj=obj, 
                             ont=ont,
@@ -54,6 +62,7 @@ run_dag_enrich <- function(obj,
                             value_threshold=value_threshold,
                             p_threshold=p_threshold,
                             q_threshold=q_threshold,
-                            sort_by=sort_by)
+                            sort_by=sort_by,
+                            on_offspring=on_offspring)
     }
 }

@@ -40,8 +40,7 @@ plot_feature_density <- function(obj,
                                    ...) 
     ### Add theme ####
     plts <- lapply(plts,function(p){
-        p + theme_nightlight() + 
-            scale_color_nightlight()
+        p + theme_nightlight() 
     })
     if(!is.null(joint_title)){
         plts[[length(plts)]] <- plts[[length(plts)]] + 

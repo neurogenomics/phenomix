@@ -7,7 +7,8 @@ run_dag_enrich_obj <- function(obj,
                                replace_char,
                                p_threshold,
                                q_threshold,
-                               sort_by){
+                               sort_by, 
+                               on_offspring=TRUE){
     messager("Running dag_enrich_on_offsprings.")
     clusters <- sort(unique(obj[[cluster_col]][,1]))
     all_ids <- if(is.null(id_col)) {
@@ -31,11 +32,18 @@ run_dag_enrich_obj <- function(obj,
             warning("Not enough terms found for cluster:",i)
             return(NULL)
         }
-        res <- simona::dag_enrich_on_offsprings(dag = ont, 
-                                                terms = nms,
-                                                min_hits = min_hits,
-                                                min_offspring = min_offspring) |>
-            data.table::data.table(key="term")
+        if(on_offspring){
+            res <- simona::dag_enrich_on_offsprings(dag = ont, 
+                                                    terms = nms,
+                                                    min_hits = min_hits,
+                                                    min_offspring = min_offspring)
+        } else {
+            res <- simona::dag_enrich_on_items(dag = ont, 
+                                               items = nms,
+                                               min_hits = min_hits,
+                                               min_items = min_offspring)
+        }
+        res <- data.table::data.table(res, key="term")
         res <- cbind(group=clusters[i],res)
         res$input_ids <- paste(nms,collapse = ";")
         res$input_names <- paste(KGExplorer::map_ontology_terms(ont = ont, 

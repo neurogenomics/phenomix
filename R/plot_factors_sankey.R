@@ -26,8 +26,8 @@ plot_factors_sankey <- function(factor.traits,
     p_adjust_all <- factor_num <- NULL;
     
     X.traits <- data.table::dcast.data.table(factor.traits,
-                                             formula = factor ~ name, 
-                                             value.var = "p_adjust_all", 
+                                             formula = factor ~ trait_name, 
+                                             value.var = "q", 
                                              fun.aggregate = mean,
                                              fill=1)|> 
         KGExplorer::dt_to_matrix()
@@ -56,7 +56,7 @@ plot_factors_sankey <- function(factor.traits,
             stats::dist()|>
             stats::hclust()
     } 
-    factor.annot <- merge(factor.traits[p_adjust_all<q_threshold,], 
+    factor.annot <- merge(factor.traits[q<q_threshold,], 
                         factor.celltypes[q<q_threshold & mean_q<q_threshold,], 
                         by=c("factor","factor_num"), all.x = TRUE, 
                         allow.cartesian = TRUE) 
@@ -69,7 +69,7 @@ plot_factors_sankey <- function(factor.traits,
                                      is.finite(logFC)]
     }
     dt <- ggsankey::make_long(factor.annot,
-                              cl_name, factor_num, name, 
+                              cl_name, factor_num, trait_name, 
                               value = value_var)
     dt$value <- 1-dt$value 
     lvls <- c(stringr::str_split(hc.factors$labels[hc.factors$order],

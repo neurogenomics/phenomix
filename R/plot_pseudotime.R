@@ -12,9 +12,11 @@
 #' Set to \code{NULL} to include all.
 #' @param map_root_cells Attempt to map root cells onto equivalent IDs
 #'  across different ontologies.
+#' @param return_cds Return the \code{CellDataSet} object.
 #' @inheritParams prepare_hpo
 #' @inheritParams monocle3::learn_graph
 #' @inheritParams monocle3::order_cells
+#' @inheritParams KGExplorer::cache_save
 #' @inheritDotParams monocle3::plot_cells
 #' @export
 #' @examples
@@ -31,6 +33,7 @@ plot_pseudotime <- function(obj,
                                 prune_graph=FALSE,
                                 nn.cores=KGExplorer::set_cores()$workers),
                             use_partition=TRUE,
+                            return_cds=FALSE,
                             merge_trajectories = TRUE,
                             symptom_color="red",
                             bg_colors=c("#5000ff","white"),
@@ -51,6 +54,9 @@ plot_pseudotime <- function(obj,
                                 20*2.5
                             ),
                             show_plot=TRUE,
+                            save_path=NULL,
+                            height=8,
+                            width=9,
                             ...
                             ){
     # obj=readRDS("../thesis/inst/pages/chapter2/data/hpo_ot_integratedV5.rds"); id_col="hp_id";
@@ -80,6 +86,7 @@ plot_pseudotime <- function(obj,
                               map_root_cells=map_root_cells,
                               learn_graph_control = learn_graph_control,
                               use_partition=use_partition,
+                              return_cds=return_cds,
                               color_by_symptoms=color_by_symptoms, 
                               color_cells_by=color_cells_by,
                               point_alpha=point_alpha,
@@ -120,6 +127,7 @@ plot_pseudotime <- function(obj,
                          map_root_cells=map_root_cells,
                          learn_graph_control = learn_graph_control,
                          use_partition=use_partition,
+                         return_cds=return_cds,
                          title = stringr::str_wrap(title,
                                                    width = title_width),
                          subtitle=subtitle,
@@ -139,7 +147,10 @@ plot_pseudotime <- function(obj,
                                    axes = "collect", 
                                    axis_titles = "collect")
         if(isTRUE(show_plot)) methods::show(out[["plot"]] )
-    }
+    } 
+    KGExplorer::plot_save(plt = out[["plot"]],
+                          save_path = save_path,
+                          height = height, width = width) 
     return(out)
     
     # pseudo_dt <- t(cds@principal_graph_aux$UMAP$pr_graph_cell_proj_dist)|>`colnames<-`(c("umap1","umap2"))

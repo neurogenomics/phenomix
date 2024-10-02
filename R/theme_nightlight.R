@@ -3,11 +3,13 @@
 #' \link{ggplot2} theme with dark background and white text.
 #' @param text Text color.
 #' @param background Background color.
+#' @inheritDotParams ggplot2::theme
 #' @returns ggplot2 theme.
 #' @export
 theme_nightlight <- function(text="white",
                              background="black",
-                             color=""){
+                             color="",
+                             ...){
     
     ggplot2::theme(text=ggplot2::element_text(color=text),
                    plot.background = ggplot2::element_rect(fill=background),
@@ -22,5 +24,6 @@ theme_nightlight <- function(text="white",
                    legend.text = ggplot2::element_text(color=text),
                    strip.background = ggplot2::element_rect(fill=background, 
                                                             color = text),
-                   strip.text = ggplot2::element_text(color=text)) 
+                   strip.text = ggplot2::element_text(color=text),
+                   ...) 
 }

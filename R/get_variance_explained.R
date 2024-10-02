@@ -13,8 +13,14 @@ get_variance_explained <- function(obj,
                                    dims=NULL
                                    ){
     dr <- obj[[reduction]] 
-    mat <- Seurat::GetAssayData(obj, layer = layer)
-    total_variance <- sum(matrixStats::rowVars(mat)) 
+    total_variance <- if(!is.null(obj@misc$total_variance[[layer]])){
+        obj@misc$total_variance[[layer]]
+    } else {
+        messager("Computing total variance.")
+        sum(matrixStats::rowVars(
+            Seurat::GetAssayData(obj, layer = layer)
+        )) 
+    } 
     ## EigenValues
     if(length(dr@stdev)==0){
         messager("Computing stdev for reduction.")

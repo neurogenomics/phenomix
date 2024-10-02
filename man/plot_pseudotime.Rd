@@ -15,6 +15,7 @@ plot_pseudotime(
   learn_graph_control = list(prune_graph = FALSE, nn.cores =
     KGExplorer::set_cores()$workers),
   use_partition = TRUE,
+  return_cds = FALSE,
   merge_trajectories = TRUE,
   symptom_color = "red",
   bg_colors = c("#5000ff", "white"),
@@ -34,6 +35,9 @@ plot_pseudotime(
   density_alpha = point_alpha,
   title = stringr::str_wrap(paste0(unique(disease_ids), collapse = "; "), 20 * 2.5),
   show_plot = TRUE,
+  save_path = NULL,
+  height = 8,
+  width = 9,
   ...
 )
 }
@@ -62,6 +66,10 @@ of potential control parameters is provided in details.}
 partitions calculated during \code{cluster_cells} and therefore to learn
 disjoint graph in each partition. When \code{use_partition = FALSE}, a
 single graph is learned across all partitions. Default is TRUE.}
+
+\item{return_cds}{Return the \code{CellDataSet} object.}
+
+\item{save_path}{File name to save to.}
 
 \item{...}{
   Arguments passed on to \code{\link[monocle3:plot_cells]{monocle3::plot_cells}}

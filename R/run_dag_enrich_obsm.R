@@ -10,13 +10,14 @@ run_dag_enrich_obsm <- function(obj,
                                 value_threshold,
                                 p_threshold,
                                 q_threshold,
-                                sort_by){
+                                sort_by,
+                                on_offspring=TRUE){
     
     obsm <- scKirby::get_obsm(obj, keys=reduction, n = 1)
-    ont_prefixes <- unique(stringr::str_split(ont@terms,pattern = ":",
-                                              simplify = TRUE)[,1])
-    obsm <- obsm[grepl(paste(paste0("^",ont_prefixes),collapse = "|"),
-                       rownames(obsm)),]
+    # ont_prefixes <- unique(stringr::str_split(ont@terms,pattern = ":",
+    #                                           simplify = TRUE)[,1])
+    # obsm <- obsm[grepl(paste(paste0("^",ont_prefixes),collapse = "|"),
+    #                    rownames(obsm)),]
     if(!is.null(trans_fun)) obsm <- trans_fun(obsm)
     if(nrow(obsm)==0) stopper("No matching terms found in obsm.")
     id_dict <- if(is.null(id_col)) {
@@ -48,11 +49,18 @@ run_dag_enrich_obsm <- function(obj,
                      v=!BPPARAM$progressbar)
             return(NULL)
         }
-        res <- simona::dag_enrich_on_offsprings(dag = ont, 
-                                                terms = nms,
-                                                min_hits = min_hits,
-                                                min_offspring = min_offspring) |>
-            data.table::data.table(key="term")
+        if(on_offspring){
+            res <- simona::dag_enrich_on_offsprings(dag = ont, 
+                                                    terms = nms,
+                                                    min_hits = min_hits,
+                                                    min_offspring = min_offspring)
+        } else {
+            res <- simona::dag_enrich_on_items(dag = ont, 
+                                               items = nms,
+                                               min_hits = min_hits,
+                                               min_items = min_offspring)
+        }
+        res <- data.table::data.table(res, key="term")
         res <- cbind(group=colnames(obsm)[i],res)
         res$input_ids <- paste(nms,collapse = ";")
         res$input_names <- paste(KGExplorer::map_ontology_terms(ont = ont, 

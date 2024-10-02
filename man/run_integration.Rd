@@ -18,6 +18,9 @@ run_integration(
   orig.reduction = "pca",
   new.reduction = "cca",
   cluster_reduction = "umap",
+  max_mem = 8000 * 1024^2,
+  workers = 1,
+  seed = 2020,
   verbose = TRUE,
   ...
 )
@@ -53,6 +56,14 @@ to get clusters that best reflect UMAP space.
 For this same reason, only cluster in two dimensions,
 because this is the view we most often use.
 That said, this may reduce the generalisability of these clusters/graph.}
+
+\item{max_mem}{Max limit on memory usage, to be passed to environmental
+variable \code{future.globals.maxSize}.}
+
+\item{workers}{Number of workers (threads) to parallelise processes across
+using \pkg{future}.}
+
+\item{seed}{Random seed to set.}
 
 \item{verbose}{Displays a progress bar for scaling procedure}
 

@@ -5,7 +5,7 @@
 \title{Run sparse SVD}
 \usage{
 run_sparsesvd(
-  mat,
+  obj,
   transpose = TRUE,
   add_names = TRUE,
   rank = 0L,
@@ -14,8 +14,6 @@ run_sparsesvd(
 )
 }
 \arguments{
-\item{mat}{Matrix to run sparseSVD on.}
-
 \item{transpose}{Whether to transpose the matrix first.}
 
 \item{add_names}{Add colnames and rownames to embeddings and loadings.}
@@ -27,10 +25,16 @@ run_sparsesvd(
 \item{tol}{exclude singular values whose magnitude is smaller than \code{tol}}
 
 \item{kappa}{accuracy parameter \eqn{\kappa} of the SVD algorithm (with SVDLIBC default)}
+
+\item{mat}{Matrix to run sparseSVD on.}
 }
 \description{
 Run sparse Singular Value Decomposition (sparseSVD).
 }
 \details{
 Uses \link[sparsesvd]{sparsesvd}.
+}
+\examples{
+obj <- get_HPO()[,1:50]
+obj2 <-run_sparsesvd()
 }

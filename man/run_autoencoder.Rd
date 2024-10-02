@@ -22,7 +22,10 @@ run_autoencoder(
   sparse = TRUE,
   variable_importances = TRUE,
   epochs = 10,
+  mini_batch_size = 1,
   seed = 2020,
+  max_mem_size = Sys.getenv("R_MAX_VSIZE"),
+  nthreads = -1,
   verbose = TRUE,
   ...
 )
@@ -57,6 +60,8 @@ before training the autoencoder.}
 networks. Defaults to TRUE.}
 
 \item{epochs}{How many times the dataset should be iterated (streamed), can be fractional. Defaults to 10.}
+
+\item{mini_batch_size}{Mini-batch size (smaller leads to better fit, larger can speed up and generalize better). Defaults to 1.}
 
 \item{seed}{Seed passed to \link[base]{set.seed} 
 for reproducibility between runs.}
@@ -179,7 +184,6 @@ propagation, but might slow down backpropagation. Defaults to FALSE.}
     \item{\code{max_categorical_features}}{Max. number of categorical features, enforced via hashing. #Experimental Defaults to 2147483647.}
     \item{\code{reproducible}}{\code{Logical}. Force reproducibility on small data (will be slow - only uses 1 thread). Defaults to FALSE.}
     \item{\code{export_weights_and_biases}}{\code{Logical}. Whether to export Neural Network weights and biases to H2O Frames. Defaults to FALSE.}
-    \item{\code{mini_batch_size}}{Mini-batch size (smaller leads to better fit, larger can speed up and generalize better). Defaults to 1.}
     \item{\code{categorical_encoding}}{Encoding scheme for categorical features Must be one of: "AUTO", "Enum", "OneHotInternal", "OneHotExplicit",
 "Binary", "Eigen", "LabelEncoder", "SortByResponse", "EnumLimited". Defaults to AUTO.}
     \item{\code{elastic_averaging}}{\code{Logical}. Elastic averaging between compute nodes can improve distributed model convergence.
@@ -215,5 +219,5 @@ Uses \link[h2o]{h2o.deeplearning}.
 }
 \examples{
 obj <- get_HPO()[seq(100),seq(50)] 
-ae_res <- run_autoencoder(obj = obj, color_var = "group_depth3")
+ae_res <- run_autoencoder(obj = obj, color_var = "nFeature_score")
 }

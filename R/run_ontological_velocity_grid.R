@@ -100,7 +100,7 @@ run_ontological_velocity_grid <- function(obj,
         ## Compute euclidean distance
         tmp[,slope:=dy/dx][is.infinite(slope),slope:=NA] 
         tmp[,ont_dist_scaled:=ont_dist/dist_lca.max]
-        tmp[,ont_velocity:=(embed_sim/max(ont_sim,.Machine$double.xmin))-1]
+        tmp[,ont_velocity:=(embed_sim/max(ont_sim,0.001))-1]
         if(nrow(tmp[is.infinite(ont_velocity)])>0){
             messager(nrow(tmp[is.infinite(ont_velocity)]),
                      "infinite values in ont_velocity, setting to NA.")

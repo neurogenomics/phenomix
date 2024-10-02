@@ -6,6 +6,10 @@
 * Remove all ontology-related functions (now within `HPOExplorer`)
 * Explore `bigstatsr`/`bigreadr` a bit.
 
+## Bug fixes
+
+* Fix GH token in rworkflows yml
+
 # phenomix 0.99.5
 
 ## New features

@@ -6,6 +6,7 @@ run_pseudotime <- function(obj,
                            id_col,
                            learn_graph_control,
                            use_partition=TRUE,
+                           return_cds=FALSE,
                            color_cells_by = "is_symptom",
                            title=NULL,
                            subtitle=NULL,
@@ -85,6 +86,8 @@ run_pseudotime <- function(obj,
             }
         )|> unique() 
     } 
+    #### Remove original obj to save memory ####
+    remove(obj)
     #### Choose k ####
     k <- min(ncol(cds[,unique(c(hpo_ids,root_cells))]),
              max(as.integer(cds@colData$seurat_clusters), na.rm = TRUE)
@@ -171,7 +174,7 @@ run_pseudotime <- function(obj,
     ## Increase alpha of graph
     plt$layers[[6]]$aes_params$alpha <- .9
     return(
-        list(data=cds,
+        list(data=if(return_cds) cds,
              plot=plt)
     )
 }

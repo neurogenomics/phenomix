@@ -2,14 +2,23 @@
 % Please edit documentation in R/prepare_opentargets.R
 \name{prepare_opentargets}
 \alias{prepare_opentargets}
-\title{Prepare OpenTargets}
+\title{Prepare Open Targets}
+\source{
+\href{https://genetics-docs.opentargets.org/our-approach/prioritising-causal-genes-at-gwas-loci-l2g}{
+Explanation of L2G methods.}
+
+\href{https://community.opentargets.org/t/accessing-l2g-scores-through-api/218/2}{
+Explanation of each data column.}
+}
 \usage{
 prepare_opentargets(
-  data_type = "associationByOverallDirect",
-  formula = "approvedSymbol ~ diseaseId",
+  data_type = "l2g",
+  formula = "gene_name ~ id",
   nfeatures = NULL,
+  value.var = if (data_type == "l2g") "y_proba_full_model" else "score",
   default_assay = "score",
   vars.to.regress = NULL,
+  fill = 0,
   save_path = NULL,
   force_new = FALSE,
   ...
@@ -53,6 +62,6 @@ variable \code{future.globals.maxSize}.}
   }}
 }
 \description{
-Prepare the OpenTargets gene-by-disease associations as a 
+Prepare the Open Targets gene-by-trait associations as a 
 \link{Seurat} object.
 }
